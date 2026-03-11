@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Terminal Souls</title>
+    <style>
+        body {
+            font-family: 'Courier New', Courier, monospace;
+            background-color: #0c0c0c;
+            color: #dcdcdc;
+            line-height: 1.6;
+            padding: 20px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        h1, h2, h3 {
+            color: #ffb86c;
+        }
+        h1 {
+            text-align: center;
+            border-bottom: 1px solid #ffb86c;
+            padding-bottom: 10px;
+        }
+        a {
+            color: #8be9fd;
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+        .container {
+            background-color: #1e1e1e;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+        }
+        ul {
+            list-style-type: square;
+        }
+        code {
+            background-color: #282a36;
+            padding: 2px 4px;
+            border-radius: 3px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Terminal Souls</h1>
+        <p><strong>Terminal Souls</strong> is a TUI-ARPG (Text User Interface Action RPG) inspired by Dark Souls and Path of Exile. Experience a minimalist terminal interface that serves as a window to deep mathematical and logical systems.</p>
+
+        <h2>Features</h2>
+        <ul>
+            <li><strong>Strategic Synergy (Min-Maxing):</strong> Chain effects, tags, and item triggers for maximum damage.</li>
+            <li><strong>Punishing Combat (Risk vs. Reward):</strong> Deliberate turn-based combat where resource management (Stamina/Mana) is key.</li>
+            <li><strong>Intellect as a Weapon:</strong> Solve logical and mathematical puzzles generated procedurally to progress and unlock high-tier loot.</li>
+            <li><strong>Immersive TUI Aesthetics:</strong> Clean, nostalgic, and highly informative visual hierarchy using Chalk and Blessed.</li>
+        </ul>
+
+        <h2>Gameplay Loop</h2>
+        <p>Explore procedurally generated 2D maps, engage in turn-based combat and puzzle-solving, gather loot, and upgrade your equipment to progress through increasingly difficult levels.</p>
+
+        <h2>Technical Architecture</h2>
+        <ul>
+            <li><strong>Runtime:</strong> Node.js (v18+)</li>
+            <li><strong>Interface:</strong> <code>blessed</code> (Layout and Input), <code>chalk</code> (Colors/Aesthetics)</li>
+            <li><strong>Data Logic:</strong> <code>uuid</code> (Unique item IDs), <code>mathjs</code> (Puzzle Generation)</li>
+        </ul>
+
+        <h2>Status</h2>
+        <p>Currently in <strong>Alpha 0.0.1</strong>. Development is ongoing to implement persistence, character progression, social hubs (Nexus), and complex item synergies.</p>
+
+        <p style="text-align: center; margin-top: 40px;">
+            <a href="https://github.com/yourusername/Terminal-Souls" target="_blank">View on GitHub</a>
+        </p>
+    </div>
+</body>
+</html>

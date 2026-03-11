@@ -1,0 +1,32 @@
+{
+  "name": "terminal-souls",
+  "version": "0.0.1",
+  "description": "TUI-ARPG inspirado em Dark Souls x Path of Exile — The Echoes of Exile",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "nodemon src/index.js",
+    "test": "jest"
+  },
+  "dependencies": {
+    "blessed": "^0.1.81",
+    "chalk": "^4.1.2",
+    "inquirer": "^8.2.4",
+    "mathjs": "^12.4.1",
+    "socket.io": "^4.7.4",
+    "uuid": "^9.0.1"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "nodemon": "^3.0.3"
+  },
+  "keywords": [
+    "tui",
+    "rpg",
+    "souls-like",
+    "terminal",
+    "roguelike"
+  ],
+  "author": "João Pedro Melloni Tardif Germano",
+  "license": "MIT"
+}

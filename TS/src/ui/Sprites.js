@@ -89,7 +89,7 @@ const Sprites = {
     treasure: chalk.yellow('[$]'),
     enemy: chalk.bold.red('!!'),
     boss: chalk.bold.magenta('$$'),
-    door: chalk.bgHex('#A52A2A').white('HH'),
+    door: chalk.bold.white('>>'),
     puzzle: chalk.bold.blue('??'),
     rest: chalk.bold.green('++')
   },

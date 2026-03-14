@@ -1,38 +1,32 @@
 📜 GAME DESIGN DOCUMENT: TERMINAL SOULS
 Subtítulo: The Echoes of Reason
 Gênero: TUI-ARPG (Text User Interface Action RPG) com foco em História da Ciência e Matemática.
-Versão: 0.9.0
+Versão: 0.9.5
 Autor: João Pedro Melloni Tardif Germano
-Tecnologias Core: Node.js, Chalk (Cores), Blessed (Layout TUI), Inquirer (Menus Interativos), Math.js (Geração de Puzzles).
+Tecnologias Core: Node.js, Chalk (Cores), Blessed (Layout TUI), Math.js (Geração de Puzzles).
 
 1. RESUMO EXECUTIVO
-Terminal Souls: The Echoes of Reason é um ARPG baseado em TUI que funde o combate deliberado de Dark Souls com a complexidade de builds de Path of Exile, ambientado em um mundo que é uma manifestação física do conhecimento científico e matemático.
-As Fendas não são apenas masmorras, mas emanações de grandes mentes como Newton, Lovelace, Euler, Turing e Noether. A progressão do jogador não é apenas física, mas uma jornada pelo legado da razão humana.
+Terminal Souls: The Echoes of Reason é um ARPG baseado em TUI ambientado em um mundo que é uma manifestação física do conhecimento científico. As Fendas representam os ecos de grandes mentes da história.
 
 1.1 Pilares de Design
-Ecos da Razão (Narrativa): O mundo reage a conceitos científicos. Itens e biomas são nomeados em homenagem a descobertas e personalidades da ciência.
-Sinergia Estratégica (Min-Maxing): O jogador é recompensado por encadear efeitos baseados em teorias como Termodinâmica e Mecânica Quântica.
-Intelecto como Arma: Desafios lógicos e matemáticos avançados são necessários para acessar os segredos mais profundos do exílio.
-Morte Permanente (Hardcore): A falha é absoluta. Perder em combate deleta a alma (save), exigindo um novo ciclo de aprendizado.
+Ecos da Razão: Narrativa integrada à história da ciência.
+Intelecto como Arma: Puzzles avançados e sistema de skills científicas.
+Progressão Diablo II Style: Árvores de habilidades ramificadas por classe.
+Hardcore: Morte permanente com deleção de save.
 
 2. O MUNDO E O GAMEPLAY LOOP
-O Nexus (Hub de Conhecimento): Área segura onde o jogador medita sobre suas descobertas, distribui pontos na Árvore de Passivas (Legado) e interage com o Ferreiro Halthor.
-As Fendas de Razão: Masmorras geradas proceduralmente com temas científicos (Ex: O Prisma de Newton, O Motor de Turing).
+As Fendas de Razão escalam em tamanho e complexidade conforme o jogador se aprofunda (Andar 1 ao 100).
+- Mapas Dinâmicos: O tamanho do grid aumenta proceduralmente.
+- Inimigos Temáticos: Esqueletos de Gauss, Lobos de Turing, Autômatos de Pascal.
 
-3. MECÂNICAS DE COMBATE
-3.1 Criação de Personagem
-O jogador define sua identidade (Raça/Background) que concede bônus iniciais de atributos e sinergias passivas.
+3. CLASSES E SKILLS (Legado dos Arquitetos)
+Cada classe possui 5 habilidades únicas que escalam com o nível:
+- Guerreiro: Impacto de Newton, Inércia de Galileu, Entropia Cinética, Força Centrípeta, Lei da Inércia.
+- Mago: Raio de Maxwell, Chama de Lavoisier, Zero Absoluto, Paradoxo de Schrödinger, Singularidade de Hawking.
+- Arqueiro: Flecha de Hawking, Diagrama de Feynman, Relatividade de Einstein, Óptica de Euclides, Efeito Doppler.
+- Clérigo: Cura de Hipócrates, Sopro de Gaia, Luz Primordial, Teorema de Pitágoras, Proporção Áurea.
 
-3.2 Árvore de Passivas (O Legado dos Arquitetos)
-Ao subir de nível, o jogador ganha pontos de Skill para investir em teorias:
-- **Cálculo Diferencial:** Aumenta a precisão e a chance de acertos críticos.
-- **Termodinâmica:** Aumenta o dano de Fogo e a eficiência energética (Stamina).
-- **Mecânica Quântica:** Aumenta a probabilidade de esquiva e teletransporte (Evasão).
-- **Entropia:** Aumenta o dano do Vazio e causa debuffs de desordem.
-- **Relatividade:** Aumenta a estabilidade da Postura sob pressão de tempo/espaço.
-
-4. SISTEMA DE LOOT & FLAVOR TEXT
-Itens Raros e Lendários carregam citações e fragmentos de história:
-- **O Suspiro de Hawking:** "Sentir a radiação do vazio emanando desta peça."
-- **A Ruína de Euler:** "Euler encontrou a harmonia nos números que compõem este item."
-- **Vingativo de Newton:** "A força é proporcional à mudança de movimento."
+4. SISTEMA DE ITENS
+Os itens possuem raridades (Comum a Lendário) e atributos randômicos (STR, DEX, INT). Itens raros carregam Flavor Text com citações históricas.
+- Sistema de Tooltip: Hover do mouse no inventário revela detalhes imediatos.
+- Exibição de Equipamento: Painel dedicado para conferência de stats em tempo real.

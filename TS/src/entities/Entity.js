@@ -4,14 +4,12 @@ class Entity {
     this.id = stats.id || uuidv4();
     this.name = name;
     this.race = stats.race || 'Humano';
-    this.background = stats.background || 'Mercenário';
+    this.background = stats.background || 'Guerreiro';
 
-    // Atributos Nucleares
-    this.strength = stats.strength || 10;     // +HP, +Dano Físico, +Stamina
-    this.dexterity = stats.dexterity || 10;   // +Crítico, +Evasão, +Postura
-    this.intelligence = stats.intelligence || 10; // +Mana, +Dano Mágico
+    this.strength = stats.strength || 10;
+    this.dexterity = stats.dexterity || 10;
+    this.intelligence = stats.intelligence || 10;
 
-    // Aplicar Bônus de Raça (apenas na criação)
     if (!stats.id) {
        if (this.race === 'Humano') { this.strength += 2; this.dexterity += 2; this.intelligence += 2; }
        if (this.race === 'Elfo') { this.intelligence += 5; }
@@ -19,13 +17,10 @@ class Entity {
        if (this.race === 'Orc') { this.dexterity += 5; }
     }
 
-    // Stats base calculados
     this.maxHp = stats.maxHp || (100 + (this.strength * 5) + (this.race === 'Anão' ? 20 : 0));
     this.hp = stats.hp || this.maxHp;
-
     this.maxSp = stats.maxSp || (50 + (this.strength * 2) + (this.race === 'Orc' ? 15 : 0));
     this.sp = stats.sp || this.maxSp;
-
     this.maxMp = stats.maxMp || (50 + (this.intelligence * 2) + (this.race === 'Elfo' ? 10 : 0));
     this.mp = stats.mp || this.maxMp;
 
@@ -38,46 +33,62 @@ class Entity {
     this.orbs = stats.orbs || 0;
     this.activeQuest = stats.activeQuest || null;
 
-    // Árvore de Passivas (Nomes científicos)
-    this.passives = stats.passives || {
-      'CALCULO_DIFERENCIAL': 0, // +% Crítico
-      'TERMODINAMICA': 0,        // +% Dano de Fogo
-      'MECANICA_QUANTICA': 0,    // +% Evasão
-      'ENTROPIA': 0,             // +% Dano do Vazio
-      'RELATIVIDADE': 0          // +% Postura Máxima
-    };
+    this.skillTree = stats.skillTree || this.initializeSkillTree();
 
-    // Proficiências (Bônus de % de Dano por Tag)
     this.proficiencies = stats.proficiencies || {
-      'CORTE': 0,
-      'ESMAGAMENTO': 0,
-      'FOGO': 0,
-      'CHOQUE': 0,
-      'VAZIO': 0
+      'CORTE': 0, 'ESMAGAMENTO': 0, 'FOGO': 0, 'CHOQUE': 0, 'VAZIO': 0
     };
 
-    // Sistema de Postura (0-100)
     this.posture = stats.posture || 0;
-    this.maxPosture = stats.maxPosture || (100 + (this.dexterity * 2) + (this.background === 'Ladino' ? 10 : 0));
-    this.postureMode = stats.postureMode || 'BALANCED'; // ATTACK, BALANCED, DEFENCE
+    this.maxPosture = stats.maxPosture || (100 + (this.dexterity * 2) + (this.background === 'Arqueiro' ? 10 : 0));
+    this.postureMode = stats.postureMode || 'BALANCED';
 
-    // Status Elementais / Reações
     this.activeStatuses = [];
-    this.skills = stats.skills || ['Raio Arcano'];
-
-    // Status
     this.isDead = false;
     this.isStaggered = false;
     this.exhaustionPhysical = false; 
     this.exhaustionMagical = false;  
 
-    // Equipamento e Inventário
     this.equipment = {
       ARMA: stats.equipment?.ARMA ? this.rehydrateItem(stats.equipment.ARMA) : null,
       ARMADURA: stats.equipment?.ARMADURA ? this.rehydrateItem(stats.equipment.ARMADURA) : null,
       ACESSÓRIO: stats.equipment?.ACESSÓRIO ? this.rehydrateItem(stats.equipment.ACESSÓRIO) : null
     };
     this.inventory = (stats.inventory || []).map(it => this.rehydrateItem(it));
+  }
+
+  initializeSkillTree() {
+    const trees = {
+      'Guerreiro': {
+        'Impacto de Newton': { lvl: 0, desc: 'Dano físico massivo.', cost: 15 },
+        'Inércia de Galileu': { lvl: 0, desc: 'Aumenta defesa temporariamente.', cost: 10 },
+        'Entropia Cinética': { lvl: 0, desc: 'Dano em área baseado em STR.', cost: 20 },
+        'Força Centrípeta': { lvl: 0, desc: 'Gira a arma atingindo todos.', cost: 25 },
+        'Lei da Inércia': { lvl: 0, desc: 'Torna-se imune a Stagger.', cost: 30 }
+      },
+      'Mago': {
+        'Raio de Maxwell': { lvl: 0, desc: 'Dano de choque preciso.', cost: 20 },
+        'Chama de Lavoisier': { lvl: 0, desc: 'Incendeia o inimigo.', cost: 15 },
+        'Zero Absoluto': { lvl: 0, desc: 'Congela e causa Stagger.', cost: 25 },
+        'Paradoxo de Schrödinger': { lvl: 0, desc: 'Chance de evitar dano ou dobrar dano.', cost: 30 },
+        'Singularidade de Hawking': { lvl: 0, desc: 'Buraco negro que suga HP.', cost: 40 }
+      },
+      'Arqueiro': {
+        'Flecha de Hawking': { lvl: 0, desc: 'Dano crítico garantido.', cost: 15 },
+        'Diagrama de Feynman': { lvl: 0, desc: 'Disparo múltiplo.', cost: 20 },
+        'Relatividade de Einstein': { lvl: 0, desc: 'Aumenta Evasão e Postura.', cost: 15 },
+        'Óptica de Euclides': { lvl: 0, desc: 'Aumenta precisão drasticamente.', cost: 10 },
+        'Efeito Doppler': { lvl: 0, desc: 'Flechas que ganham velocidade/dano.', cost: 25 }
+      },
+      'Clérigo': {
+        'Cura de Hipócrates': { lvl: 0, desc: 'Recupera HP.', cost: 20 },
+        'Sopro de Gaia': { lvl: 0, desc: 'Remove efeitos negativos.', cost: 15 },
+        'Luz Primordial': { lvl: 0, desc: 'Dano mágico e cura leve.', cost: 25 },
+        'Teorema de Pitágoras': { lvl: 0, desc: 'Escudo triangular perfeito.', cost: 30 },
+        'Proporção Áurea': { lvl: 0, desc: 'Harmoniza todos os status.', cost: 35 }
+      }
+    };
+    return trees[this.background] || trees['Guerreiro'];
   }
 
   addExperience(amount) {
@@ -97,19 +108,24 @@ class Entity {
 
   upgradeAttribute(attr) {
     if (this.attributePoints <= 0) return false;
-    if (attr === 'STR') {
-      this.strength++;
-      this.maxHp += 5;
-      this.maxSp += 2;
-    } else if (attr === 'DEX') {
-      this.dexterity++;
-      this.maxPosture += 2;
-    } else if (attr === 'INT') {
-      this.intelligence++;
-      this.maxMp += 2;
-    }
+    if (attr === 'STR') { this.strength++; this.maxHp += 5; this.maxSp += 2; }
+    else if (attr === 'DEX') { this.dexterity++; this.maxPosture += 2; }
+    else if (attr === 'INT') { this.intelligence++; this.maxMp += 2; }
     this.attributePoints--;
     return true;
+  }
+
+  upgradeSkill(skillName) {
+    if (this.skillPoints > 0 && this.skillTree[skillName]) {
+      this.skillTree[skillName].lvl++;
+      this.skillPoints--;
+      return true;
+    }
+    return false;
+  }
+
+  getLearnedSkills() {
+    return Object.keys(this.skillTree).filter(name => this.skillTree[name].lvl > 0);
   }
 
   upgradeProficiency(tag) {
@@ -122,15 +138,6 @@ class Entity {
     return false;
   }
 
-  upgradePassive(skillKey) {
-    if (this.skillPoints > 0 && this.passives[skillKey] !== undefined) {
-      this.passives[skillKey]++;
-      this.skillPoints--;
-      return true;
-    }
-    return false;
-  }
-
   rehydrateItem(itemData) {
     const Item = require('../items/Item');
     return new Item(itemData.floor, null, itemData);
@@ -138,11 +145,8 @@ class Entity {
 
   addStatus(name, duration) {
     const existing = this.activeStatuses.find(s => s.name === name);
-    if (existing) {
-      existing.duration = Math.max(existing.duration, duration);
-    } else {
-      this.activeStatuses.push({ name, duration });
-    }
+    if (existing) existing.duration = Math.max(existing.duration, duration);
+    else this.activeStatuses.push({ name, duration });
   }
 
   processStatuses(combatLog) {
@@ -158,72 +162,37 @@ class Entity {
         this.hp -= dmg;
         if (combatLog) combatLog.push(` > ${this.name} sofreu ${dmg} de Combustão.`);
       }
-
       status.duration--;
       if (status.duration <= 0) {
         if (combatLog) combatLog.push(` > [${status.name}] expirou em ${this.name}.`);
         this.activeStatuses.splice(i, 1);
       }
     }
-    if (this.hp <= 0) {
-      this.hp = 0;
-      this.isDead = true;
-    }
-  }
-
-  hasStatus(name) {
-    return this.activeStatuses.some(s => s.name === name);
-  }
-
-  removeStatus(name) {
-    this.activeStatuses = this.activeStatuses.filter(s => s.name !== name);
+    if (this.hp <= 0) { this.hp = 0; this.isDead = true; }
   }
 
   serialize() {
     return {
-      id: this.id,
-      name: this.name,
-      race: this.race,
-      background: this.background,
-      strength: this.strength,
-      dexterity: this.dexterity,
-      intelligence: this.intelligence,
-      maxHp: this.maxHp,
-      hp: this.hp,
-      maxSp: this.maxSp,
-      sp: this.sp,
-      maxMp: this.maxMp,
-      mp: this.mp,
-      level: this.level,
-      xp: this.xp,
-      orbs: this.orbs,
-      attributePoints: this.attributePoints,
-      proficiencyPoints: this.proficiencyPoints,
-      skillPoints: this.skillPoints,
-      proficiencies: this.proficiencies,
-      passives: this.passives,
-      activeQuest: this.activeQuest,
-      posture: this.posture,
-      maxPosture: this.maxPosture,
-      postureMode: this.postureMode,
-      equipment: this.equipment,
-      inventory: this.inventory
+      id: this.id, name: this.name, race: this.race, background: this.background,
+      strength: this.strength, dexterity: this.dexterity, intelligence: this.intelligence,
+      maxHp: this.maxHp, hp: this.hp, maxSp: this.maxSp, sp: this.sp, maxMp: this.maxMp, mp: this.mp,
+      level: this.level, xp: this.xp, orbs: this.orbs,
+      attributePoints: this.attributePoints, proficiencyPoints: this.proficiencyPoints, skillPoints: this.skillPoints,
+      proficiencies: this.proficiencies, skillTree: this.skillTree,
+      activeQuest: this.activeQuest, posture: this.posture, maxPosture: this.maxPosture,
+      postureMode: this.postureMode, equipment: this.equipment, inventory: this.inventory
     };
   }
 
-  static fromSave(saveData) {
-    return new Entity(saveData.name, saveData);
-  }
+  static fromSave(saveData) { return new Entity(saveData.name, saveData); }
 
   getAttackPower() {
     let power = (this.level * 2) + (this.strength * 1.5);
     if (this.equipment.ARMA) {
       power += this.equipment.ARMA.stats.physicalDamage || 0;
+      if (this.equipment.ARMA.stats.strength) power += this.equipment.ARMA.stats.strength * 2;
     }
-    
-    // Bônus de Background
-    if (this.background === 'Mercenário') power *= 1.1;
-    
+    if (this.background === 'Guerreiro') power *= 1.1;
     return Math.floor(power);
   }
 
@@ -231,95 +200,75 @@ class Entity {
     let def = 0;
     if (this.equipment.ARMADURA) {
       def += this.equipment.ARMADURA.stats.defense || 0;
+      if (this.equipment.ARMADURA.stats.dexterity) def += this.equipment.ARMADURA.stats.dexterity;
     }
     return def;
   }
 
   equipItem(item) {
     if (item.type === 'CONSUMÍVEL') return false;
-
-    // Desequipar anterior se existir
     if (this.equipment[item.type]) {
       const oldItem = this.equipment[item.type];
-      // Remover bônus do item antigo
       if (oldItem.stats.maxHp) this.maxHp -= oldItem.stats.maxHp;
       if (oldItem.stats.maxSp) this.maxSp -= oldItem.stats.maxSp;
       if (oldItem.stats.maxMp) this.maxMp -= oldItem.stats.maxMp;
+      // Remover atributos do item antigo
+      if (oldItem.stats.strength) this.strength -= oldItem.stats.strength;
+      if (oldItem.stats.dexterity) this.dexterity -= oldItem.stats.dexterity;
+      if (oldItem.stats.intelligence) this.intelligence -= oldItem.stats.intelligence;
       this.inventory.push(oldItem);
     }
-
     this.equipment[item.type] = item;
     this.inventory = this.inventory.filter(i => i.id !== item.id);
-
-    // Bônus de Status do item ao equipar
     if (item.stats.maxHp) this.maxHp += item.stats.maxHp;
     if (item.stats.maxSp) this.maxSp += item.stats.maxSp;
     if (item.stats.maxMp) this.maxMp += item.stats.maxMp;
+    // Aplicar atributos do novo item
+    if (item.stats.strength) this.strength += item.stats.strength;
+    if (item.stats.dexterity) this.dexterity += item.stats.dexterity;
+    if (item.stats.intelligence) this.intelligence += item.stats.intelligence;
 
-    // Ajustar HP/SP/MP se necessário (não passar do máximo)
     this.hp = Math.min(this.hp, this.maxHp);
     this.sp = Math.min(this.sp, this.maxSp);
     this.mp = Math.min(this.mp, this.maxMp);
-
     return true;
   }
 
   useConsumable(item) {
     if (item.type !== 'CONSUMÍVEL') return false;
     const val = item.stats.recoverValue || 20;
-
     if (item.name.includes('HP')) this.hp = Math.min(this.maxHp, this.hp + val);
     if (item.name.includes('SP')) this.sp = Math.min(this.maxSp, this.sp + val);
     if (item.name.includes('MP')) this.mp = Math.min(this.maxMp, this.mp + val);
-
     this.inventory = this.inventory.filter(i => i.id !== item.id);
     return true;
   }
 
   takeDamage(amount, type = 'physical') {
     let finalDamage = amount;
-    if (type === 'physical') {
-      finalDamage = Math.max(1, amount - this.getDefense());
-    }
-
-    // Penalidades de exaustão
+    if (type === 'physical') finalDamage = Math.max(1, amount - this.getDefense());
     if (type === 'physical' && this.exhaustionPhysical) finalDamage *= 2;
     if (type === 'magical' && this.exhaustionMagical) finalDamage *= 2;
-
     this.hp -= finalDamage;
-    if (this.hp <= 0) {
-      this.hp = 0;
-      this.isDead = true;
-    }
+    if (this.hp <= 0) { this.hp = 0; this.isDead = true; }
     return finalDamage;
   }
 
   consumeSp(amount) {
     this.sp -= amount;
-    if (this.sp < 0) {
-      this.sp = 0;
-      this.exhaustionPhysical = true;
-    } else {
-      this.exhaustionPhysical = false;
-    }
+    if (this.sp < 0) { this.sp = 0; this.exhaustionPhysical = true; }
+    else this.exhaustionPhysical = false;
   }
 
   consumeMp(amount) {
     this.mp -= amount;
-    if (this.mp < 0) {
-      this.mp = 0;
-      this.exhaustionMagical = true;
-    } else {
-      this.exhaustionMagical = false;
-    }
+    if (this.mp < 0) { this.mp = 0; this.exhaustionMagical = true; }
+    else this.exhaustionMagical = false;
   }
 
   addPostureDamage(amount) {
     this.posture += amount;
-    if (this.posture >= this.maxPosture) {
-      this.posture = this.maxPosture;
-      this.isStaggered = true;
-    }
+    if (this.posture >= this.maxPosture) { this.posture = this.maxPosture; this.isStaggered = true; }
   }
 
   recover(hpPerc = 0.1, spPerc = 0.2, mpPerc = 0.2) {
@@ -327,20 +276,14 @@ class Entity {
     this.hp = Math.min(this.maxHp, this.hp + Math.floor(this.maxHp * hpPerc * bonus));
     this.sp = Math.min(this.maxSp, this.sp + Math.floor(this.maxSp * spPerc * bonus));
     this.mp = Math.min(this.maxMp, this.mp + Math.floor(this.maxMp * mpPerc * bonus));
-
     if (this.sp > 0) this.exhaustionPhysical = false;
     if (this.mp > 0) this.exhaustionMagical = false;
-
     this.posture = Math.max(0, this.posture - 20);
     if (this.posture < this.maxPosture) this.isStaggered = false;
   }
 
   setPostureMode(mode) {
-    const validModes = ['ATTACK', 'BALANCED', 'DEFENCE'];
-    if (validModes.includes(mode)) {
-      this.postureMode = mode;
-    }
+    if (['ATTACK', 'BALANCED', 'DEFENCE'].includes(mode)) this.postureMode = mode;
   }
 }
-
 module.exports = Entity;

@@ -56,8 +56,8 @@ class Dungeon {
 
     this.addRandomObject('TREASURE', 2 + Math.floor(this.floor / 2));
     this.addRandomObject('PUZZLE', 2 + Math.floor(this.floor / 3));
-    this.addRandomObject('REST', 1);
-    this.addRandomObject('ENEMY', 5 + this.floor);
+    this.addRandomObject('REST', 1 + Math.floor(this.floor / 5));
+    this.addRandomObject('ENEMY', 3 + Math.floor(this.floor / 2));
     this.addRandomObject('BOSS', 1);
   }
 
@@ -97,12 +97,12 @@ class Dungeon {
     }
 
     const t = templates[Math.floor(Math.random() * templates.length)];
-    // Multiplicador de Dificuldade
-    const difficultyMult = 1 + (this.floor * 0.2);
+    // Multiplicador de Dificuldade Balanceado
+    const difficultyMult = 1 + (this.floor * 0.1);
     return [new Entity(t.name, {
-      hp: Math.floor((t.hp + (this.floor * 10)) * difficultyMult),
-      sp: Math.floor((t.sp + (this.floor * 10)) * difficultyMult),
-      mp: Math.floor((t.mp + (this.floor * 10)) * difficultyMult),
+      hp: Math.floor((t.hp + (this.floor * 8)) * difficultyMult),
+      sp: Math.floor((t.sp + (this.floor * 8)) * difficultyMult),
+      mp: Math.floor((t.mp + (this.floor * 8)) * difficultyMult),
       level: this.floor
     })];
   }

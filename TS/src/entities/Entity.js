@@ -17,7 +17,7 @@ class Entity {
        if (this.race === 'Orc') { this.dexterity += 5; }
     }
 
-    this.maxHp = stats.maxHp || (100 + (this.strength * 5) + (this.race === 'Anão' ? 20 : 0));
+    this.maxHp = stats.maxHp || (100 + (this.strength * 8) + (this.race === 'Anão' ? 20 : 0));
     this.hp = stats.hp || this.maxHp;
     this.maxSp = stats.maxSp || (50 + (this.strength * 2) + (this.race === 'Orc' ? 15 : 0));
     this.sp = stats.sp || this.maxSp;
@@ -108,7 +108,7 @@ class Entity {
 
   upgradeAttribute(attr) {
     if (this.attributePoints <= 0) return false;
-    if (attr === 'STR') { this.strength++; this.maxHp += 5; this.maxSp += 2; }
+    if (attr === 'STR') { this.strength++; this.maxHp += 8; this.maxSp += 2; }
     else if (attr === 'DEX') { this.dexterity++; this.maxPosture += 2; }
     else if (attr === 'INT') { this.intelligence++; this.maxMp += 2; }
     this.attributePoints--;

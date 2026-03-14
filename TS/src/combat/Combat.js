@@ -20,7 +20,7 @@ class Combat {
     let postureDamage = 10;
 
     if (moveType === 'physical') {
-      baseDamage = Math.max(1, baseDamage - target.getDefense());
+      baseDamage = Math.max(attacker.level, baseDamage - target.getDefense());
     }
 
     if (attacker.postureMode === 'ATTACK') {

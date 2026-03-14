@@ -2,6 +2,20 @@
 
 ---
 
+## [v0.9.7] - O Códice da Existência
+*O conhecimento coletado é a fundação da vitória.*
+
+### 📖 Bestiário Científico
+- **Catálogo de Espécimes:** Novo sistema para rastrear todos os tipos de monstros derrotados. Acesse via tecla `B` ou no menu do Nexus.
+- **Análise Dinâmica:** O Bestiário exibe a quantidade de abates e análises preliminares de cada criatura das fendas.
+- **Lore Expandida:** Pequenas notas sobre o comportamento "matemático" das criaturas encontradas.
+
+### 🛡️ Sinergia de Atributos
+- **Equipamento Inteligente:** Itens agora concedem bônus diretos em STR, DEX e INT.
+- **Cálculo Dinâmico:** Seus atributos totais são recalculados instantaneamente ao equipar ou desequipar itens, afetando seu HP e Dano.
+
+---
+
 ## [v0.9.6] - O Equilíbrio da Razão
 *Ajustes finos para uma jornada justa, mas ainda desafiadora.*
 

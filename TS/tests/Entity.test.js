@@ -4,15 +4,16 @@ describe('Entity Class', () => {
   let player;
 
   beforeEach(() => {
-    // Default: Humano (+2 STR, DEX, INT), Mercenário (+10% Physical Dmg)
+    // Default: Humano (+2 STR, DEX, INT), Guerreiro (+10% Physical Dmg)
     player = new Entity('Test Hero', { strength: 10, dexterity: 10, intelligence: 10 });
   });
 
-  test('should calculate initial stats correctly with Humano race', () => {
+  test('should calculate initial stats correctly with Humano race and v0.9.6 balance', () => {
     expect(player.name).toBe('Test Hero');
     // Humano bonus: STR 12, DEX 12, INT 12
-    expect(player.maxHp).toBe(160); // 100 + (12 * 5)
-    expect(player.hp).toBe(160);
+    // v0.9.6: HP per STR = 8
+    expect(player.maxHp).toBe(196); // 100 + (12 * 8)
+    expect(player.hp).toBe(196);
     expect(player.maxSp).toBe(74);  // 50 + (12 * 2)
     expect(player.maxMp).toBe(74);  // 50 + (12 * 2)
   });
@@ -23,21 +24,22 @@ describe('Entity Class', () => {
     expect(player.level).toBe(2);
     expect(player.attributePoints).toBe(3);
     expect(player.proficiencyPoints).toBe(1);
+    expect(player.skillPoints).toBe(1);
   });
 
   test('should upgrade attributes correctly starting from Humano base', () => {
     player.addExperience(100); // level 2, +3 points
     player.upgradeAttribute('STR');
     expect(player.strength).toBe(13); // 10 base + 2 race + 1 upgrade
-    expect(player.maxHp).toBe(165);
+    expect(player.maxHp).toBe(204); // 196 + 8
     expect(player.maxSp).toBe(76);
     expect(player.attributePoints).toBe(2);
   });
 
   test('should take damage correctly and respect defense', () => {
     player.takeDamage(20);
-    // HP 160 - 20 = 140
-    expect(player.hp).toBe(140);
+    // HP 196 - 20 = 176
+    expect(player.hp).toBe(176);
   });
 
   test('should become exhausted when SP or MP reaches 0', () => {
@@ -51,16 +53,16 @@ describe('Entity Class', () => {
   });
 
   test('should die when HP reaches 0', () => {
-    player.takeDamage(200);
+    player.takeDamage(300);
     expect(player.hp).toBe(0);
     expect(player.isDead).toBe(true);
   });
 
   test('should recover correctly considering Humano max stats', () => {
-    player.takeDamage(50); // 160 - 50 = 110
+    player.takeDamage(50); // 196 - 50 = 146
     player.consumeSp(30);  // 74 - 30 = 44
-    player.recover(0.1, 0.2, 0.2); // +16 HP, +14.8 -> 14 SP
-    expect(player.hp).toBe(126); 
-    expect(player.sp).toBe(58);
+    player.recover(0.1, 0.2, 0.2); // +19.6 HP, +14.8 SP
+    expect(player.hp).toBe(165); // 146 + 19
+    expect(player.sp).toBe(58);  // 44 + 14
   });
 });

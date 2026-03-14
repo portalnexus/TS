@@ -178,6 +178,13 @@ class Combat {
   }
 
   checkVictory() {
+    this.enemies.forEach(e => {
+      if (e.isDead && !e.recorded) {
+        this.player.recordKill(e.name);
+        e.recorded = true; // Evita duplicar abates no mesmo combate
+      }
+    });
+
     if (this.enemies.every(e => e.isDead)) {
       this.isOver = true;
       this.result = 'WIN';

@@ -34,6 +34,7 @@ class Entity {
     this.activeQuest = stats.activeQuest || null;
 
     this.skillTree = stats.skillTree || this.initializeSkillTree();
+    this.bestiary = stats.bestiary || {}; // Registro de monstros derrotados
 
     this.proficiencies = stats.proficiencies || {
       'CORTE': 0, 'ESMAGAMENTO': 0, 'FOGO': 0, 'CHOQUE': 0, 'VAZIO': 0
@@ -124,6 +125,11 @@ class Entity {
     return false;
   }
 
+  recordKill(monsterName) {
+    if (!this.bestiary[monsterName]) this.bestiary[monsterName] = 0;
+    this.bestiary[monsterName]++;
+  }
+
   getLearnedSkills() {
     return Object.keys(this.skillTree).filter(name => this.skillTree[name].lvl > 0);
   }
@@ -178,7 +184,7 @@ class Entity {
       maxHp: this.maxHp, hp: this.hp, maxSp: this.maxSp, sp: this.sp, maxMp: this.maxMp, mp: this.mp,
       level: this.level, xp: this.xp, orbs: this.orbs,
       attributePoints: this.attributePoints, proficiencyPoints: this.proficiencyPoints, skillPoints: this.skillPoints,
-      proficiencies: this.proficiencies, skillTree: this.skillTree,
+      proficiencies: this.proficiencies, skillTree: this.skillTree, bestiary: this.bestiary,
       activeQuest: this.activeQuest, posture: this.posture, maxPosture: this.maxPosture,
       postureMode: this.postureMode, equipment: this.equipment, inventory: this.inventory
     };
@@ -212,7 +218,6 @@ class Entity {
       if (oldItem.stats.maxHp) this.maxHp -= oldItem.stats.maxHp;
       if (oldItem.stats.maxSp) this.maxSp -= oldItem.stats.maxSp;
       if (oldItem.stats.maxMp) this.maxMp -= oldItem.stats.maxMp;
-      // Remover atributos do item antigo
       if (oldItem.stats.strength) this.strength -= oldItem.stats.strength;
       if (oldItem.stats.dexterity) this.dexterity -= oldItem.stats.dexterity;
       if (oldItem.stats.intelligence) this.intelligence -= oldItem.stats.intelligence;
@@ -223,11 +228,9 @@ class Entity {
     if (item.stats.maxHp) this.maxHp += item.stats.maxHp;
     if (item.stats.maxSp) this.maxSp += item.stats.maxSp;
     if (item.stats.maxMp) this.maxMp += item.stats.maxMp;
-    // Aplicar atributos do novo item
     if (item.stats.strength) this.strength += item.stats.strength;
     if (item.stats.dexterity) this.dexterity += item.stats.dexterity;
     if (item.stats.intelligence) this.intelligence += item.stats.intelligence;
-
     this.hp = Math.min(this.hp, this.maxHp);
     this.sp = Math.min(this.sp, this.maxSp);
     this.mp = Math.min(this.mp, this.maxMp);

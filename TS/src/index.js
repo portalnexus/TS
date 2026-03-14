@@ -17,10 +17,7 @@ const screen = blessed.screen({ smartCSR: true, title: 'Terminal Souls - The Ech
 const titleBox = blessed.box({ top: 0, left: 'center', width: '100%', height: 3, content: chalk.bold.red(' TERMINAL SOULS: THE ECHOES OF REASON '), align: 'center', border: { type: 'line', fg: 'red' } });
 const statusBox = blessed.box({ top: 3, left: 0, width: '20%', height: 13, label: ' [ STATUS ] ', border: { type: 'line', fg: 'cyan' } });
 const synergyBox = blessed.box({ top: 16, left: 0, width: '20%', height: 8, label: ' [ SINERGIAS ] ', border: { type: 'line', fg: 'magenta' }, tags: true });
-
-// NOVA: Caixa de Legenda Dinâmica
 const legendBox = blessed.box({ top: 24, left: 0, width: '20%', height: '30%', label: ' [ LEGENDA ] ', border: { type: 'line', fg: 'white' }, tags: true });
-
 const mapBox = blessed.box({ top: 3, left: '20%', width: '60%', height: '65%', label: ' [ MAPA DA FENDA ] ', border: { type: 'line', fg: 'white' }, tags: true, mouse: true });
 const combatVisualBox = blessed.box({ top: 3, left: '20%', width: '60%', height: '65%', label: ' [ COMBATE ] ', border: { type: 'line', fg: 'red' }, hidden: true, tags: true });
 const logBox = blessed.log({ top: '68%', left: '20%', width: '80%', height: '30%', label: ' [ CRÔNICAS ] ', border: { type: 'line', fg: 'yellow' }, scrollable: true, alwaysScroll: true, mouse: true });
@@ -76,17 +73,13 @@ function updateStatus() {
 function updateLegend() {
   let content = '';
   if (gameState === 'EXPLORING' && currentDungeon) {
-    content += `${Sprites.objects.player || chalk.bold.cyan('@ ')} : Voce\n`;
-    content += `${Sprites.objects.enemy} : Inimigo\n`;
-    content += `${Sprites.objects.boss} : Guardiao\n`;
-    content += `${Sprites.objects.treasure} : Tesouro\n`;
-    content += `${Sprites.objects.door} : Escada\n`;
-    content += `${Sprites.objects.puzzle} : Enigma\n`;
-    content += `${Sprites.objects.rest} : Descanso\n`;
+    content += `${Sprites.objects.player || chalk.bold.cyan('@ ')} : Voce\n${Sprites.objects.enemy} : Inimigo\n${Sprites.objects.boss} : Guardiao\n${Sprites.objects.treasure} : Tesouro\n${Sprites.objects.door} : Escada\n${Sprites.objects.puzzle} : Enigma\n${Sprites.objects.rest} : Descanso\n`;
   } else if (gameState === 'COMBAT' && currentCombat) {
     const enemy = currentCombat.enemies[0];
     content += `${chalk.bold.red('ALVO:')}\n${enemy.name}\nLvl: ${enemy.level}\n`;
     if (enemy.isStaggered) content += chalk.bgRed.white(' STAGGER ') + '\n';
+  } else if (gameState === 'BESTIARY') {
+    content += chalk.bold.cyan('ANALISE CIENTIFICA:\n') + chalk.gray('Passe o mouse ou\nfocalize um monstro\npara ver os dados.');
   } else {
     content += chalk.gray('Nenhuma informacao\nno momento.');
   }
@@ -120,6 +113,26 @@ function handleSkillUpgrade(choice) {
   if (skillName && player.upgradeSkill(skillName)) { log(chalk.green(`Up: ${skillName}`)); showPassives(); } else log(chalk.red('Erro no upgrade!'));
 }
 
+function showBestiary() {
+  gameState = 'BESTIARY'; mapBox.hide(); logBox.hide(); inventoryBox.show(); itemDetailBox.show();
+  const known = Object.keys(player.bestiary);
+  const items = known.length > 0 ? known.map(name => `${chalk.red(name)} - Abates: ${player.bestiary[name]}`) : [chalk.gray('Nenhum dado coletado.')];
+  inventoryBox.setItems(items); inventoryBox.setLabel(' [ BESTIARIO CIENTIFICO ] '); inventoryBox.focus();
+  actionMenu.setItems([' [V/ESC] Voltar']);
+  screen.render();
+}
+
+inventoryBox.on('element focus', (el) => {
+  if (gameState === 'BESTIARY') {
+    const i = inventoryBox.getItemIndex(el);
+    const name = Object.keys(player.bestiary)[i];
+    if (name) {
+      itemDetailBox.setContent(`${chalk.bold.red(name)}\n\nDados Coletados: ${player.bestiary[name]} espécimes.\nAnalise: Criatura que habita as fendas de razão.\nFraquezas: Desconhecidas (Em analise).`);
+      screen.render();
+    }
+  }
+});
+
 function showAttributes() {
   gameState = 'ATTRIBUTES'; actionMenu.setItems([` [S] + FORÇA (${player.strength})`, ` [D] + DESTREZA (${player.dexterity})`, ` [I] + INTELIGÊNCIA (${player.intelligence})`, ' [ESC] Voltar']); actionMenu.focus(); updateStatus();
 }
@@ -141,7 +154,7 @@ function handleProficiencyUpgrade(choice) {
 
 function showNexus() {
   gameState = 'NEXUS'; mapBox.setContent('\n\n    ' + chalk.bold.blue('[ O NEXUS ]') + '\n\n  Hub de Conhecimento.\n  Halthor martela ecos de Newton.\n  O Altar de Turing brilha.');
-  actionMenu.setItems([' [1] Entrar na Fenda', ' [2] Halthor (Ferreiro)', ' [3] Altar de Turing', ' [4] Quadro de Missões', ' [I] Inventário', ' [H] Atributos', ' [P] Proficiências', ' [K] Árvore de Skills', ' [ESC] Menu Principal']);
+  actionMenu.setItems([' [1] Entrar na Fenda', ' [2] Halthor (Ferreiro)', ' [3] Altar de Turing', ' [4] Quadro de Missões', ' [I] Inventário', ' [H] Atributos', ' [B] Bestiário', ' [K] Árvore de Skills', ' [ESC] Menu Principal']);
   actionMenu.focus(); updateStatus();
 }
 
@@ -198,19 +211,11 @@ function renderMap() {
 }
 
 function renderCombat() {
-  if (!currentCombat) return; 
-  const enemy = currentCombat.enemies[0]; 
-  const es = Sprites.getEnemySprite(enemy.name); 
-  const ps = Sprites.getPlayerSprite(player.race);
-  let d = '\n'; 
-  es.forEach(l => { d += ' '.repeat(35) + l + '\n'; });
+  if (!currentCombat) return; const enemy = currentCombat.enemies[0]; const es = Sprites.getEnemySprite(enemy.name); const ps = Sprites.getPlayerSprite(player.race);
+  let d = '\n'; es.forEach(l => { d += ' '.repeat(35) + l + '\n'; });
   d += ' '.repeat(33) + chalk.bold.red(enemy.name) + '\n';
-  
-  // FIX: RangeError: Invalid count value
-  const hpP = Math.min(10, Math.max(0, Math.floor(enemy.hp / enemy.maxHp * 10)));
-  const emptyHp = Math.max(0, 10 - hpP);
-  d += ' '.repeat(33) + `HP: [${'#'.repeat(hpP)}${'.'.repeat(emptyHp)}]\n\n` + ' '.repeat(5) + '-'.repeat(50) + '\n\n';
-  
+  const hpP = Math.min(10, Math.max(0, Math.floor(enemy.hp / enemy.maxHp * 10))); const eH = Math.max(0, 10-hpP);
+  d += ' '.repeat(33) + `HP: [${'#'.repeat(hpP)}${'.'.repeat(eH)}]\n\n` + ' '.repeat(5) + '-'.repeat(50) + '\n\n';
   ps.forEach(l => { d += ' '.repeat(5) + l + '\n'; });
   combatVisualBox.setContent(d); updateLegend(); screen.render();
 }
@@ -265,7 +270,7 @@ function startPuzzle(t) {
   });
 }
 
-function startDungeonNav() { actionMenu.setItems([' [W,A,S,D] Mover', ' [I] Inventário', ' [H] Atributos', ' [V/ESC] Fugir']); actionMenu.focus(); renderMap(); }
+function startDungeonNav() { actionMenu.setItems([' [W,A,S,D] Mover', ' [I] Inventário', ' [H] Atributos', ' [B] Bestiário', ' [V/ESC] Fugir']); actionMenu.focus(); renderMap(); }
 
 function startCreation() {
   gameState = 'CREATION_NAME'; interactBox.setLabel(' [ NOME ] '); interactBox.show(); inputField.focus(); inputField.setValue(''); screen.render();
@@ -288,6 +293,7 @@ screen.key(['i'], () => { if (gameState === 'EXPLORING') showInventory(); if (ga
 screen.key(['h'], () => { if (gameState === 'EXPLORING' || gameState === 'MENU' || gameState === 'NEXUS') showAttributes(); });
 screen.key(['k'], () => { if (gameState === 'EXPLORING' || gameState === 'MENU' || gameState === 'NEXUS') showPassives(); });
 screen.key(['p'], () => { if (gameState === 'EXPLORING' || gameState === 'MENU' || gameState === 'NEXUS') showProficiencies(); });
+screen.key(['b'], () => { if (gameState === 'EXPLORING' || gameState === 'MENU' || gameState === 'NEXUS') showBestiary(); });
 screen.key(['q'], () => { if (actionMenu.focused) actionMenu.up(1); if (inventoryBox.focused) inventoryBox.up(1); screen.render(); });
 screen.key(['e'], () => { if (actionMenu.focused) actionMenu.down(1); if (inventoryBox.focused) inventoryBox.down(1); screen.render(); });
 screen.key(['f', 'space'], () => { if (actionMenu.focused) actionMenu.emit('select', actionMenu.getItem(actionMenu.selected), actionMenu.selected); else if (inventoryBox.focused) inventoryBox.emit('select', inventoryBox.getItem(inventoryBox.selected), inventoryBox.selected); });
@@ -295,7 +301,7 @@ screen.key(['f', 'space'], () => { if (actionMenu.focused) actionMenu.emit('sele
 actionMenu.on('select', (item, index) => {
   const c = item.getText().trim();
   if (gameState === 'MENU') { if (c.includes('Novo Jogo')) startCreation(); if (c.includes('Carregar')) loadGame(); if (c.includes('Sair')) process.exit(0); }
-  else if (gameState === 'NEXUS') { if (c.includes('Entrar')) startDungeon(); if (c.includes('Halthor')) showBlacksmith(); if (c.includes('Altar')) showAltar(); if (c.includes('Missões')) showQuests(); if (c.includes('Inventário')) showInventory(); if (c.includes('Atributos')) showAttributes(); if (c.includes('Proficiências')) showProficiencies(); if (c.includes('Skills')) showPassives(); if (c.includes('Menu Principal')) { gameState = 'MENU'; actionMenu.setItems([' [1] Novo Jogo', ' [2] Carregar Jogo', ' [ESC] Sair']); } }
+  else if (gameState === 'NEXUS') { if (c.includes('Entrar')) startDungeon(); if (c.includes('Halthor')) showBlacksmith(); if (c.includes('Altar')) showAltar(); if (c.includes('Missões')) showQuests(); if (c.includes('Inventário')) showInventory(); if (c.includes('Atributos')) showAttributes(); if (c.includes('Proficiências')) showProficiencies(); if (c.includes('Bestiário')) showBestiary(); if (c.includes('Skills')) showPassives(); if (c.includes('Menu Principal')) { gameState = 'MENU'; actionMenu.setItems([' [1] Novo Jogo', ' [2] Carregar Jogo', ' [ESC] Sair']); } }
   else if (gameState === 'COMBAT') handleCombatAction(c);
   else if (gameState === 'COMBAT_SKILLS') { if (c.includes('Voltar')) { gameState = 'COMBAT'; actionMenu.setItems([' [A] ATACAR', ' [S] SKILLS', ' [R] RECUPERAR', ' [P] POSTURA']); } else processCombatTurn(c); }
   else if (gameState === 'ATTRIBUTES') handleAttributeUpgrade(c);
@@ -303,15 +309,16 @@ actionMenu.on('select', (item, index) => {
   else if (gameState === 'SKILL_TREE') handleSkillUpgrade(c);
   else if (gameState === 'ALTAR') handleAltar(c, index);
   else if (gameState === 'QUESTS') handleQuests(c, index);
-  else if (gameState === 'TRADE_BUY' || gameState === 'TRADE_SELL') handleTrade(c, index);
+  else if (gameState === 'TRADE_BUY' || gameState === 'TRADE_SELL') handleTrade(choice, index);
 });
 
 screen.key(['escape', 'v'], () => {
   if (gameState === 'MENU') process.exit(0);
-  if (gameState === 'INVENTORY' || gameState === 'ATTRIBUTES' || gameState === 'PROFICIENCIES' || gameState === 'SKILL_TREE' || gameState === 'TRADE_BUY' || gameState === 'TRADE_SELL' || gameState === 'ALTAR' || gameState === 'QUESTS' || gameState === 'COMBAT_SKILLS') {
+  if (gameState === 'INVENTORY' || gameState === 'ATTRIBUTES' || gameState === 'PROFICIENCIES' || gameState === 'SKILL_TREE' || gameState === 'BESTIARY' || gameState === 'TRADE_BUY' || gameState === 'TRADE_SELL' || gameState === 'ALTAR' || gameState === 'QUESTS' || gameState === 'COMBAT_SKILLS') {
     inventoryBox.hide(); itemDetailBox.hide(); mapBox.show(); logBox.show();
     if (currentDungeon) { if (gameState === 'COMBAT_SKILLS') { gameState = 'COMBAT'; actionMenu.setItems([' [A] ATACAR', ' [S] SKILLS', ' [R] RECUPERAR', ' [P] POSTURA']); return; } gameState = 'EXPLORING'; startDungeonNav(); }
     else showNexus();
+    inventoryBox.setLabel(' [ INVENTÁRIO ] ');
     return;
   }
   if (gameState === 'EXPLORING' || gameState === 'COMBAT') { saveGame(); currentDungeon = null; showNexus(); }

@@ -53,8 +53,13 @@ class Combat {
       });
 
       // Bônus para Magia baseado em INT/VAZIO
-      if (moveType === 'magical' && attacker.proficiencies['VAZIO']) {
-        tagBonus += (attacker.proficiencies['VAZIO'] * 0.05);
+      if (moveType === 'magical') {
+        if (attacker.proficiencies['VAZIO']) {
+          tagBonus += (attacker.proficiencies['VAZIO'] * 0.05);
+        }
+        if (attacker.background === 'Erudito') {
+          tagBonus *= 1.1;
+        }
       }
 
       baseDamage *= tagBonus;

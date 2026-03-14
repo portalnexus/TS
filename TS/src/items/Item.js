@@ -13,6 +13,7 @@ class Item {
       this.stats = data.stats;
       this.tags = data.tags;
       this.uniques = data.uniques || [];
+      this.flavorText = data.flavorText || "";
     } else {
       // Geração de novo item
       this.id = uuidv4();
@@ -23,6 +24,7 @@ class Item {
       this.stats = this.generateStats();
       this.tags = this.generateTags();
       this.uniques = [];
+      this.flavorText = this.generateFlavorText();
 
       if (this.rarity === 'LENDÁRIO') {
         this.generateUniqueEffect();
@@ -47,8 +49,8 @@ class Item {
     const prefixes = {
       COMUM: ['Velho', 'Enferrujado', 'Simples', 'Gasto'],
       MÁGICO: ['Brilhante', 'Agudo', 'Firme', 'Abençoado'],
-      RARO: ['Ancestral', 'Vingativo', 'Sombrio', 'Eterno'],
-      LENDÁRIO: ['O Eco de', 'A Ruína de', 'O Suspiro de', 'O Legado de']
+      RARO: ['Ancestral de Gauss', 'Vingativo de Newton', 'Sombrio de Turing', 'Eterno de Noether'],
+      LENDÁRIO: ['O Eco de Lovelace', 'A Ruína de Euler', 'O Suspiro de Hawking', 'O Legado de Pascal']
     };
 
     const bases = {
@@ -62,6 +64,22 @@ class Item {
     const base = bases[this.type][Math.floor(Math.random() * bases[this.type].length)];
 
     return `${prefix} ${base}`;
+  }
+
+  generateFlavorText() {
+    if (this.rarity === 'COMUM' || this.rarity === 'MÁGICO') return "";
+    
+    const lores = [
+      "Newton previu que a força é proporcional à mudança de movimento.",
+      "Lovelace viu poesia nos algoritmos desta relíquia.",
+      "Euler encontrou a harmonia nos números que compõem este item.",
+      "O crivo de Eratóstenes purifica a alma do portador.",
+      "Noether provou que a simetria gera leis de conservação eternas.",
+      "Gauss, o Príncipe, calculou a trajetória desta arma com perfeição.",
+      "Turing decifrou os segredos ocultos na fenda para forjar isto.",
+      "Hawking sentiu a radiação do vazio emanando desta peça."
+    ];
+    return lores[Math.floor(Math.random() * lores.length)];
   }
 
   generateStats() {
@@ -128,18 +146,17 @@ class Item {
   }
 
   getDetails() {
-    let details = `[${this.rarity}] ${this.name}
-`;
-    details += `Tipo: ${this.type}
-`;
+    let details = `[${this.rarity}] ${this.name}\n`;
+    details += `Tipo: ${this.type}\n`;
     for (const [stat, value] of Object.entries(this.stats)) {
-      details += `  + ${value} ${stat}
-`;
+      details += `  + ${value} ${stat}\n`;
     }
-    if (this.tags.length > 0) details += `Tags: <${this.tags.join('> <')}>
-`;
+    if (this.tags.length > 0) details += `Tags: <${this.tags.join('> <')}> \n`;
     if (this.uniques.length > 0) {
-      details += chalk.magenta(`Único: "${this.uniques[0]}"`);
+      details += chalk.magenta(`Único: "${this.uniques[0]}"\n`);
+    }
+    if (this.flavorText) {
+      details += chalk.gray.italic(`\n"${this.flavorText}"`);
     }
     return details;
   }

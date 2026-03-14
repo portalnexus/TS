@@ -3,20 +3,30 @@ class Entity {
   constructor(name, stats = {}) {
     this.id = stats.id || uuidv4();
     this.name = name;
+    this.race = stats.race || 'Humano';
+    this.background = stats.background || 'Mercenário';
 
     // Atributos Nucleares
     this.strength = stats.strength || 10;     // +HP, +Dano Físico, +Stamina
     this.dexterity = stats.dexterity || 10;   // +Crítico, +Evasão, +Postura
     this.intelligence = stats.intelligence || 10; // +Mana, +Dano Mágico
 
+    // Aplicar Bônus de Raça (apenas na criação)
+    if (!stats.id) {
+       if (this.race === 'Humano') { this.strength += 2; this.dexterity += 2; this.intelligence += 2; }
+       if (this.race === 'Elfo') { this.intelligence += 5; }
+       if (this.race === 'Anão') { this.strength += 5; }
+       if (this.race === 'Orc') { this.dexterity += 5; }
+    }
+
     // Stats base calculados
-    this.maxHp = stats.maxHp || (100 + (this.strength * 5));
+    this.maxHp = stats.maxHp || (100 + (this.strength * 5) + (this.race === 'Anão' ? 20 : 0));
     this.hp = stats.hp || this.maxHp;
 
-    this.maxSp = stats.maxSp || (50 + (this.strength * 2));
+    this.maxSp = stats.maxSp || (50 + (this.strength * 2) + (this.race === 'Orc' ? 15 : 0));
     this.sp = stats.sp || this.maxSp;
 
-    this.maxMp = stats.maxMp || (50 + (this.intelligence * 2));
+    this.maxMp = stats.maxMp || (50 + (this.intelligence * 2) + (this.race === 'Elfo' ? 10 : 0));
     this.mp = stats.mp || this.maxMp;
 
     this.level = stats.level || 1;
@@ -24,8 +34,18 @@ class Entity {
     this.xpToNextLevel = this.level * 100;
     this.attributePoints = stats.attributePoints || 0;
     this.proficiencyPoints = stats.proficiencyPoints || 0;
+    this.skillPoints = stats.skillPoints || 0;
     this.orbs = stats.orbs || 0;
     this.activeQuest = stats.activeQuest || null;
+
+    // Árvore de Passivas (Nomes científicos)
+    this.passives = stats.passives || {
+      'CALCULO_DIFERENCIAL': 0, // +% Crítico
+      'TERMODINAMICA': 0,        // +% Dano de Fogo
+      'MECANICA_QUANTICA': 0,    // +% Evasão
+      'ENTROPIA': 0,             // +% Dano do Vazio
+      'RELATIVIDADE': 0          // +% Postura Máxima
+    };
 
     // Proficiências (Bônus de % de Dano por Tag)
     this.proficiencies = stats.proficiencies || {
@@ -38,7 +58,7 @@ class Entity {
 
     // Sistema de Postura (0-100)
     this.posture = stats.posture || 0;
-    this.maxPosture = stats.maxPosture || (100 + (this.dexterity * 2));
+    this.maxPosture = stats.maxPosture || (100 + (this.dexterity * 2) + (this.background === 'Ladino' ? 10 : 0));
     this.postureMode = stats.postureMode || 'BALANCED'; // ATTACK, BALANCED, DEFENCE
 
     // Status Elementais / Reações
@@ -69,6 +89,7 @@ class Entity {
       this.xpToNextLevel = this.level * 100;
       this.attributePoints += 3;
       this.proficiencyPoints += 1;
+      this.skillPoints += 1;
       leveledUp = true;
     }
     return leveledUp;
@@ -96,6 +117,15 @@ class Entity {
     if (this.proficiencies[tag] !== undefined) {
       this.proficiencies[tag]++;
       this.proficiencyPoints--;
+      return true;
+    }
+    return false;
+  }
+
+  upgradePassive(skillKey) {
+    if (this.skillPoints > 0 && this.passives[skillKey] !== undefined) {
+      this.passives[skillKey]++;
+      this.skillPoints--;
       return true;
     }
     return false;
@@ -153,6 +183,8 @@ class Entity {
     return {
       id: this.id,
       name: this.name,
+      race: this.race,
+      background: this.background,
       strength: this.strength,
       dexterity: this.dexterity,
       intelligence: this.intelligence,
@@ -167,8 +199,9 @@ class Entity {
       orbs: this.orbs,
       attributePoints: this.attributePoints,
       proficiencyPoints: this.proficiencyPoints,
+      skillPoints: this.skillPoints,
       proficiencies: this.proficiencies,
-      orbs: this.orbs,
+      passives: this.passives,
       activeQuest: this.activeQuest,
       posture: this.posture,
       maxPosture: this.maxPosture,
@@ -187,6 +220,10 @@ class Entity {
     if (this.equipment.ARMA) {
       power += this.equipment.ARMA.stats.physicalDamage || 0;
     }
+    
+    // Bônus de Background
+    if (this.background === 'Mercenário') power *= 1.1;
+    
     return Math.floor(power);
   }
 
@@ -286,9 +323,10 @@ class Entity {
   }
 
   recover(hpPerc = 0.1, spPerc = 0.2, mpPerc = 0.2) {
-    this.hp = Math.min(this.maxHp, this.hp + Math.floor(this.maxHp * hpPerc));
-    this.sp = Math.min(this.maxSp, this.sp + Math.floor(this.maxSp * spPerc));
-    this.mp = Math.min(this.maxMp, this.mp + Math.floor(this.maxMp * mpPerc));
+    let bonus = this.background === 'Clérigo' ? 1.1 : 1.0;
+    this.hp = Math.min(this.maxHp, this.hp + Math.floor(this.maxHp * hpPerc * bonus));
+    this.sp = Math.min(this.maxSp, this.sp + Math.floor(this.maxSp * spPerc * bonus));
+    this.mp = Math.min(this.maxMp, this.mp + Math.floor(this.maxMp * mpPerc * bonus));
 
     if (this.sp > 0) this.exhaustionPhysical = false;
     if (this.mp > 0) this.exhaustionMagical = false;

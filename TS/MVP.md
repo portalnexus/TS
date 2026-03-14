@@ -1,44 +1,38 @@
 # MVP - TERMINAL SOULS
-**Versão:** 0.8.0
-**Status:** **COMPLETO** (Fase Single Player)
+**Versão:** 0.9.0
+**Status:** **POLIMENTO CIENTÍFICO** (Fase Single Player Avançada)
 
 ---
 
 ## 1. OBJETIVO ALCANÇADO
-O protótipo validou todos os pilares centrais e expandiu para sistemas de RPG profundos:
-- [x] Combate turn-based punitivo (Stagger/Postura)
-- [x] Sinergia de Tags e Status Elementais
-- [x] Geração procedural de Fendas com Biomas
-- [x] Economia no Nexus (NPCs e Altar)
-- [x] Sistema de Persistência (Save/Load)
-- [x] Quadro de Missões Procedurais
+O protótipo evoluiu para um simulador de combate e intelecto:
+- [x] Combate turn-based (Ecos da Razão)
+- [x] Árvore de Passivas (Legado dos Arquitetos)
+- [x] Lore e Flavor Text em itens (História da Ciência)
+- [x] Biomas Temáticos (Newton, Hawking, Turing, Noether)
+- [x] Puzzles com contexto histórico (Euler, Lovelace)
+- [x] Morte Permanente (Hardcore)
 
 ---
 
-## 2. ESTRUTURA DE DIRETÓRIOS ATUAL
+## 2. NOVO ROADMAP (Foco Single-Player)
 
-```
-src/
-├── core/
-│   ├── Dungeon.js     # Mapas 2D e Biomas
-│   ├── Puzzle.js      # Desafios Matemáticos
-│   ├── QuestBoard.js  # Missões Procedurais
-│   └── SaveSystem.js  # Persistência JSON
-├── combat/
-│   └── Combat.js      # Motor de Reações Elementais
-├── entities/
-│   └── Entity.js      # Atributos, Proficiências e Status
-├── items/
-│   ├── Item.js        # Gerador de Loot
-│   ├── Blacksmith.js  # NPC de Comércio
-│   └── CraftingAltar.js # Modificação de Itens
-└── ui/
-    └── Sprites.js     # Arte ASCII
-```
+### Fase 1: Profundidade e Progressão (v0.9.0)
+- [ ] **Árvore de Habilidades (Passive Tree):** Sistema de especialização de pontos.
+- [ ] **Expansão de Biomas:** Novos tiles de armadilhas e obstáculos ambientais.
+- [ ] **Sistema de Bestiário:** Registro de fraquezas e drops de inimigos derrotados.
 
----
+### Fase 2: Conteúdo Final e Balanceamento (v0.9.5)
+- [ ] **Modo Boss Rush:** Desafio de sobrevivência pós-jogo.
+- [ ] **Lore & Crônicas:** Itens de leitura que contam a história do Exílio.
+- [ ] **Maestria de Crafting:** Níveis para o Altar de Transmutação.
 
-## 3. PRÓXIMOS PASSOS (FUTURO)
-- [ ] v0.9.0 - Multiplayer (Socket.io)
-- [ ] v1.0.0 - Integração MariaDB/Firestore para Ranking Global
-- [ ] v1.1.0 - Sons e Músicas CLI
+### Fase 3: Lançamento Single-Player (v1.0.0)
+- [ ] Balanceamento final da curva de dificuldade até o Andar 100.
+- [ ] Boss Final: "O Arquiteto do Exílio".
+- [ ] Créditos e Finalização do Jogo.
+
+### Fase 4: Pós-Lançamento (v1.1.0+)
+- [ ] **Multiplayer (Nexus Online):** Hub compartilhado via Socket.io.
+- [ ] **Mercado Global:** Sistema de Trade entre jogadores.
+- [ ] **Espectros Assíncronos:** Visualizar a morte de outros jogadores no mapa.

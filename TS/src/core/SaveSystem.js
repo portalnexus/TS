@@ -39,6 +39,19 @@ class SaveSystem {
   hasSave() {
     return fs.existsSync(this.saveFile);
   }
+
+  deleteSave() {
+    try {
+      if (this.hasSave()) {
+        fs.unlinkSync(this.saveFile);
+        return true;
+      }
+      return false;
+    } catch (err) {
+      console.error('Erro ao deletar save:', err);
+      return false;
+    }
+  }
 }
 
 module.exports = new SaveSystem();

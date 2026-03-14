@@ -3,9 +3,13 @@ const chalk = require('chalk');
 
 class Puzzle {
   constructor(type, floor) {
-    this.type = type; // MATH, EQUATION, RIDDLE, MINESWEEPER
     this.floor = floor;
     this.difficulty = Math.min(10, Math.floor(floor / 2) + 1);
+    
+    // Pick random type for variety if not specifically requested
+    const types = ['MATH', 'EQUATION', 'RIDDLE'];
+    this.type = type || types[Math.floor(Math.random() * types.length)];
+    
     this.isSolved = false;
     this.question = '';
     this.answer = null;
@@ -44,7 +48,7 @@ class Puzzle {
       expr += i === numCount - 1 ? num : `${num} ${op} `;
     }
 
-    this.question = `Resolva a expressão: ${expr}`;
+    this.question = `Euler exige que voce resolva: ${expr}`;
     this.answer = math.evaluate(expr).toString();
   }
 
@@ -55,21 +59,26 @@ class Puzzle {
     const b = Math.floor(Math.random() * 20);
     const c = a * x + b;
 
-    this.question = `Encontre o valor de X em: ${a}x + ${b} = ${c}`;
+    this.question = `Lovelace preve que o valor de X em "${a}x + ${b} = ${c}" e:`;
     this.answer = x.toString();
   }
 
   generateRiddle() {
     const riddles = [
       { q: "O que é que quanto mais se tira, maior fica?", a: "buraco" },
-      { q: "O que tem cidades, mas não casas; montanhas, mas não árvores; e água, mas não peixes?", a: "mapa" },
-      { q: "O que é que corre, mas não tem pernas; tem boca, mas não fala; tem leito, mas não dorme?", a: "rio" },
-      { q: "O que é que se quebra quando se diz o seu nome?", a: "silencio" }
+      { q: "O que é que quanto mais seca, mais molhada fica?", a: "toalha" },
+      { q: "O que é que cai em pé e corre deitado?", a: "chuva" },
+      { q: "Um terreno retangular tem 40m de perimetro. O comprimento e o triplo da largura. Qual a largura em metros?", a: "5" },
+      { q: "Pedro tem o triplo da idade de Lucas. Em 10 anos a soma das idades sera 60. Qual a idade atual de Lucas?", a: "10" },
+      { q: "Qual a probabilidade em porcentagem (apenas numero) de acertar uma questao de 4 alternativas apenas chutando?", a: "25" },
+      { q: "Um item de 100 reais sofre 20% de desconto e depois 20% de aumento. Qual o preco final em reais?", a: "96" },
+      { q: "Se 3 pintores pintam 3 casas em 3 dias, quantos dias 1 pintor leva para pintar 1 casa?", a: "3" },
+      { q: "Em uma gaveta ha 6 meias pretas e 6 meias brancas. Qual o numero minimo de meias a retirar para garantir um par da mesma cor?", a: "3" }
     ];
     const picked = riddles[Math.floor(Math.random() * riddles.length)];
     this.question = picked.q;
     this.answer = picked.a;
-    this.hint = "Dica: Responda com uma única palavra em minúsculo.";
+    this.hint = "Dica: Responda com uma única palavra ou número inteiro.";
   }
 
   generateMinesweeper() {

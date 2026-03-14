@@ -26,66 +26,72 @@ const titleBox = blessed.box({
 });
 
 const statusBox = blessed.box({
-  top: 3, left: 0, width: '25%', height: 12,
+  top: 3, left: 0, width: '25%', height: 11,
   label: ' [ STATUS ] ', border: { type: 'line', fg: 'cyan' }
 });
 
+const synergyBox = blessed.box({
+  top: 14, left: 0, width: '25%', height: 5,
+  label: ' [ SINERGIAS ] ', border: { type: 'line', fg: 'magenta' },
+  tags: true
+});
+
 const mapBox = blessed.box({
-  top: 3, left: '25%', width: '50%', height: 15,
+  top: 3, left: '25%', width: '50%', height: 16,
   label: ' [ MAPA DA FENDA ] ', border: { type: 'line', fg: 'white' },
   tags: true
 });
 
 const combatVisualBox = blessed.box({
-  top: 3, left: '25%', width: '50%', height: 15,
+  top: 3, left: '25%', width: '50%', height: 16,
   label: ' [ COMBATE ] ', border: { type: 'line', fg: 'red' },
   hidden: true, tags: true
 });
 
 const logBox = blessed.log({
-  top: 18, left: '25%', width: '75%', height: 10,
+  top: 19, left: '25%', width: '75%', height: 10,
   label: ' [ CRÔNICAS ] ', border: { type: 'line', fg: 'yellow' },
   scrollable: true, alwaysScroll: true, mouse: true
 });
 
 const actionMenu = blessed.list({
-  top: 15, left: 0, width: '25%', height: 13,
+  top: 19, left: 0, width: '25%', height: 10,
   label: ' [ AÇÕES ] ', border: { type: 'line', fg: 'green' },
   keys: true, vi: true, style: { selected: { bg: 'red', bold: true } }
 });
 
 const interactBox = blessed.box({
-  top: 10, left: '30%', width: '40%', height: 5,
+  top: 10, left: '30%', width: '40%', height: 7,
   label: ' [ INTERAÇÃO ] ', border: { type: 'line', fg: 'white' },
-  hidden: true
+  hidden: true, tags: true
 });
 
 const inputField = blessed.textbox({
-  parent: interactBox, top: 1, left: 2, width: '90%', height: 1,
+  parent: interactBox, top: 4, left: 2, width: '90%', height: 1,
   inputOnFocus: true, style: { bg: 'blue' }
 });
 
 const inventoryBox = blessed.list({
-  top: 3, left: '25%', width: '50%', height: 15,
+  top: 3, left: '25%', width: '50%', height: 16,
   label: ' [ INVENTÁRIO ] ', border: { type: 'line', fg: 'cyan' },
   keys: true, vi: true, style: { selected: { bg: 'blue', bold: true } },
   hidden: true
 });
 
 const itemDetailBox = blessed.box({
-  top: 18, left: 0, width: '25%', height: 10,
+  top: 19, left: '75%', width: '25%', height: 10,
   label: ' [ DETALHES ] ', border: { type: 'line', fg: 'yellow' },
-  tags: true
+  tags: true, hidden: true
 });
 
 const equipVisualBox = blessed.box({
-  top: 3, left: '75%', width: '25%', height: 15,
+  top: 3, left: '75%', width: '25%', height: 16,
   label: ' [ EQUIPADO ] ', border: { type: 'line', fg: 'magenta' },
   tags: true
 });
 
 // --- ESTADO DO JOGO ---
-let player = new Entity('Exilado', { hp: 150, sp: 100, mp: 100 });
+let player = null;
 let currentBlacksmith = new Blacksmith(1);
 let currentAltar = new CraftingAltar();
 let questBoard = new QuestBoard();
@@ -112,9 +118,11 @@ function loadGame() {
 
 // --- RENDERIZAÇÃO ---
 function updateStatus() {
+  if (!player) return;
   const hpColor = player.hp < player.maxHp * 0.3 ? chalk.red : chalk.green;
   statusBox.setContent(`
   ${chalk.bold.cyan(player.name)}
+  ${chalk.gray(player.race + ' | ' + player.background)}
   LVL: ${player.level} | XP: ${player.xp}/${player.level * 100}
 
   HP: ${hpColor(player.hp + '/' + player.maxHp)}
@@ -124,12 +132,17 @@ function updateStatus() {
   STR: ${player.strength} | DEX: ${player.dexterity} | INT: ${player.intelligence}
   PONTOS: ${chalk.bold.green(player.attributePoints)}
   ORBES: ${chalk.yellow(player.orbs)}
-
-  POSTURA: ${player.postureMode}
-  S-BAR: [${'#'.repeat(Math.min(10, Math.floor(player.posture / 10)))}${'.'.repeat(Math.max(0, 10 - Math.floor(player.posture / 10)))}]
-
-  ${player.isStaggered ? chalk.bgRed(' ATORDOADO ') : ''}
+  SKILLS: ${chalk.bold.magenta(player.skillPoints)}
   `);
+
+  // Sinergias e Passivas
+  let synergyContent = '';
+  if (player.background === 'Mercenário') synergyContent += chalk.red('• +10% Dano Físico\n');
+  if (player.background === 'Erudito') synergyContent += chalk.blue('• +10% Dano Mágico\n');
+  if (player.background === 'Ladino') synergyContent += chalk.yellow('• +10 Postura Máxima\n');
+  if (player.background === 'Clérigo') synergyContent += chalk.green('• +10% Recuperação\n');
+  
+  synergyBox.setContent(synergyContent);
 
   // Render Visual Equip
   let paperDoll = `
@@ -210,6 +223,35 @@ function handleAttributeUpgrade(choice) {
   }
 }
 
+function showPassives() {
+  gameState = 'PASSIVES';
+  const items = Object.keys(player.passives).map(key => {
+    return ` [${key}] NIVEL ${player.passives[key]}`;
+  });
+  items.push(' [ESC] Voltar');
+  
+  actionMenu.setItems(items);
+  actionMenu.setLabel(` [ ARVORE DE PASSIVAS - PONTOS: ${player.skillPoints} ] `);
+  actionMenu.focus();
+  updateStatus();
+}
+
+function handlePassiveUpgrade(choice) {
+  let targetKey = null;
+  if (choice.includes('CALCULO_DIFERENCIAL')) targetKey = 'CALCULO_DIFERENCIAL';
+  if (choice.includes('TERMODINAMICA')) targetKey = 'TERMODINAMICA';
+  if (choice.includes('MECANICA_QUANTICA')) targetKey = 'MECANICA_QUANTICA';
+  if (choice.includes('ENTROPIA')) targetKey = 'ENTROPIA';
+  if (choice.includes('RELATIVIDADE')) targetKey = 'RELATIVIDADE';
+
+  if (targetKey && player.upgradePassive(targetKey)) {
+    log(chalk.green(`Conhecimento em ${targetKey} aprofundado!`));
+    showPassives();
+  } else {
+    log(chalk.red('Sem pontos de skill disponiveis!'));
+  }
+}
+
 function showInventory() {
   gameState = 'INVENTORY';
   mapBox.hide();
@@ -260,6 +302,7 @@ function showNexus() {
     ' [I] Inventário',
     ' [H] Atributos',
     ' [P] Proficiências',
+    ' [K] Passivas (Legado)',
     ' [ESC] Menu Principal'
   ]);
   actionMenu.focus();
@@ -375,6 +418,7 @@ function renderMap() {
           case 'FLOOR': mapDisplay += Sprites.objects.floor; break;
           case 'TREASURE': mapDisplay += Sprites.objects.treasure; break;
           case 'ENEMY': mapDisplay += Sprites.objects.enemy; break;
+          case 'BOSS': mapDisplay += Sprites.objects.boss; break;
           case 'PUZZLE': mapDisplay += Sprites.objects.puzzle; break;
           case 'EXIT': mapDisplay += Sprites.objects.door; break;
           case 'REST': mapDisplay += Sprites.objects.rest; break;
@@ -391,7 +435,7 @@ function renderCombat() {
   if (!currentCombat) return;
   const enemy = currentCombat.enemies[0];
   const enemySprite = Sprites.getEnemySprite(enemy.name);
-  const playerSprite = Sprites.player;
+  const playerSprite = Sprites.getPlayerSprite(player.race);
 
   let combatDisplay = '\n';
 
@@ -458,17 +502,12 @@ function handleMove(dx, dy) {
 function handleTileInteraction(tile) {
   switch(tile.type) {
     case 'ENEMY':
+    case 'BOSS':
       startCombat(tile.data);
       tile.type = 'FLOOR';
       break;
     case 'EXIT':
-      if (tile.data) {
-        // tile.data já é um array [Entity] vindo de Dungeon.generateEnemyData
-        startCombat(tile.data);
-        tile.type = 'FLOOR';
-      } else {
-        startDungeon(currentDungeon.floor + 1);
-      }
+      startDungeon(currentDungeon.floor + 1);
       break;
     case 'TREASURE':
       const loot = new Item(currentDungeon.floor);
@@ -503,6 +542,44 @@ function startCombat(enemies) {
   actionMenu.focus();
 }
 
+// --- CRIAÇÃO DE PERSONAGEM ---
+function startCreation() {
+  gameState = 'CREATION_NAME';
+  log(chalk.bold.cyan('>>> CRIAÇÃO DE PERSONAGEM <<<'));
+  interactBox.setLabel(' [ NOME DO EXILADO ] ');
+  interactBox.show();
+  inputField.focus();
+  inputField.setValue('');
+
+  inputField.once('submit', (name) => {
+    if (!name || name.trim() === '') name = 'Exilado';
+    
+    // Escolha de Raça
+    gameState = 'CREATION_RACE';
+    interactBox.hide();
+    actionMenu.setLabel(' [ ESCOLHA SUA RAÇA ] ');
+    actionMenu.setItems([' Humano', ' Elfo', ' Anão', ' Orc']);
+    actionMenu.focus();
+
+    actionMenu.once('select', (item) => {
+      const race = item.getText().trim();
+      
+      // Escolha de Background
+      gameState = 'CREATION_BG';
+      actionMenu.setLabel(' [ ESCOLHA SEU PASSADO ] ');
+      actionMenu.setItems([' Mercenário', ' Erudito', ' Ladino', ' Clérigo']);
+      actionMenu.focus();
+
+      actionMenu.once('select', (bgItem) => {
+        const bg = bgItem.getText().trim();
+        player = new Entity(name, { race, background: bg });
+        log(chalk.green(`Bem-vindo, ${player.name} o ${player.race} ${player.background}.`));
+        showNexus();
+      });
+    });
+  });
+}
+
 function handleCombatAction(choice) {
   if (currentCombat.isOver) return;
 
@@ -527,14 +604,21 @@ function handleCombatAction(choice) {
       
       const hasBoss = currentCombat.enemies.some(e => e.name.includes('CHEFE') || e.name.includes('SENHOR'));
       if (hasBoss) {
-        log(chalk.bold.magenta('Você derrotou o guardião! A fenda se aprofunda...'));
-        startDungeon(currentDungeon.floor + 1);
+        log(chalk.bold.magenta('O GUARDIÃO CAIU! Uma passagem para as profundezas se abriu.'));
+        const tile = currentDungeon.getTile(currentDungeon.playerPos.x, currentDungeon.playerPos.y);
+        if (tile) tile.type = 'EXIT';
+        renderMap();
       } else {
         startDungeonNav();
         updateStatus();
       }
     } else {
-      process.exit(0);
+      // MORTE PERMANENTE
+      log(chalk.bold.red('SUA ALMA FOI CONSUMIDA PELO VAZIO...'));
+      SaveSystem.deleteSave();
+      setTimeout(() => {
+        process.exit(0);
+      }, 3000);
     }
   }
 }
@@ -564,7 +648,7 @@ function startPuzzle(tile) {
 }
 
 function startDungeonNav() {
-  actionMenu.setItems([' [W,A,S,D] Mover', ' [I] Inventário', ' [H] Atributos', ' [Q] Fugir']);
+  actionMenu.setItems([' [W,A,S,D] Mover', ' [I] Inventário', ' [H] Atributos', ' [V/ESC] Fugir']);
   actionMenu.focus();
   renderMap();
 }
@@ -591,10 +675,29 @@ screen.key(['p'], () => {
   if (gameState === 'EXPLORING' || gameState === 'MENU') showProficiencies();
 });
 
-// Teclas de Seleção Alternativas
-screen.key(['space'], () => {
-  if (gameState === 'MENU' || gameState === 'INVENTORY' || gameState === 'COMBAT' || gameState === 'ATTRIBUTES' || gameState === 'PROFICIENCIES') {
+screen.key(['k'], () => {
+  if (gameState === 'EXPLORING' || gameState === 'MENU' || gameState === 'NEXUS') showPassives();
+});
+
+// Navegação em Menus (Q/E)
+screen.key(['q'], () => {
+  if (actionMenu.focused) actionMenu.up(1);
+  if (inventoryBox.focused) inventoryBox.up(1);
+  screen.render();
+});
+
+screen.key(['e'], () => {
+  if (actionMenu.focused) actionMenu.down(1);
+  if (inventoryBox.focused) inventoryBox.down(1);
+  screen.render();
+});
+
+// Seleção (F / Espaço)
+screen.key(['f', 'space'], () => {
+  if (actionMenu.focused) {
     actionMenu.emit('select', actionMenu.getItem(actionMenu.selected), actionMenu.selected);
+  } else if (inventoryBox.focused) {
+    inventoryBox.emit('select', inventoryBox.getItem(inventoryBox.selected), inventoryBox.selected);
   }
 });
 
@@ -609,9 +712,12 @@ screen.key(['2', 'x'], () => {
 actionMenu.on('select', (item, index) => {
   const choice = item.getText().trim();
   if (gameState === 'MENU') {
-    if (choice.includes('Entrar')) startDungeon();
+    if (choice.includes('Novo Jogo')) startCreation();
     if (choice.includes('Carregar')) loadGame();
     if (choice.includes('Sair')) process.exit(0);
+  } else if (gameState === 'CREATION_RACE' || gameState === 'CREATION_BG') {
+    // handled by once('select') in startCreation
+    return;
   } else if (gameState === 'NEXUS') {
     if (choice.includes('Entrar')) startDungeon();
     if (choice.includes('Halthor')) showBlacksmith();
@@ -620,11 +726,12 @@ actionMenu.on('select', (item, index) => {
     if (choice.includes('Inventário')) showInventory();
     if (choice.includes('Atributos')) showAttributes();
     if (choice.includes('Proficiências')) showProficiencies();
+    if (choice.includes('Passivas')) showPassives();
     if (choice.includes('Menu Principal')) {
       gameState = 'MENU';
-      const menuItems = [' [1] Entrar na Fenda'];
+      const menuItems = [' [1] Novo Jogo'];
       if (SaveSystem.hasSave()) menuItems.push(' [2] Carregar Jogo');
-      menuItems.push(' [Q] Sair');
+      menuItems.push(' [ESC] Sair');
       actionMenu.setItems(menuItems);
     }
   } else if (gameState === 'COMBAT') {
@@ -633,6 +740,8 @@ actionMenu.on('select', (item, index) => {
     handleAttributeUpgrade(choice);
   } else if (gameState === 'PROFICIENCIES') {
     handleProficiencyUpgrade(choice);
+  } else if (gameState === 'PASSIVES') {
+    handlePassiveUpgrade(choice);
   } else if (gameState === 'ALTAR') {
     handleAltar(choice, index);
   } else if (gameState === 'QUESTS') {
@@ -642,10 +751,10 @@ actionMenu.on('select', (item, index) => {
   }
 });
 
-screen.key(['escape', 'q'], () => {
+screen.key(['escape', 'v'], () => {
   if (gameState === 'MENU') process.exit(0);
-  if (gameState === 'INVENTORY' || gameState === 'ATTRIBUTES' || gameState === 'PROFICIENCIES' || gameState === 'TRADE_BUY' || gameState === 'TRADE_SELL' || gameState === 'ALTAR' || gameState === 'QUESTS') {
-    if (gameState.includes('TRADE') || gameState === 'ALTAR' || gameState === 'QUESTS') {
+  if (gameState === 'INVENTORY' || gameState === 'ATTRIBUTES' || gameState === 'PROFICIENCIES' || gameState === 'PASSIVES' || gameState === 'TRADE_BUY' || gameState === 'TRADE_SELL' || gameState === 'ALTAR' || gameState === 'QUESTS') {
+    if (gameState.includes('TRADE') || gameState === 'ALTAR' || gameState === 'QUESTS' || gameState === 'PASSIVES') {
       showNexus();
       return;
     }
@@ -671,13 +780,13 @@ screen.key(['escape', 'q'], () => {
 });
 
 // --- INIT ---
-screen.append(titleBox); screen.append(statusBox); screen.append(mapBox);
+screen.append(titleBox); screen.append(statusBox); screen.append(synergyBox); screen.append(mapBox);
 screen.append(combatVisualBox); screen.append(inventoryBox); screen.append(itemDetailBox);
 screen.append(equipVisualBox); screen.append(logBox); screen.append(actionMenu); screen.append(interactBox);
 
-const initialMenu = [' [1] Entrar na Fenda'];
+const initialMenu = [' [1] Novo Jogo'];
 if (SaveSystem.hasSave()) initialMenu.push(' [2] Carregar Jogo');
-initialMenu.push(' [Q] Sair');
+initialMenu.push(' [ESC] Sair');
 
 actionMenu.setItems(initialMenu);
 actionMenu.focus();

@@ -2,7 +2,7 @@ const Entity = require('../entities/Entity');
 
 class Tile {
   constructor(type, x, y, data = null) {
-    this.type = type; // 'WALL', 'FLOOR', 'ENEMY', 'TREASURE', 'PUZZLE', 'EXIT', 'REST'
+    this.type = type; // 'WALL', 'FLOOR', 'ENEMY', 'BOSS', 'TREASURE', 'PUZZLE', 'EXIT', 'REST'
     this.x = x;
     this.y = y;
     this.data = data;
@@ -20,10 +20,10 @@ class Dungeon {
     this.bossDefeated = false;
 
     const biomes = [
-      { name: 'Catacumbas Esquecidas', color: 'gray' },
-      { name: 'Caverna de Gelo', color: 'cyan' },
-      { name: 'Fosso de Fogo', color: 'red' },
-      { name: 'Vazio Distorcido', color: 'magenta' }
+      { name: 'O Prisma de Newton', color: 'gray' },
+      { name: 'A Singularidade de Hawking', color: 'cyan' },
+      { name: 'O Motor de Turing', color: 'red' },
+      { name: 'O Vazio de Noether', color: 'magenta' }
     ];
     this.biome = biomes[Math.floor(Math.random() * biomes.length)];
 
@@ -60,7 +60,7 @@ class Dungeon {
     this.addRandomObject('PUZZLE', 2);
     this.addRandomObject('REST', 1);
     this.addRandomObject('ENEMY', 4 + this.floor);
-    this.addRandomObject('EXIT', 1); // Boss / Saída
+    this.addRandomObject('BOSS', 1); // Boss / Saída (escada aparece após derrotar)
   }
 
   addRandomObject(type, count) {
@@ -71,7 +71,7 @@ class Dungeon {
 
       if (this.grid[ry][rx].type === 'FLOOR' && (rx !== this.playerPos.x || ry !== this.playerPos.y)) {
         let data = null;
-        if (type === 'ENEMY' || type === 'EXIT') data = this.generateEnemyData(type === 'EXIT');
+        if (type === 'ENEMY' || type === 'BOSS') data = this.generateEnemyData(type === 'BOSS');
         this.grid[ry][rx].type = type;
         this.grid[ry][rx].data = data;
         placed++;
@@ -88,11 +88,11 @@ class Dungeon {
 
     if (isBoss) {
       if (this.floor === 10) {
-        return [new Entity('SENHOR DA ASCENSÃO', {
+        return [new Entity('CHEFE: SENHOR DA ASCENSÃO', {
           hp: 500, sp: 200, mp: 200, level: 10
         })];
       }
-      return [new Entity('Senhor das Fendas', {
+      return [new Entity('CHEFE: Senhor das Fendas', {
         hp: 80 + (this.floor * 20),
         sp: 60 + (this.floor * 10),
         mp: 60 + (this.floor * 10),

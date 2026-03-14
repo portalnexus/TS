@@ -1,16 +1,48 @@
 const chalk = require('chalk');
 
 const Sprites = {
-  // --- PLAYER GIGANTE (6 linhas) ---
-  player: [
-    chalk.cyan('      _____      '),
-    chalk.cyan('     /     \\     '),
-    chalk.cyan('    |  o o  |    '),
-    chalk.cyan('    \\_  -  _/    '),
-    chalk.cyan('      /| |\\      '),
-    chalk.cyan('     / | | \\     '),
-    chalk.cyan('      /   \\      ')
-  ],
+  playerSprites: {
+    'Humano': [
+      chalk.cyan('      _____      '),
+      chalk.cyan('     /     \\     '),
+      chalk.cyan('    |  o o  |    '),
+      chalk.cyan('    \\_  -  _/    '),
+      chalk.cyan('      /| |\\      '),
+      chalk.cyan('     / | | \\     '),
+      chalk.cyan('      /   \\      ')
+    ],
+    'Elfo': [
+      chalk.green('     /\\     /\\   '),
+      chalk.green('    /  \\___/  \\  '),
+      chalk.green('   |   o   o   | '),
+      chalk.green('    \\_  -  _/    '),
+      chalk.green('     /| |\\      '),
+      chalk.green('    / | | \\     '),
+      chalk.green('     /   \\      ')
+    ],
+    'Anão': [
+      chalk.yellow('      _____      '),
+      chalk.yellow('     /     \\     '),
+      chalk.yellow('    |  - -  |    '),
+      chalk.yellow('    |#######|    '),
+      chalk.yellow('    \\_#####_/    '),
+      chalk.yellow('     [|||||]     '),
+      chalk.yellow('     /     \\     ')
+    ],
+    'Orc': [
+      chalk.red('     /     \\     '),
+      chalk.red('    |  ^ ^  |    '),
+      chalk.red('    |  \\_/  |    '),
+      chalk.red('    \\__VVV__/    '),
+      chalk.red('     /|   |\\     '),
+      chalk.red('    / |   | \\    '),
+      chalk.red('     /     \\     ')
+    ]
+  },
+
+  getPlayerSprite(race) {
+    return this.playerSprites[race] || this.playerSprites['Humano'];
+  },
 
   enemies: {
     'Esqueleto Maldito': [
@@ -56,6 +88,7 @@ const Sprites = {
     floor: chalk.hex('#1a1a1a')('··'),
     treasure: chalk.yellow('[$]'),
     enemy: chalk.bold.red('!!'),
+    boss: chalk.bold.magenta('$$'),
     door: chalk.bgHex('#A52A2A').white('HH'),
     puzzle: chalk.bold.blue('??'),
     rest: chalk.bold.green('++')

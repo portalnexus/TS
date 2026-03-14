@@ -1,42 +1,29 @@
 # 📜 PATCH NOTES - TERMINAL SOULS
 
-Acompanhe a evolução do Exílio.
-
 ---
 
-## [v0.0.1c] - O Despertar Visual (Atual)
-*A interface e a jogabilidade atingiram um novo patamar de polimento.*
+## [v0.8.0] - A Ascensão do Exilado
+*O loop de gameplay está completo. De um simples combate a um mundo vivo.*
 
-### 🎨 Visual & Imersão
-- **Sprites Gigantes:** Todos os inimigos e o jogador agora possuem artes ASCII de 6-8 linhas para maior impacto visual nas batalhas.
-- **Paper Doll (Equipamento Visual):** Adicionada interface que mostra visualmente o que o jogador está vestindo/empunhando.
-- **Mapa de Alto Contraste:** Paredes agora usam blocos sólidos (`bgWhite`) para legibilidade perfeita. O chão foi suavizado para reduzir ruído visual.
+### 🏛️ Nexus & Economia
+- **Blacksmith (Ferreiro):** Halthor agora compra loot e vende estoque rotativo.
+- **Altar de Crafting:** Implementado o Reroll de atributos para itens Raros e Lendários.
+- **Quadro de Missões:** Sistema de quests procedurais (Abates e Exploração) com recompensas.
+- **Economia de Orbes:** Introduzida a moeda oficial para trade e serviços.
 
-### ⚔️ Jogabilidade & Balanceamento
-- **Sistema de Inventário:** Agora é possível abrir o inventário (`I`), visualizar detalhes técnicos de cada item e **Equipar/Usar** itens para ganhar bônus de status.
-- **Curva de Dificuldade Suavizada:** Inimigos iniciais tiveram HP e Dano reduzidos drasticamente para permitir uma progressão justa.
-- **Hotkeys de Combate:** Adicionados atalhos (`1`, `Z`, `2`, `X`) para realizar ações sem navegar em menus.
-- **Controle Refinado:** Movimentação fixada em WASD; as setas agora servem exclusivamente para navegação em listas.
-- **Hotkey Global:** Tecla `Espaço` agora funciona como seleção em todos os menus.
+### ⚔️ Combate & RPG
+- **Atributos Nucleares:** Sistema de Força (STR), Destreza (DEX) e Inteligência (INT) com Level Up.
+- **Árvore de Proficiências:** Mestria em Tags (Corte, Fogo, etc.) que concede bônus de dano.
+- **Reações Elementais:** Tags agora causam efeitos de status (Sangramento, Combustão, Choque).
+- **IA de Combate:** Inimigos agora sofrem e causam status elementais.
 
----
+### 🌍 Mundo & Exploração
+- **Biomas Procedurais:** Fendas agora possuem temas (Gelo, Vazio, Fogo) com cores dinâmicas.
+- **Descida Infinita:** Derrotar o Boss do andar permite descer para o próximo nível sem retornar ao Nexus.
+- **Boss de Ascensão:** Novo boss final no Andar 10 (Senhor da Ascensão).
 
-## [v0.0.1b] - A Fenda Aberta
-*Transição do combate textual para a exploração de mapa.*
-
-- **Mapa 2D Procedural:** Implementado o grid de navegação em tempo real.
-- **Sprites ASCII:** Primeira versão dos sprites para criaturas e objetos.
-- **Interação de Tiles:** Sistema para detectar tesouros, inimigos e puzzles ao caminhar.
-
----
-
-## [v0.0.1a] - O Primeiro Exílio (MVP)
-*Nascimento dos sistemas fundamentais.*
-
-- **Motor de Combate:** Sistema de Postura (Stagger) e recursos (Stamina/Mana).
-- **Gerador de Loot:** Criação de itens com raridades e afixos aleatórios.
-- **Enigmas do Exílio:** Implementação de puzzles matemáticos e charadas.
-- **Arquitetura Base:** Integração entre Node.js, Blessed e Chalk.
+### 💾 Sistema de Almas
+- **Persistência Completa:** Inventário, Orbes, Missões Ativas e Proficiências são salvos localmente em JSON.
 
 ---
-*"O caminho é longo, mas os sprites são grandes."*
+*"O caminho é árduo, mas os sistemas estão prontos."*

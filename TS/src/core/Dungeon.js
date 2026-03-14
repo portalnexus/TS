@@ -17,6 +17,15 @@ class Dungeon {
     this.height = height;
     this.grid = [];
     this.playerPos = { x: 2, y: 2 };
+    this.bossDefeated = false;
+
+    const biomes = [
+      { name: 'Catacumbas Esquecidas', color: 'gray' },
+      { name: 'Caverna de Gelo', color: 'cyan' },
+      { name: 'Fosso de Fogo', color: 'red' },
+      { name: 'Vazio Distorcido', color: 'magenta' }
+    ];
+    this.biome = biomes[Math.floor(Math.random() * biomes.length)];
 
     this.generate();
   }
@@ -78,6 +87,11 @@ class Dungeon {
     ];
 
     if (isBoss) {
+      if (this.floor === 10) {
+        return [new Entity('SENHOR DA ASCENSÃO', {
+          hp: 500, sp: 200, mp: 200, level: 10
+        })];
+      }
       return [new Entity('Senhor das Fendas', {
         hp: 80 + (this.floor * 20),
         sp: 60 + (this.floor * 10),

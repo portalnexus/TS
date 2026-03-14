@@ -6,6 +6,10 @@ const Combat = require('./combat/Combat');
 const Puzzle = require('./core/Puzzle');
 const Item = require('./items/Item');
 const Sprites = require('./ui/Sprites');
+const SaveSystem = require('./core/SaveSystem');
+const Blacksmith = require('./items/Blacksmith');
+const CraftingAltar = require('./items/CraftingAltar');
+const QuestBoard = require('./core/QuestBoard');
 
 // --- SETUP DA TELA ---
 const screen = blessed.screen({
@@ -81,21 +85,45 @@ const equipVisualBox = blessed.box({
 });
 
 // --- ESTADO DO JOGO ---
-const player = new Entity('Exilado', { hp: 150, sp: 100, mp: 100 });
+let player = new Entity('Exilado', { hp: 150, sp: 100, mp: 100 });
+let currentBlacksmith = new Blacksmith(1);
+let currentAltar = new CraftingAltar();
+let questBoard = new QuestBoard();
 let currentDungeon = null;
 let currentCombat = null;
-let gameState = 'MENU'; // MENU, EXPLORING, COMBAT, PUZZLE, INVENTORY
+let gameState = 'MENU'; // MENU, EXPLORING, COMBAT, PUZZLE, INVENTORY, NEXUS, TRADE_BUY, TRADE_SELL, ALTAR, QUESTS
+
+// --- SISTEMA DE SAVE ---
+function saveGame() {
+  if (SaveSystem.save(player.serialize())) {
+    log(chalk.green('💾 Alma vinculada ao receptáculo (Salvo).'));
+  }
+}
+
+function loadGame() {
+  const data = SaveSystem.load();
+  if (data) {
+    player = Entity.fromSave(data);
+    log(chalk.cyan('✨ Reencarnação concluída. Almas recuperadas.'));
+    updateStatus();
+    showNexus();
+  }
+}
 
 // --- RENDERIZAÇÃO ---
 function updateStatus() {
   const hpColor = player.hp < player.maxHp * 0.3 ? chalk.red : chalk.green;
   statusBox.setContent(`
   ${chalk.bold.cyan(player.name)}
-  LVL: ${player.level} | XP: ${player.xp}
+  LVL: ${player.level} | XP: ${player.xp}/${player.level * 100}
 
   HP: ${hpColor(player.hp + '/' + player.maxHp)}
   SP: ${chalk.yellow(player.sp + '/' + player.maxSp)}
   MP: ${chalk.blue(player.mp + '/' + player.maxMp)}
+
+  STR: ${player.strength} | DEX: ${player.dexterity} | INT: ${player.intelligence}
+  PONTOS: ${chalk.bold.green(player.attributePoints)}
+  ORBES: ${chalk.yellow(player.orbs)}
 
   POSTURA: ${player.postureMode}
   S-BAR: [${'#'.repeat(Math.min(10, Math.floor(player.posture / 10)))}${'.'.repeat(Math.max(0, 10 - Math.floor(player.posture / 10)))}]
@@ -123,6 +151,63 @@ function updateStatus() {
   `);
 
   screen.render();
+}
+
+function showProficiencies() {
+  gameState = 'PROFICIENCIES';
+  const items = Object.keys(player.proficiencies).map(tag => {
+    return ` [${tag[0]}] ${tag}: LVL ${player.proficiencies[tag]} (+${player.proficiencies[tag] * 5}%)`;
+  });
+  items.push(' [ESC] Voltar');
+  
+  actionMenu.setItems(items);
+  actionMenu.setLabel(` [ PROFICIÊNCIAS - PONTOS: ${player.proficiencyPoints} ] `);
+  actionMenu.focus();
+  updateStatus();
+}
+
+function handleProficiencyUpgrade(choice) {
+  const tagMap = { 'C': 'CORTE', 'E': 'ESMAGAMENTO', 'F': 'FOGO', 'C': 'CHOQUE', 'V': 'VAZIO' };
+  // Lógica de detecção por texto do item selecionado
+  let targetTag = null;
+  if (choice.includes('CORTE')) targetTag = 'CORTE';
+  if (choice.includes('ESMAGAMENTO')) targetTag = 'ESMAGAMENTO';
+  if (choice.includes('FOGO')) targetTag = 'FOGO';
+  if (choice.includes('CHOQUE')) targetTag = 'CHOQUE';
+  if (choice.includes('VAZIO')) targetTag = 'VAZIO';
+
+  if (targetTag && player.upgradeProficiency(targetTag)) {
+    log(chalk.green(`Mestria em ${targetTag} aumentada!`));
+    showProficiencies();
+  } else {
+    log(chalk.red('Sem pontos de proficiência!'));
+  }
+}
+
+function showAttributes() {
+  gameState = 'ATTRIBUTES';
+  actionMenu.setItems([
+    ` [S] + FORÇA (${player.strength})`,
+    ` [D] + DESTREZA (${player.dexterity})`,
+    ` [I] + INTELIGÊNCIA (${player.intelligence})`,
+    ' [ESC] Voltar'
+  ]);
+  actionMenu.focus();
+  updateStatus();
+}
+
+function handleAttributeUpgrade(choice) {
+  let success = false;
+  if (choice.includes('FORÇA')) success = player.upgradeAttribute('STR');
+  if (choice.includes('DESTREZA')) success = player.upgradeAttribute('DEX');
+  if (choice.includes('INTELIGÊNCIA')) success = player.upgradeAttribute('INT');
+
+  if (success) {
+    log(chalk.green('Atributo aprimorado!'));
+    showAttributes();
+  } else {
+    log(chalk.red('Sem pontos disponíveis!'));
+  }
 }
 
 function showInventory() {
@@ -163,6 +248,118 @@ inventoryBox.on('element focus', (item) => {
   screen.render();
 }
 );
+
+function showNexus() {
+  gameState = 'NEXUS';
+  mapBox.setContent('\n\n    ' + chalk.bold.blue('[ O NEXUS ]') + '\n\n  Um lugar de paz temporária.\n  O vento sopra cinzas...\n\n  Halthor, o Ferreiro, martela ao longe.\n  Um antigo Altar brilha fraco.');
+  actionMenu.setItems([
+    ' [1] Entrar na Fenda',
+    ' [2] Halthor (Ferreiro)',
+    ' [3] Altar da Transmutação',
+    ' [4] Quadro de Missões',
+    ' [I] Inventário',
+    ' [H] Atributos',
+    ' [P] Proficiências',
+    ' [ESC] Menu Principal'
+  ]);
+  actionMenu.focus();
+  updateStatus();
+}
+
+function showAltar() {
+  gameState = 'ALTAR';
+  actionMenu.setLabel(` [ ALTAR - REROLL: ${currentAltar.reRollCost} ORBES ] `);
+  const items = player.inventory.map(it => {
+    return currentAltar.canReRoll(it) ? `${it.getColorizedName()} (${it.type})` : chalk.gray(`${it.name} (Incompatível)`);
+  });
+  items.push(' [ESC] Voltar');
+  actionMenu.setItems(items);
+  actionMenu.focus();
+}
+
+function handleAltar(choice, index) {
+  if (choice.includes('Voltar')) {
+    showNexus();
+    return;
+  }
+  
+  if (currentAltar.reRollItem(player, index)) {
+    log(chalk.magenta('As energias do item foram reescritas!'));
+    showAltar();
+    updateStatus();
+  } else {
+    log(chalk.red('Falha: Item incompatível ou Orbes insuficientes.'));
+  }
+}
+
+function showQuests() {
+  gameState = 'QUESTS';
+  actionMenu.setLabel(' [ QUADRO DE MISSÕES ] ');
+  actionMenu.setItems(questBoard.getMenuOptions(player));
+  actionMenu.focus();
+}
+
+function handleQuests(choice, index) {
+  if (choice.includes('Voltar')) {
+    showNexus();
+    return;
+  }
+
+  if (choice.includes('ENTREGAR')) {
+    if (questBoard.turnInQuest(player)) {
+      log(chalk.green('Missão entregue! Recompensas recebidas.'));
+      showQuests();
+      updateStatus();
+    }
+  } else if (questBoard.acceptQuest(player, index)) {
+    log(chalk.cyan('Nova missão aceita. Cumpra seu destino.'));
+    showQuests();
+  } else {
+    log(chalk.red('Você já tem uma missão ativa ou a missão é inválida.'));
+  }
+}
+
+function showBlacksmith() {
+  gameState = 'TRADE_BUY';
+  actionMenu.setLabel(` [ FERREIRO - ${player.orbs} ORBES ] `);
+  actionMenu.setItems(currentBlacksmith.getMenuOptions());
+  actionMenu.focus();
+}
+
+function showBlacksmithSell() {
+  gameState = 'TRADE_SELL';
+  const sellItems = player.inventory.map(it => `${it.getColorizedName()} (${chalk.yellow(Math.floor(it.getPrice() * 0.4) + ' Orbes')})`);
+  sellItems.push(' [ESC] Voltar');
+  actionMenu.setItems(sellItems);
+  actionMenu.focus();
+}
+
+function handleTrade(choice, index) {
+  if (gameState === 'TRADE_BUY') {
+    if (choice.includes('VENDER')) {
+      showBlacksmithSell();
+    } else if (choice.includes('COMPRAR')) {
+      if (currentBlacksmith.buyItem(player, index)) {
+        log(chalk.green('Negócio fechado!'));
+        showBlacksmith();
+        updateStatus();
+      } else {
+        log(chalk.red('Orbes insuficientes!'));
+      }
+    }
+  } else if (gameState === 'TRADE_SELL') {
+    if (choice.includes('Voltar')) {
+      showBlacksmith();
+    } else {
+      const value = currentBlacksmith.sellItem(player, index);
+      if (value) {
+        log(chalk.green(`Item vendido por ${value} Orbes.`));
+        showBlacksmithSell();
+        updateStatus();
+      }
+    }
+  }
+}
 
 function renderMap() {
   if (!currentDungeon) return;
@@ -223,13 +420,27 @@ function log(msg) {
 }
 
 // --- LOGICA DE JOGO ---
-function startDungeon() {
-  currentDungeon = new Dungeon(1);
+function startDungeon(floor = 1) {
+  currentDungeon = new Dungeon(floor);
   gameState = 'EXPLORING';
+  mapBox.setLabel(chalk[currentDungeon.biome.color](` [ ${currentDungeon.biome.name} - Andar ${floor} ] `));
   mapBox.show();
   combatVisualBox.hide();
-  actionMenu.setItems([' [W,A,S,D] Mover', ' [I] Inventário', ' [Q] Fugir']);
-  log(chalk.green('Você adentrou na fenda. Use WASD para explorar.'));
+  inventoryBox.hide();
+  actionMenu.setLabel(' [ AÇÕES ] ');
+  actionMenu.setItems([' [W,A,S,D] Mover', ' [I] Inventário', ' [H] Atributos', ' [Q] Fugir']);
+  log(chalk.green(`Você adentrou no Andar ${floor} da fenda.`));
+  
+  if (player.activeQuest && player.activeQuest.type === 'FLOOR' && !player.activeQuest.completed) {
+    if (floor >= player.activeQuest.target) {
+      player.activeQuest.progress = player.activeQuest.target;
+      player.activeQuest.completed = true;
+      log(chalk.bold.yellow(' [!] MISSÃO CONCLUÍDA! Retorne ao Nexus.'));
+    } else {
+      player.activeQuest.progress = floor;
+    }
+  }
+
   renderMap();
 }
 
@@ -247,9 +458,17 @@ function handleMove(dx, dy) {
 function handleTileInteraction(tile) {
   switch(tile.type) {
     case 'ENEMY':
-    case 'EXIT':
       startCombat(tile.data);
-      tile.type = 'FLOOR'; // Remove após combate
+      tile.type = 'FLOOR';
+      break;
+    case 'EXIT':
+      if (tile.data) {
+        // tile.data já é um array [Entity] vindo de Dungeon.generateEnemyData
+        startCombat(tile.data);
+        tile.type = 'FLOOR';
+      } else {
+        startDungeon(currentDungeon.floor + 1);
+      }
       break;
     case 'TREASURE':
       const loot = new Item(currentDungeon.floor);
@@ -305,7 +524,15 @@ function handleCombatAction(choice) {
       gameState = 'EXPLORING';
       combatVisualBox.hide();
       mapBox.show();
-      startDungeonNav();
+      
+      const hasBoss = currentCombat.enemies.some(e => e.name.includes('CHEFE') || e.name.includes('SENHOR'));
+      if (hasBoss) {
+        log(chalk.bold.magenta('Você derrotou o guardião! A fenda se aprofunda...'));
+        startDungeon(currentDungeon.floor + 1);
+      } else {
+        startDungeonNav();
+        updateStatus();
+      }
     } else {
       process.exit(0);
     }
@@ -321,7 +548,10 @@ function startPuzzle(tile) {
   inputField.once('submit', (val) => {
     interactBox.hide();
     if (puzzle.checkAnswer(val)) {
-      log(chalk.green('Sucesso!'));
+      const xpReward = 50 * currentDungeon.floor;
+      const leveledUp = player.addExperience(xpReward);
+      log(chalk.green(`Sucesso! +${xpReward} XP.`));
+      if (leveledUp) log(chalk.bold.cyan('>>> NÍVEL AUMENTADO! +3 PONTOS DE ATRIBUTO. <<<'));
       tile.type = 'FLOOR';
     } else {
       log(chalk.red('Falha! Armadilha disparada.'));
@@ -334,23 +564,36 @@ function startPuzzle(tile) {
 }
 
 function startDungeonNav() {
-  actionMenu.setItems([' [W,A,S,D] Mover', ' [I] Inventário', ' [Q] Fugir']);
+  actionMenu.setItems([' [W,A,S,D] Mover', ' [I] Inventário', ' [H] Atributos', ' [Q] Fugir']);
   actionMenu.focus();
   renderMap();
 }
 
 // --- INPUTS ---
 screen.key(['w'], () => handleMove(0, -1));
-screen.key(['s'], () => handleMove(0, 1));
+screen.key(['s'], () => {
+  if (gameState === 'EXPLORING') handleMove(0, 1);
+  if (gameState === 'ATTRIBUTES') handleAttributeUpgrade('FORÇA');
+});
 screen.key(['a'], () => handleMove(-1, 0));
-screen.key(['d'], () => handleMove(1, 0));
+screen.key(['d'], () => {
+  if (gameState === 'EXPLORING') handleMove(1, 0);
+  if (gameState === 'ATTRIBUTES') handleAttributeUpgrade('DESTREZA');
+});
 screen.key(['i'], () => {
   if (gameState === 'EXPLORING') showInventory();
+  if (gameState === 'ATTRIBUTES') handleAttributeUpgrade('INTELIGÊNCIA');
+});
+screen.key(['h'], () => {
+  if (gameState === 'EXPLORING' || gameState === 'MENU') showAttributes();
+});
+screen.key(['p'], () => {
+  if (gameState === 'EXPLORING' || gameState === 'MENU') showProficiencies();
 });
 
 // Teclas de Seleção Alternativas
 screen.key(['space'], () => {
-  if (gameState === 'MENU' || gameState === 'INVENTORY' || gameState === 'COMBAT') {
+  if (gameState === 'MENU' || gameState === 'INVENTORY' || gameState === 'COMBAT' || gameState === 'ATTRIBUTES' || gameState === 'PROFICIENCIES') {
     actionMenu.emit('select', actionMenu.getItem(actionMenu.selected), actionMenu.selected);
   }
 });
@@ -363,31 +606,68 @@ screen.key(['2', 'x'], () => {
   if (gameState === 'COMBAT') handleCombatAction('MAGIA');
 });
 
-actionMenu.on('select', (item) => {
+actionMenu.on('select', (item, index) => {
   const choice = item.getText().trim();
   if (gameState === 'MENU') {
     if (choice.includes('Entrar')) startDungeon();
+    if (choice.includes('Carregar')) loadGame();
     if (choice.includes('Sair')) process.exit(0);
+  } else if (gameState === 'NEXUS') {
+    if (choice.includes('Entrar')) startDungeon();
+    if (choice.includes('Halthor')) showBlacksmith();
+    if (choice.includes('Altar')) showAltar();
+    if (choice.includes('Missões')) showQuests();
+    if (choice.includes('Inventário')) showInventory();
+    if (choice.includes('Atributos')) showAttributes();
+    if (choice.includes('Proficiências')) showProficiencies();
+    if (choice.includes('Menu Principal')) {
+      gameState = 'MENU';
+      const menuItems = [' [1] Entrar na Fenda'];
+      if (SaveSystem.hasSave()) menuItems.push(' [2] Carregar Jogo');
+      menuItems.push(' [Q] Sair');
+      actionMenu.setItems(menuItems);
+    }
   } else if (gameState === 'COMBAT') {
     handleCombatAction(choice);
+  } else if (gameState === 'ATTRIBUTES') {
+    handleAttributeUpgrade(choice);
+  } else if (gameState === 'PROFICIENCIES') {
+    handleProficiencyUpgrade(choice);
+  } else if (gameState === 'ALTAR') {
+    handleAltar(choice, index);
+  } else if (gameState === 'QUESTS') {
+    handleQuests(choice, index);
+  } else if (gameState === 'TRADE_BUY' || gameState === 'TRADE_SELL') {
+    handleTrade(choice, index);
   }
 });
 
 screen.key(['escape', 'q'], () => {
   if (gameState === 'MENU') process.exit(0);
-  if (gameState === 'INVENTORY') {
+  if (gameState === 'INVENTORY' || gameState === 'ATTRIBUTES' || gameState === 'PROFICIENCIES' || gameState === 'TRADE_BUY' || gameState === 'TRADE_SELL' || gameState === 'ALTAR' || gameState === 'QUESTS') {
+    if (gameState.includes('TRADE') || gameState === 'ALTAR' || gameState === 'QUESTS') {
+      showNexus();
+      return;
+    }
     inventoryBox.hide();
     mapBox.show();
-    gameState = 'EXPLORING';
-    startDungeonNav();
+    if (currentDungeon) {
+      gameState = 'EXPLORING';
+      startDungeonNav();
+    } else {
+      showNexus();
+    }
+    actionMenu.setLabel(' [ AÇÕES ] ');
     return;
   }
-  gameState = 'MENU';
-  mapBox.hide();
-  combatVisualBox.hide();
-  inventoryBox.hide();
-  actionMenu.setItems([' [1] Entrar na Fenda', ' [2] Sair']);
-  actionMenu.focus();
+
+  // Ao fugir da fenda
+  if (gameState === 'EXPLORING' || gameState === 'COMBAT') {
+    saveGame();
+    currentDungeon = null;
+    showNexus();
+    return;
+  }
 });
 
 // --- INIT ---
@@ -395,7 +675,11 @@ screen.append(titleBox); screen.append(statusBox); screen.append(mapBox);
 screen.append(combatVisualBox); screen.append(inventoryBox); screen.append(itemDetailBox);
 screen.append(equipVisualBox); screen.append(logBox); screen.append(actionMenu); screen.append(interactBox);
 
-actionMenu.setItems([' [1] Entrar na Fenda', ' [2] Sair']);
+const initialMenu = [' [1] Entrar na Fenda'];
+if (SaveSystem.hasSave()) initialMenu.push(' [2] Carregar Jogo');
+initialMenu.push(' [Q] Sair');
+
+actionMenu.setItems(initialMenu);
 actionMenu.focus();
 updateStatus();
 log(chalk.gray('Bem-vindo ao Terminal Souls. Selecione uma opção.'));

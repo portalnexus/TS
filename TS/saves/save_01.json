@@ -1,0 +1,161 @@
+{
+  "id": "6496d6c7-3d86-4a5b-8946-ee9a2c649703",
+  "name": "Exilado",
+  "strength": 19,
+  "dexterity": 10,
+  "intelligence": 10,
+  "maxHp": 214,
+  "hp": 214,
+  "maxSp": 96,
+  "sp": 81,
+  "maxMp": 82,
+  "mp": 62,
+  "level": 5,
+  "xp": 25,
+  "orbs": 34,
+  "attributePoints": 3,
+  "proficiencyPoints": 3,
+  "proficiencies": {
+    "CORTE": 0,
+    "ESMAGAMENTO": 0,
+    "FOGO": 0,
+    "CHOQUE": 0,
+    "VAZIO": 1
+  },
+  "activeQuest": {
+    "id": "tdv6n7ega",
+    "type": "FLOOR",
+    "desc": "Alcance o Andar 3.",
+    "target": 3,
+    "progress": 1,
+    "rewardOrbs": 75,
+    "rewardXp": 300,
+    "completed": false
+  },
+  "posture": 0,
+  "maxPosture": 120,
+  "postureMode": "BALANCED",
+  "equipment": {
+    "ARMA": {
+      "id": "d59a74b2-1a63-4ba0-8e3b-15814341d28a",
+      "floor": 1,
+      "rarity": "MÁGICO",
+      "type": "ARMA",
+      "name": "Abençoado Espada",
+      "stats": {
+        "physicalDamage": 16,
+        "maxHp": 2
+      },
+      "tags": [
+        "ESMAGAMENTO"
+      ],
+      "uniques": []
+    },
+    "ARMADURA": {
+      "id": "ed7e1f04-43f9-4714-b38a-fb81c25df265",
+      "floor": 1,
+      "rarity": "MÁGICO",
+      "type": "ARMADURA",
+      "name": "Firme Peitoral",
+      "stats": {
+        "defense": 8,
+        "maxHp": 3
+      },
+      "tags": [],
+      "uniques": []
+    },
+    "ACESSÓRIO": {
+      "id": "6fca68e1-9fc8-483c-9931-db242698007b",
+      "floor": 1,
+      "rarity": "RARO",
+      "type": "ACESSÓRIO",
+      "name": "Eterno Talismã",
+      "stats": {
+        "maxMp": 12,
+        "maxHp": 14,
+        "maxSp": 8
+      },
+      "tags": [],
+      "uniques": []
+    }
+  },
+  "inventory": [
+    {
+      "id": "d8ff6993-3219-4ae8-b15c-5b4cfecb2b5d",
+      "floor": 1,
+      "rarity": "COMUM",
+      "type": "ARMA",
+      "name": "Gasto Cetro",
+      "stats": {
+        "physicalDamage": 11
+      },
+      "tags": [
+        "CORTE"
+      ],
+      "uniques": []
+    },
+    {
+      "id": "a3db0969-c176-49ea-b058-d182ffb67b98",
+      "floor": 1,
+      "rarity": "MÁGICO",
+      "type": "CONSUMÍVEL",
+      "name": "Firme Frasco de HP",
+      "stats": {
+        "recoverValue": 33
+      },
+      "tags": [],
+      "uniques": []
+    },
+    {
+      "id": "c6a6aa86-f8ec-4b8d-ac63-6ef9aedabfaf",
+      "floor": 1,
+      "rarity": "COMUM",
+      "type": "ARMA",
+      "name": "Velho Daga",
+      "stats": {
+        "physicalDamage": 11
+      },
+      "tags": [
+        "ESMAGAMENTO"
+      ],
+      "uniques": []
+    },
+    {
+      "id": "d4c1141b-88fc-47f1-8ac2-f626ace2a8f0",
+      "floor": 1,
+      "rarity": "COMUM",
+      "type": "CONSUMÍVEL",
+      "name": "Gasto Poção de SP",
+      "stats": {
+        "recoverValue": 22
+      },
+      "tags": [],
+      "uniques": []
+    },
+    {
+      "id": "98fe1362-4ce7-4985-bdf9-e5278b34f343",
+      "floor": 1,
+      "rarity": "MÁGICO",
+      "type": "CONSUMÍVEL",
+      "name": "Abençoado Poção de SP",
+      "stats": {
+        "recoverValue": 33
+      },
+      "tags": [],
+      "uniques": []
+    },
+    {
+      "id": "46b1b04c-8158-4bbd-bb2b-cadfb17282a3",
+      "floor": 1,
+      "rarity": "MÁGICO",
+      "type": "ACESSÓRIO",
+      "name": "Abençoado Amuleto",
+      "stats": {
+        "maxMp": 8,
+        "maxHp": 7
+      },
+      "tags": [],
+      "uniques": []
+    }
+  ]
+}

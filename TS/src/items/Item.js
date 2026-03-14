@@ -2,18 +2,31 @@ const { v4: uuidv4 } = require('uuid');
 const chalk = require('chalk');
 
 class Item {
-  constructor(floor = 1, forceRarity = null) {
-    this.id = uuidv4();
-    this.floor = floor;
-    this.rarity = forceRarity || this.rollRarity();
-    this.type = this.rollType();
-    this.name = this.generateName();
-    this.stats = this.generateStats();
-    this.tags = this.generateTags();
-    this.uniques = [];
+  constructor(floor = 1, forceRarity = null, data = null) {
+    if (data) {
+      // Rehidratação de item salvo
+      this.id = data.id;
+      this.floor = data.floor;
+      this.rarity = data.rarity;
+      this.type = data.type;
+      this.name = data.name;
+      this.stats = data.stats;
+      this.tags = data.tags;
+      this.uniques = data.uniques || [];
+    } else {
+      // Geração de novo item
+      this.id = uuidv4();
+      this.floor = floor;
+      this.rarity = forceRarity || this.rollRarity();
+      this.type = this.rollType();
+      this.name = this.generateName();
+      this.stats = this.generateStats();
+      this.tags = this.generateTags();
+      this.uniques = [];
 
-    if (this.rarity === 'LENDÁRIO') {
-      this.generateUniqueEffect();
+      if (this.rarity === 'LENDÁRIO') {
+        this.generateUniqueEffect();
+      }
     }
   }
 
@@ -106,6 +119,12 @@ class Item {
       LENDÁRIO: chalk.magenta.bold
     };
     return colors[this.rarity](this.name);
+  }
+
+  getPrice() {
+    const rarityMult = { COMUM: 10, MÁGICO: 25, RARO: 75, LENDÁRIO: 300 };
+    const base = rarityMult[this.rarity] * (1 + (this.floor * 0.2));
+    return Math.floor(base);
   }
 
   getDetails() {

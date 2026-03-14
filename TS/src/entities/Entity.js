@@ -1,49 +1,193 @@
 const { v4: uuidv4 } = require('uuid');
-
 class Entity {
   constructor(name, stats = {}) {
-    this.id = uuidv4();
+    this.id = stats.id || uuidv4();
     this.name = name;
 
-    // Stats base
-    this.maxHp = stats.hp || 100;
-    this.hp = this.maxHp;
+    // Atributos Nucleares
+    this.strength = stats.strength || 10;     // +HP, +Dano Físico, +Stamina
+    this.dexterity = stats.dexterity || 10;   // +Crítico, +Evasão, +Postura
+    this.intelligence = stats.intelligence || 10; // +Mana, +Dano Mágico
 
-    this.maxSp = stats.sp || 50;
-    this.sp = this.maxSp;
+    // Stats base calculados
+    this.maxHp = stats.maxHp || (100 + (this.strength * 5));
+    this.hp = stats.hp || this.maxHp;
 
-    this.maxMp = stats.mp || 50;
-    this.mp = this.maxMp;
+    this.maxSp = stats.maxSp || (50 + (this.strength * 2));
+    this.sp = stats.sp || this.maxSp;
+
+    this.maxMp = stats.maxMp || (50 + (this.intelligence * 2));
+    this.mp = stats.mp || this.maxMp;
 
     this.level = stats.level || 1;
-    this.xp = 0;
+    this.xp = stats.xp || 0;
+    this.xpToNextLevel = this.level * 100;
+    this.attributePoints = stats.attributePoints || 0;
+    this.proficiencyPoints = stats.proficiencyPoints || 0;
+    this.orbs = stats.orbs || 0;
+    this.activeQuest = stats.activeQuest || null;
+
+    // Proficiências (Bônus de % de Dano por Tag)
+    this.proficiencies = stats.proficiencies || {
+      'CORTE': 0,
+      'ESMAGAMENTO': 0,
+      'FOGO': 0,
+      'CHOQUE': 0,
+      'VAZIO': 0
+    };
 
     // Sistema de Postura (0-100)
-    this.posture = 0;
-    this.maxPosture = 100;
-    this.postureMode = 'BALANCED'; // ATTACK, BALANCED, DEFENCE
+    this.posture = stats.posture || 0;
+    this.maxPosture = stats.maxPosture || (100 + (this.dexterity * 2));
+    this.postureMode = stats.postureMode || 'BALANCED'; // ATTACK, BALANCED, DEFENCE
+
+    // Status Elementais / Reações
+    this.activeStatuses = [];
+    this.skills = stats.skills || ['Raio Arcano'];
 
     // Status
     this.isDead = false;
     this.isStaggered = false;
-    this.exhaustionPhysical = false; // 2x dano físico recebido
-    this.exhaustionMagical = false;  // 2x dano mágico recebido
+    this.exhaustionPhysical = false; 
+    this.exhaustionMagical = false;  
 
     // Equipamento e Inventário
     this.equipment = {
-      ARMA: null,
-      ARMADURA: null,
-      ACESSÓRIO: null
+      ARMA: stats.equipment?.ARMA ? this.rehydrateItem(stats.equipment.ARMA) : null,
+      ARMADURA: stats.equipment?.ARMADURA ? this.rehydrateItem(stats.equipment.ARMADURA) : null,
+      ACESSÓRIO: stats.equipment?.ACESSÓRIO ? this.rehydrateItem(stats.equipment.ACESSÓRIO) : null
     };
-    this.inventory = [];
+    this.inventory = (stats.inventory || []).map(it => this.rehydrateItem(it));
+  }
+
+  addExperience(amount) {
+    this.xp += amount;
+    let leveledUp = false;
+    while (this.xp >= this.xpToNextLevel) {
+      this.xp -= this.xpToNextLevel;
+      this.level++;
+      this.xpToNextLevel = this.level * 100;
+      this.attributePoints += 3;
+      this.proficiencyPoints += 1;
+      leveledUp = true;
+    }
+    return leveledUp;
+  }
+
+  upgradeAttribute(attr) {
+    if (this.attributePoints <= 0) return false;
+    if (attr === 'STR') {
+      this.strength++;
+      this.maxHp += 5;
+      this.maxSp += 2;
+    } else if (attr === 'DEX') {
+      this.dexterity++;
+      this.maxPosture += 2;
+    } else if (attr === 'INT') {
+      this.intelligence++;
+      this.maxMp += 2;
+    }
+    this.attributePoints--;
+    return true;
+  }
+
+  upgradeProficiency(tag) {
+    if (this.proficiencyPoints <= 0) return false;
+    if (this.proficiencies[tag] !== undefined) {
+      this.proficiencies[tag]++;
+      this.proficiencyPoints--;
+      return true;
+    }
+    return false;
+  }
+
+  rehydrateItem(itemData) {
+    const Item = require('../items/Item');
+    return new Item(itemData.floor, null, itemData);
+  }
+
+  addStatus(name, duration) {
+    const existing = this.activeStatuses.find(s => s.name === name);
+    if (existing) {
+      existing.duration = Math.max(existing.duration, duration);
+    } else {
+      this.activeStatuses.push({ name, duration });
+    }
+  }
+
+  processStatuses(combatLog) {
+    for (let i = this.activeStatuses.length - 1; i >= 0; i--) {
+      const status = this.activeStatuses[i];
+      if (status.name === 'SANGRAMENTO') {
+        const dmg = Math.max(5, Math.floor(this.maxHp * 0.05));
+        this.hp -= dmg;
+        if (combatLog) combatLog.push(` > ${this.name} sofreu ${dmg} de Sangramento.`);
+      }
+      if (status.name === 'COMBUSTÃO') {
+        const dmg = Math.max(10, Math.floor(this.maxHp * 0.08));
+        this.hp -= dmg;
+        if (combatLog) combatLog.push(` > ${this.name} sofreu ${dmg} de Combustão.`);
+      }
+
+      status.duration--;
+      if (status.duration <= 0) {
+        if (combatLog) combatLog.push(` > [${status.name}] expirou em ${this.name}.`);
+        this.activeStatuses.splice(i, 1);
+      }
+    }
+    if (this.hp <= 0) {
+      this.hp = 0;
+      this.isDead = true;
+    }
+  }
+
+  hasStatus(name) {
+    return this.activeStatuses.some(s => s.name === name);
+  }
+
+  removeStatus(name) {
+    this.activeStatuses = this.activeStatuses.filter(s => s.name !== name);
+  }
+
+  serialize() {
+    return {
+      id: this.id,
+      name: this.name,
+      strength: this.strength,
+      dexterity: this.dexterity,
+      intelligence: this.intelligence,
+      maxHp: this.maxHp,
+      hp: this.hp,
+      maxSp: this.maxSp,
+      sp: this.sp,
+      maxMp: this.maxMp,
+      mp: this.mp,
+      level: this.level,
+      xp: this.xp,
+      orbs: this.orbs,
+      attributePoints: this.attributePoints,
+      proficiencyPoints: this.proficiencyPoints,
+      proficiencies: this.proficiencies,
+      orbs: this.orbs,
+      activeQuest: this.activeQuest,
+      posture: this.posture,
+      maxPosture: this.maxPosture,
+      postureMode: this.postureMode,
+      equipment: this.equipment,
+      inventory: this.inventory
+    };
+  }
+
+  static fromSave(saveData) {
+    return new Entity(saveData.name, saveData);
   }
 
   getAttackPower() {
-    let power = this.level * 5;
+    let power = (this.level * 2) + (this.strength * 1.5);
     if (this.equipment.ARMA) {
       power += this.equipment.ARMA.stats.physicalDamage || 0;
     }
-    return power;
+    return Math.floor(power);
   }
 
   getDefense() {

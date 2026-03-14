@@ -1,84 +1,39 @@
-# Tutorial: Terminal Souls (v0.0.1 - MVP)
+# Tutorial: Terminal Souls (v0.8.0)
 
-Bem-vindo ao guia de inicialização e testes do **Terminal Souls**. Este documento orienta como configurar o ambiente, executar o jogo e validar as mecânicas principais.
-
----
-
-## 1. Pré-requisitos
-
-Certifique-se de ter instalado em sua máquina:
-- **Node.js**: Versão 18.0.0 ou superior.
-- **npm**: Gerenciador de pacotes do Node (instalado automaticamente com o Node.js).
+Bem-vindo ao Exílio Profundo. Este guia ensina como sobreviver e evoluir.
 
 ---
 
-## 2. Instalação
-
-Abra o terminal na pasta raiz do projeto e execute o comando abaixo para instalar as dependências necessárias (`blessed`, `chalk`, `mathjs`, etc.):
-
-```bash
-npm install
-```
+## 🏛️ O NEXUS (Hub)
+Sua base segura. Aqui você pode:
+- **Halthor (Ferreiro):** Compre armas e venda seu loot para ganhar Orbes.
+- **Altar de Transmutação:** Use 50 Orbes para tentar novos atributos em seus itens raros.
+- **Quadro de Missões:** Sempre pegue uma missão antes de entrar na fenda para ganhar XP extra.
 
 ---
 
-## 3. Como Jogar
-
-Para iniciar a interface do jogo (TUI), execute:
-
-```bash
-npm start
-```
-
-### Controles Básicos:
-- **Setas (Cima/Baixo)**: Navegar entre as opções do menu.
-- **ENTER**: Confirmar a ação selecionada.
-- **ESC / Q / Ctrl+C**: Sair do jogo a qualquer momento.
-- **Teclado**: Digitar respostas para os Puzzles Matemáticos quando solicitado.
+## ⚔️ COMBATE E RPG
+- **Posturas (H):** Use `ATTACK` para dano máximo, ou `DEFENCE` para reduzir dano recebido e de postura.
+- **Atributos:**
+  - `STR`: Mais HP e Dano Físico.
+  - `DEX`: Mais Postura Máxima.
+  - `INT`: Mais Mana Máxima.
+- **Proficiências (P):** Invista pontos de mestria para ganhar +5% de dano por ponto em tags específicas (Corte, Fogo, etc).
+- **Status Elementais:** Armas de Fogo incendeiam, Armas de Corte causam sangramento. Use as tags a seu favor.
 
 ---
 
-## 4. Guia de Testes (Manual)
-
-Para validar se o MVP está funcionando corretamente, siga este roteiro de teste:
-
-### Teste A: Exploração e Geração
-1. No menu principal, selecione **[1] Entrar na Fenda**.
-2. Verifique se o log exibe "SALA 1/X" e o tipo da sala (COMBAT, TREASURE, etc.).
-3. Confirme se as barras de status (HP/SP/MP) no canto esquerdo estão atualizadas.
-
-### Teste B: Combate e Postura
-1. Ao encontrar inimigos, selecione **[A] ATACAR**.
-2. Verifique se o valor de **SP (Stamina)** diminui após o ataque.
-3. Selecione **[P] MUDAR POSTURA** e veja se o status muda entre `ATTACK`, `BALANCED` e `DEFENCE`.
-4. Deixe sua Stamina chegar a 0 e verifique se o rótulo `EXAUSTÃO FÍSICA` aparece (isso dobra o dano que você recebe).
-
-### Teste C: Puzzles
-1. Entre em uma sala do tipo **PUZZLE**.
-2. Leia a expressão matemática no log.
-3. Digite a resposta no campo azul que aparecerá abaixo e aperte **ENTER**.
-4. Verifique se você recebe XP em caso de acerto ou perde HP em caso de erro.
-
-### Teste D: Loot e Inventário
-1. Após vencer um combate ou abrir um tesouro, verifique se o nome de um item (colorido por raridade) aparece no log.
-2. Selecione **[2] Ver Inventário** para listar seus itens coletados.
+## 🌍 EXPLORAÇÃO
+- **Andares:** A dificuldade aumenta a cada nível.
+- **Bosses:** Derrotar o chefe de um andar permite descer para o próximo nível da fenda.
+- **Morte:** Morrer faz você perder XP acumulada, mas mantém seus itens e orbes.
 
 ---
 
-## 5. Testes Automatizados (Em breve)
-
-O projeto está configurado para usar **Jest**. Para rodar a suíte de testes (atualmente em expansão):
-
-```bash
-npm test
-```
-
----
-
-## 6. Troubleshooting (Resolução de Problemas)
-
-- **Caracteres Estranhos**: Se a interface parecer quebrada, certifique-se de que seu terminal suporta UTF-8 e cores (recomenda-se VS Code Terminal, iTerm2 ou Windows Terminal).
-- **Erro de Módulo não encontrado**: Execute `npm install` novamente para garantir que todas as bibliotecas foram baixadas.
-
----
-*"O caminho do Exilado é árduo, mas a recompensa é eterna."*
+## ⌨️ CONTROLES
+- **WASD:** Movimentar no mapa.
+- **I:** Inventário (Equipar/Usar).
+- **H:** Atributos (Distribuir pontos).
+- **P:** Proficiências (Mestria).
+- **Q / ESC:** Voltar ou Fugir da Fenda.
+- **Espaço / Enter:** Confirmar seleções.

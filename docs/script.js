@@ -108,6 +108,7 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     const updateSkillTree = () => {
+        if (!simClass || !skillContainer) return;
         const selectedClass = simClass.value;
         const skills = skillData[selectedClass];
         skillContainer.innerHTML = '';
@@ -125,9 +126,12 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     [simClass, simLevel, simStr, simDex, simInt].forEach(el => {
-        el.addEventListener('input', () => {
-            updatePrestige();
-            if (el === simClass) updateSkillTree();
+        if (!el) return;
+        ['input', 'change'].forEach(evt => {
+            el.addEventListener(evt, () => {
+                updatePrestige();
+                if (el === simClass) updateSkillTree();
+            });
         });
     });
 

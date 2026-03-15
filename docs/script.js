@@ -52,6 +52,89 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }, 200);
 
+    // --- SIMULADOR DE RENOME & SKILL TREE ---
+    const skillData = {
+        'Guerreiro': {
+            'Impacto de Newton': { desc: 'Dano físico massivo. Reduz estabilidade.', cost: 15 },
+            'Inércia de Galileu': { desc: 'Aumenta defesa e recupera estabilidade.', cost: 10 },
+            'Entropia Cinética': { desc: 'Dano em área baseado em STR.', cost: 20 },
+            'Força Centrípeta': { desc: 'Gira a arma atingindo todos.', cost: 25 },
+            'Lei da Inércia': { desc: 'Imunidade a Colapso.', cost: 30 }
+        },
+        'Mago': {
+            'Raio de Maxwell': { desc: 'Dano de choque preciso.', cost: 20 },
+            'Chama de Lavoisier': { desc: 'Incendeia o inimigo.', cost: 15 },
+            'Zero Absoluto': { desc: 'Gera Stagger imediato.', cost: 25 },
+            'Paradoxo de Schrödinger': { desc: 'Chance de evitar dano.', cost: 30 },
+            'Singularidade de Hawking': { desc: 'Dreno massivo de HP.', cost: 40 }
+        },
+        'Arqueiro': {
+            'Flecha de Hawking': { desc: 'Dano crítico garantido.', cost: 15 },
+            'Diagrama de Feynman': { desc: 'Disparo múltiplo.', cost: 20 },
+            'Relatividade de Einstein': { desc: 'Aumenta Evasão.', cost: 15 },
+            'Óptica de Euclides': { desc: 'Precisão máxima.', cost: 10 },
+            'Efeito Doppler': { desc: 'Dano aumenta com a distância.', cost: 25 }
+        },
+        'Clérigo': {
+            'Cura de Hipócrates': { desc: 'Recupera HP.', cost: 20 },
+            'Sopro de Gaia': { desc: 'Remove debuffs.', cost: 15 },
+            'Luz Primordial': { desc: 'Dano e cura leve.', cost: 25 },
+            'Teorema de Pitágoras': { desc: 'Escudo triangular.', cost: 30 },
+            'Proporção Áurea': { desc: 'Harmoniza atributos.', cost: 35 }
+        }
+    };
+
+    const simClass = document.getElementById('sim-class');
+    const simLevel = document.getElementById('sim-level');
+    const simStr = document.getElementById('sim-str');
+    const simDex = document.getElementById('sim-dex');
+    const simInt = document.getElementById('sim-int');
+    const prestigeValue = document.getElementById('prestige-value');
+    const skillContainer = document.getElementById('skill-container');
+
+    const updatePrestige = () => {
+        const level = parseInt(simLevel.value) || 1;
+        const str = parseInt(simStr.value) || 10;
+        const dex = parseInt(simDex.value) || 10;
+        const int = parseInt(simInt.value) || 10;
+        
+        // Lógica simplificada de Entity.js: (Lvl * 100) + (Stats Sum * 10)
+        let prestige = (level * 100) + (str + dex + int) * 10;
+        
+        // Simular prestige de skills (assumindo que o player comprou algumas)
+        prestige += Math.floor(level / 2) * 50; 
+        
+        prestigeValue.innerText = prestige;
+    };
+
+    const updateSkillTree = () => {
+        const selectedClass = simClass.value;
+        const skills = skillData[selectedClass];
+        skillContainer.innerHTML = '';
+        
+        Object.entries(skills).forEach(([name, data]) => {
+            const node = document.createElement('div');
+            node.className = 'skill-node';
+            node.innerHTML = `
+                <h4>${name}</h4>
+                <p>${data.desc}</p>
+                <span class="cost">Custo: ${data.cost} MP</span>
+            `;
+            skillContainer.appendChild(node);
+        });
+    };
+
+    [simClass, simLevel, simStr, simDex, simInt].forEach(el => {
+        el.addEventListener('input', () => {
+            updatePrestige();
+            if (el === simClass) updateSkillTree();
+        });
+    });
+
+    // Inicialização
+    updatePrestige();
+    updateSkillTree();
+
     // Terminal-like keyboard interaction
     document.addEventListener('keydown', (e) => {
         // Log key press in a "terminal" way

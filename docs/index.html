@@ -46,6 +46,54 @@
                 </ul>
             </section>
 
+            <section class="box simulator-box">
+                <h2>[ SIMULADOR DE RENOME ]</h2>
+                <div class="content">
+                    <div class="sim-controls">
+                        <div class="input-group">
+                            <label>CLASSE:</label>
+                            <select id="sim-class">
+                                <option value="Guerreiro">Guerreiro</option>
+                                <option value="Mago">Mago</option>
+                                <option value="Arqueiro">Arqueiro</option>
+                                <option value="Clérigo">Clérigo</option>
+                            </select>
+                        </div>
+                        <div class="input-group">
+                            <label>NÍVEL:</label>
+                            <input type="number" id="sim-level" value="1" min="1" max="100">
+                        </div>
+                        <div class="stats-inputs">
+                            <div class="input-group">
+                                <label class="red">STR:</label>
+                                <input type="number" id="sim-str" value="10">
+                            </div>
+                            <div class="input-group">
+                                <label class="cyan">DEX:</label>
+                                <input type="number" id="sim-dex" value="10">
+                            </div>
+                            <div class="input-group">
+                                <label class="blue">INT:</label>
+                                <input type="number" id="sim-int" value="10">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="sim-result">
+                        <p>PRESTÍGIO ESTIMADO:</p>
+                        <span id="prestige-value" class="yellow">1300</span>
+                    </div>
+                </div>
+            </section>
+
+            <section class="box skill-tree-box">
+                <h2>[ LEGADO DOS ARQUITETOS ]</h2>
+                <div class="content">
+                    <div id="skill-container" class="skill-grid">
+                        <!-- Skills will be injected here via JS -->
+                    </div>
+                </div>
+            </section>
+
             <section class="box classes-box">
                 <h2>[ CLASSES & HABILIDADES ]</h2>
                 <div class="content class-grid">
@@ -83,7 +131,7 @@
 
         <footer class="footer-box">
             <p class="github-link">
-                <a href="https://github.com/yourusername/Terminal-Souls" target="_blank">[ ACESSAR_REPOSITÓRIO_GITHUB ]</a>
+                <a href="https://github.com/portalnexus/TS" target="_blank">[ ACESSAR_REPOSITÓRIO_GITHUB ]</a>
             </p>
             <p class="copyright">© 2026 - O Exílio aguarda sua contribuição científica.</p>
         </footer>

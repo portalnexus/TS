@@ -300,6 +300,8 @@ select {
 .yellow { color: var(--yellow); }
 .green { color: var(--green); }
 .blue { color: var(--blue); }
+.white { color: var(--white); }
+.gray { color: var(--gray); }
 
 .label { color: var(--gray); font-weight: bold; }
 

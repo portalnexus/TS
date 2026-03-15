@@ -279,10 +279,15 @@ document.addEventListener('DOMContentLoaded', () => {
     const skillContainer = document.getElementById('skill-container');
 
     const updatePrestige = () => {
-        const level = parseInt(simLevel.value) || 1;
-        const str = parseInt(simStr.value) || 10;
-        const dex = parseInt(simDex.value) || 10;
-        const int = parseInt(simInt.value) || 10;
+        const parsedLevel = parseInt(simLevel.value);
+        const parsedStr = parseInt(simStr.value);
+        const parsedDex = parseInt(simDex.value);
+        const parsedInt = parseInt(simInt.value);
+
+        const level = isNaN(parsedLevel) ? 1 : parsedLevel;
+        const str = isNaN(parsedStr) ? 10 : parsedStr;
+        const dex = isNaN(parsedDex) ? 10 : parsedDex;
+        const int = isNaN(parsedInt) ? 10 : parsedInt;
         
         // Lógica simplificada de Entity.js: (Lvl * 100) + (Stats Sum * 10)
         let prestige = (level * 100) + (str + dex + int) * 10;

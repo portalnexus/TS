@@ -26,3 +26,9 @@ O mouse foi desativado para garantir uma experiência retro-terminal autêntica 
 npm install
 npm start
 ```
+
+## 📖 Documentação Web
+Acesse a pasta `docs/` e abra `index.html` em seu navegador para explorar o universo de Terminal Souls. Lá você encontrará:
+- **Simulador de Renome:** Calcule o prestígio da sua build antes de se aventurar, combinando nível, classe e atributos (STR, DEX, INT).
+- **Galeria de Sprites ASCII:** Contemple as manifestações do Exílio com uma galeria interativa de Heróis e Inimigos em ASCII art.
+- **Transmissões do Exílio:** Acompanhe o "Códice da Existência" para notas de atualizações detalhadas (Patch Notes) e lore do jogo.

@@ -65,13 +65,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 '<span class="cyan">      /   \\      </span>'
             ],
             'Elfo': [
-                '<span class="green">     /\\     /\\   </span>',
-                '<span class="green">    /  \\___/  \\  </span>',
-                '<span class="green">   |   o   o   | </span>',
-                '<span class="green">    \\_  -  _/    </span>',
-                '<span class="green">     /| |\\      </span>',
-                '<span class="green">    / | | \\     </span>',
-                '<span class="green">     /   \\      </span>'
+                '<span class="green">     /|     |\\   </span>',
+                '<span class="green">    / |_____| \\  </span>',
+                '<span class="green">   |  ^     ^  | </span>',
+                '<span class="green">    \\_   -   _/  </span>',
+                '<span class="green">     --| |--     </span>',
+                '<span class="green">      /| |\\      </span>',
+                '<span class="green">     /     \\     </span>'
             ],
             'Anão': [
                 '<span class="yellow">      _____      </span>',
@@ -102,6 +102,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 '<span class="white">     |__|__|     </span>',
                 '<span class="white">     /     \\     </span>'
             ],
+            'Esqueleto de Gauss': [
+                '<span class="white">      .---.      </span>',
+                '<span class="white">     / ( ) \\     </span>',
+                '<span class="white">    |  _|_  |    </span>',
+                '<span class="white">     \\_/_\\_/     </span>',
+                '<span class="white">      _|_|_      </span>',
+                '<span class="white">     |  |  |     </span>',
+                '<span class="white">     |__|__|     </span>'
+            ],
             'Lobo Corrompido': [
                 '<span class="gray">    /\\___/\\    </span>',
                 '<span class="gray">   / o   o \\   </span>',
@@ -109,6 +118,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 '<span class="gray">   )       (   </span>',
                 '<span class="gray">  /         \\  </span>',
                 '<span class="gray"> /           \\ </span>'
+            ],
+            'Lobo de Turing': [
+                '<span class="cyan">    /\\___/\\    </span>',
+                '<span class="cyan">   / 0   1 \\   </span>',
+                '<span class="cyan">  ( == X == )  </span>',
+                '<span class="cyan">   ) 10101 (   </span>',
+                '<span class="cyan">  / 0101010 \\  </span>',
+                '<span class="cyan"> / 101010101 \\ </span>'
             ],
             'Guerreiro Caído': [
                 '<span class="red">     ._____.     </span>',
@@ -118,6 +135,127 @@ document.addEventListener('DOMContentLoaded', () => {
                 '<span class="red">   / |  X  | \\   </span>',
                 '<span class="red">  /  |_____|  \\  </span>',
                 '<span class="red">     |     |     </span>'
+            ],
+            'Autômato de Pascal': [
+                '<span class="yellow">     _______     </span>',
+                '<span class="yellow">    | [ ] [ ] |    </span>',
+                '<span class="yellow">    |    ^    |    </span>',
+                '<span class="yellow">    |  [===]  |    </span>',
+                '<span class="yellow">    |_________|    </span>',
+                '<span class="yellow">     |_|   |_|     </span>',
+                '<span class="yellow">     |_|   |_|     </span>'
+            ],
+            'Eco de Noether': [
+                '<span class="magenta">     < * * >     </span>',
+                '<span class="magenta">    <   |   >    </span>',
+                '<span class="magenta">   <--- o --->   </span>',
+                '<span class="magenta">    <   |   >    </span>',
+                '<span class="magenta">     < * * >     </span>',
+                '<span class="magenta">      / | \\      </span>',
+                '<span class="magenta">     /  |  \\     </span>'
+            ],
+            'Fractal de Mandelbrot': [
+                '<span class="magenta">      { & % }     </span>',
+                '<span class="magenta">    { % # @ & }   </span>',
+                '<span class="magenta">   { & @ % # @ }  </span>',
+                '<span class="magenta">    { % # @ & }   </span>',
+                '<span class="magenta">      { & % }     </span>'
+            ],
+            'Prisma de Pitágoras': [
+                '<span class="yellow">        /\\       </span>',
+                '<span class="yellow">       /  \\      </span>',
+                '<span class="yellow">      /____\\     </span>',
+                '<span class="yellow">     | a²+b²|    </span>',
+                '<span class="yellow">     |  =c² |    </span>',
+                '<span class="yellow">     |______|    </span>'
+            ],
+            'Matriz de Cayley': [
+                '<span class="blue">     [ a  b ]    </span>',
+                '<span class="blue">     [ c  d ]    </span>',
+                '<span class="blue">     [ e  f ]    </span>',
+                '<span class="blue">      Vektor     </span>',
+                '<span class="blue">     <------>    </span>'
+            ],
+            'Coelho de Fibonacci': [
+                '<span class="white">      (\\_/)      </span>',
+                '<span class="white">      (o.o)      </span>',
+                '<span class="white">     (>1,1<)     </span>',
+                '<span class="white">      (2,3)      </span>',
+                '<span class="white">      (5,8)      </span>'
+            ],
+            'Diferencial de Leibniz': [
+                '<span class="green">      dy / dx     </span>',
+                '<span class="green">     ∫ (f(x))     </span>',
+                '<span class="green">    |   ||   |    </span>',
+                '<span class="green">    |   ||   |    </span>',
+                '<span class="green">     -------     </span>'
+            ],
+            'Crivo de Eratóstenes': [
+                '<span class="red">    [2][3][5]    </span>',
+                '<span class="red">    [7][11][13]  </span>',
+                '<span class="red">    [17][19][23] </span>',
+                '<span class="red">     # PRIMES #  </span>',
+                '<span class="red">     ##########  </span>'
+            ],
+            'Euler (Arquiteto da Identidade)': [
+                '<span class="yellow" style="font-weight:bold">      .-------.      </span>',
+                '<span class="yellow" style="font-weight:bold">     / e^iπ+1=0 \\     </span>',
+                '<span class="yellow" style="font-weight:bold">    |   ( ∑ )   |    </span>',
+                '<span class="yellow" style="font-weight:bold">    |   / | \\   |    </span>',
+                '<span class="yellow" style="font-weight:bold">    |  /  |  \\  |    </span>',
+                '<span class="yellow" style="font-weight:bold">   /   --|--   \\   </span>',
+                '<span class="yellow" style="font-weight:bold">  /    /   \\    \\  </span>',
+                '<span class="yellow" style="font-weight:bold"> /_______________\\  </span>'
+            ],
+            'Lovelace (Tecelã da Lógica)': [
+                '<span class="green" style="font-weight:bold">      .-------.      </span>',
+                '<span class="green" style="font-weight:bold">     / [10101] \\     </span>',
+                '<span class="green" style="font-weight:bold">    |  { LOOP } |    </span>',
+                '<span class="green" style="font-weight:bold">    |   ( < > ) |    </span>',
+                '<span class="green" style="font-weight:bold">    |  /  |  \\  |    </span>',
+                '<span class="green" style="font-weight:bold">   /   --|--   \\   </span>',
+                '<span class="green" style="font-weight:bold">  /    /   \\    \\  </span>',
+                '<span class="green" style="font-weight:bold"> /_______________\\  </span>'
+            ],
+            'Riemann (Guardião da Hipótese)': [
+                '<span class="blue" style="font-weight:bold">      .-------.      </span>',
+                '<span class="blue" style="font-weight:bold">     /  ζ(s)=0  \\     </span>',
+                '<span class="blue" style="font-weight:bold">    |  (  ∞  )  |    </span>',
+                '<span class="blue" style="font-weight:bold">    |   / | \\   |    </span>',
+                '<span class="blue" style="font-weight:bold">    |  /  |  \\  |    </span>',
+                '<span class="blue" style="font-weight:bold">   /   --|--   \\   </span>',
+                '<span class="blue" style="font-weight:bold">  /    /   \\    \\  </span>',
+                '<span class="blue" style="font-weight:bold"> /_______________\\  </span>'
+            ],
+            'Newton (Arquiteto da Gravidade)': [
+                '<span class="red" style="font-weight:bold">      .-------.      </span>',
+                '<span class="red" style="font-weight:bold">     /   [G]   \\     </span>',
+                '<span class="red" style="font-weight:bold">    |  F = ma   |    </span>',
+                '<span class="red" style="font-weight:bold">    |   ( O )   |    </span>',
+                '<span class="red" style="font-weight:bold">    |  /  |  \\  |    </span>',
+                '<span class="red" style="font-weight:bold">   /   --|--   \\   </span>',
+                '<span class="red" style="font-weight:bold">  /    /   \\    \\  </span>',
+                '<span class="red" style="font-weight:bold"> /_______________\\  </span>'
+            ],
+            'Hawking (Senhor da Singularidade)': [
+                '<span class="blue" style="font-weight:bold">      .-------.      </span>',
+                '<span class="blue" style="font-weight:bold">     /  (   )  \\     </span>',
+                '<span class="blue" style="font-weight:bold">    |   ( X )   |    </span>',
+                '<span class="blue" style="font-weight:bold">    |  (     )  |    </span>',
+                '<span class="blue" style="font-weight:bold">    |   -----   |    </span>',
+                '<span class="blue" style="font-weight:bold">   /     |     \\   </span>',
+                '<span class="blue" style="font-weight:bold">  /    /   \\    \\  </span>',
+                '<span class="blue" style="font-weight:bold"> /_______________\\  </span>'
+            ],
+            'Maxwell (Tecelão do Eletromagnetismo)': [
+                '<span class="cyan" style="font-weight:bold">      .-------.      </span>',
+                '<span class="cyan" style="font-weight:bold">     /  ~ ~ ~  \\     </span>',
+                '<span class="cyan" style="font-weight:bold">    |  E -> B   |    </span>',
+                '<span class="cyan" style="font-weight:bold">    |  (  ⚡  )  |    </span>',
+                '<span class="cyan" style="font-weight:bold">    |  /  |  \\  |    </span>',
+                '<span class="cyan" style="font-weight:bold">   /   --|--   \\   </span>',
+                '<span class="cyan" style="font-weight:bold">  /    /   \\    \\  </span>',
+                '<span class="cyan" style="font-weight:bold"> /_______________\\  </span>'
             ],
             'Senhor das Fendas': [
                 '<span class="magenta" style="font-weight:bold">      .-------.      </span>',

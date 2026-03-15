@@ -3,39 +3,90 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Terminal Souls</title>
+    <title>Terminal Souls: The Echoes of Reason</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@300;400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
-<body>
+<body class="crt">
+    <div class="scanlines"></div>
     <div class="container">
-        <h1>Terminal Souls</h1>
-        <p><strong>Terminal Souls</strong> é um TUI-ARPG (RPG de Ação com Interface de Texto) inspirado em Dark Souls e Path of Exile. Experiencie uma interface de terminal minimalista que serve como uma janela para sistemas matemáticos e lógicos profundos.</p>
+        <header class="header-box">
+            <h1 class="glitch" data-text="TERMINAL SOULS">TERMINAL SOULS</h1>
+            <p class="subtitle">THE ECHOES OF REASON - v0.9.9.1</p>
+        </header>
 
-        <h2>Recursos Adicionados na v0.8.0</h2>
-        <ul>
-            <li><strong>Nexus & Economia:</strong> Sistema completo com Blacksmith (Ferreiro) rotativo, Altar de Crafting com reroll, Quadro de Missões e economia baseada em Orbes.</li>
-            <li><strong>Combate & RPG:</strong> Progressão com Atributos Nucleares (STR, DEX, INT), Árvore de Proficiências e Reações Elementais complexas (Sangramento, Combustão, Choque).</li>
-            <li><strong>Mundo & Exploração:</strong> Biomas procedurais dinâmicos (Gelo, Vazio, Fogo), mecânica de Descida Infinita e um Boss de Ascensão no andar 10.</li>
-            <li><strong>Sistema de Almas:</strong> Persistência total garantindo que Inventário, Orbes, Missões Ativas e Proficiências sejam salvos localmente em JSON.</li>
-            <li><strong>Estética TUI Imersiva:</strong> Hierarquia visual limpa, nostálgica e altamente informativa usando Chalk e Blessed.</li>
-        </ul>
+        <main class="grid-layout">
+            <section class="box status-box">
+                <h2>[ STATUS DO PROJETO ]</h2>
+                <div class="content">
+                    <p><span class="label">VERSÃO:</span> <span class="value cyan">0.9.9.1</span></p>
+                    <p><span class="label">NÚCLEO:</span> <span class="value red">Node.js / TUI</span></p>
+                    <p><span class="label">ESTADO:</span> <span class="value yellow">Polimento Científico</span></p>
+                    <p><span class="label">OBJETIVO:</span> <span class="value green">Andar 100</span></p>
+                </div>
+            </section>
 
-        <h2>Ciclo de Jogo</h2>
-        <p>Explore mapas 2D gerados proceduralmente, engaje em combates por turnos, resolva missões e quebra-cabeças, colete itens e melhore seu equipamento no Nexus para progredir e ascender níveis através do mundo vivo da v0.8.0.</p>
+            <section class="box vision-box">
+                <h2>[ VISÃO GERAL ]</h2>
+                <div class="content">
+                    <p><strong>Terminal Souls</strong> é um TUI-ARPG (RPG de Ação com Interface de Texto) que funde a brutalidade dos <em>Souls-like</em> com a complexidade de <em>Path of Exile</em>, sob uma lente de <strong>História da Ciência e Matemática</strong>.</p>
+                    <p>Navegue pelo Exílio usando apenas seu teclado, enfrentando manifestações físicas do conhecimento humano em um mundo gerado proceduralmente.</p>
+                </div>
+            </section>
 
-        <h2>Arquitetura Técnica</h2>
-        <ul>
-            <li><strong>Tempo de Execução (Runtime):</strong> Node.js (v18+)</li>
-            <li><strong>Interface:</strong> <code>blessed</code> (Layout e Entrada), <code>chalk</code> (Cores/Estética)</li>
-            <li><strong>Lógica de Dados:</strong> <code>uuid</code> (IDs de itens únicos), <code>mathjs</code> (Geração de Quebra-cabeças)</li>
-        </ul>
+            <section class="box pillars-box">
+                <h2>[ PILARES DE DESIGN ]</h2>
+                <ul class="content">
+                    <li><strong class="red">Intelecto como Arma:</strong> Combate tático onde puzzles matemáticos e lógica são tão letais quanto sua espada.</li>
+                    <li><strong class="cyan">Ecos da Razão:</strong> Dungeons (Fendas) inspiradas em mentes como Newton, Hawking, Turing e Noether.</li>
+                    <li><strong class="magenta">Legado dos Arquitetos:</strong> Árvores de habilidades baseadas em leis físicas e teoremas matemáticos.</li>
+                    <li><strong class="yellow">Hardcore:</strong> Morte permanente. No Exílio, a falha significa a deleção total de sua alma, mas seu Renome é eterno.</li>
+                </ul>
+            </section>
 
-        <h2>Status</h2>
-        <p>Atualmente na <strong>v0.8.0 - A Ascensão do Exilado</strong>. O loop de gameplay está completo, apresentando persistência, progressão de personagens por atributos, hubs sociais (Nexus) e economia em funcionamento.</p>
+            <section class="box classes-box">
+                <h2>[ CLASSES & HABILIDADES ]</h2>
+                <div class="content class-grid">
+                    <div class="class-card">
+                        <h3 class="red">Guerreiro</h3>
+                        <p>Leis de Newton & Inércia.</p>
+                    </div>
+                    <div class="class-card">
+                        <h3 class="blue">Mago</h3>
+                        <p>Maxwell & Schrödinger.</p>
+                    </div>
+                    <div class="class-card">
+                        <h3 class="yellow">Arqueiro</h3>
+                        <p>Einstein & Euclides.</p>
+                    </div>
+                    <div class="class-card">
+                        <h3 class="green">Clérigo</h3>
+                        <p>Pitágoras & Hipócrates.</p>
+                    </div>
+                </div>
+            </section>
 
-        <p class="github-link">
-            <a href="https://github.com/yourusername/Terminal-Souls" target="_blank">Ver no GitHub</a>
-        </p>
+            <section class="box tech-box">
+                <h2>[ ARQUITETURA TÉCNICA ]</h2>
+                <div class="content">
+                    <ul>
+                        <li><code>blessed</code> & <code>chalk</code> para renderização TUI imersiva.</li>
+                        <li><code>mathjs</code> para geração dinâmica de puzzles históricos.</li>
+                        <li>Navegação 100% via teclado (1-0, Q/E, WASD).</li>
+                        <li>Sistema de Orbes e Economia de Crafting (Altar de Transmutação).</li>
+                    </ul>
+                </div>
+            </section>
+        </main>
+
+        <footer class="footer-box">
+            <p class="github-link">
+                <a href="https://github.com/yourusername/Terminal-Souls" target="_blank">[ ACESSAR_REPOSITÓRIO_GITHUB ]</a>
+            </p>
+            <p class="copyright">© 2026 - O Exílio aguarda sua contribuição científica.</p>
+        </footer>
     </div>
     <script src="script.js"></script>
 </body>

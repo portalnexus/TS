@@ -7,7 +7,7 @@ class Combat {
     this.turn = 1;
     this.log = [];
     this.isOver = false;
-    this.result = null; // 'WIN', 'LOSS', 'FLED'
+    this.result = null;
   }
 
   addLog(msg) {
@@ -17,48 +17,27 @@ class Combat {
 
   calculateDamage(attacker, target, moveType = 'physical', skillMultiplier = 1) {
     let baseDamage = attacker.getAttackPower() + Math.floor(Math.random() * 5);
-    let postureDamage = 10;
+    let stabilityDmg = 15;
 
     if (moveType === 'physical') {
       baseDamage = Math.max(attacker.level, baseDamage - target.getDefense());
     }
 
-    if (attacker.postureMode === 'ATTACK') {
-      baseDamage *= 1.5;
-      postureDamage *= 1.2;
-    } else if (attacker.postureMode === 'DEFENCE') {
-      baseDamage *= 0.7;
-    }
-
-    if (target.postureMode === 'DEFENCE') {
-      baseDamage *= 0.5;
-      postureDamage *= 0.5;
-    } else if (target.postureMode === 'ATTACK') {
-      baseDamage *= 1.2;
-    }
-
-    if (attacker.proficiencies) {
-      let tagBonus = 1;
-      const tagsToCheck = attacker.equipment.ARMA ? attacker.equipment.ARMA.tags : [];
-      tagsToCheck.forEach(tag => {
-        if (attacker.proficiencies[tag]) tagBonus += (attacker.proficiencies[tag] * 0.05);
-      });
-
-      if (moveType === 'magical') {
-        if (attacker.proficiencies['VAZIO']) tagBonus += (attacker.proficiencies['VAZIO'] * 0.05);
-        if (attacker.background === 'Mago') tagBonus *= 1.1;
-      }
-      baseDamage *= tagBonus;
+    // Sinergias de Reação
+    if (typeof target.hasStatus === 'function' && target.hasStatus('SANGRAMENTO') && attacker.equipment.ARMA?.tags.includes('FOGO')) {
+      baseDamage *= 2;
+      target.removeStatus('SANGRAMENTO');
+      this.addLog(chalk.bold.red(' >>> CAUTERIZAÇÃO: Dano térmico massivo!'));
     }
 
     if (target.isStaggered) {
       baseDamage *= 2;
-      this.addLog(chalk.bold.yellow(` ! CRÍTICO: ${target.name} está vulnerável!`));
+      this.addLog(chalk.bold.yellow(` ! COLAPSO: ${target.name} está vulnerável!`));
     }
 
     return {
       hpDamage: Math.floor(baseDamage * skillMultiplier),
-      postureDamage: Math.floor(postureDamage)
+      stabilityDmg: Math.floor(stabilityDmg)
     };
   }
 
@@ -69,20 +48,26 @@ class Combat {
     this.player.processStatuses(this.log);
     if (this.player.isDead) { this.isOver = true; this.result = 'LOSS'; return; }
 
+    // Penalidade de Estabilidade por Ação no modo MOMENTO
+    if (this.player.postureMode === 'MOMENTO') {
+      this.player.modifyStability(-10);
+      this.addLog(chalk.gray(' > Momento reduz estabilidade (-10).'));
+    }
+
     switch (action) {
       case 'ATTACK':
-        if (this.player.sp < 10) this.addLog(chalk.red(' > Stamina insuficiente!'));
+        if (this.player.sp < 10) { this.addLog(chalk.red(' > Sem stamina!')); return false; }
         const dmg = this.calculateDamage(this.player, target);
         target.takeDamage(dmg.hpDamage, 'physical');
-        target.addPostureDamage(dmg.postureDamage);
+        target.modifyStability(-dmg.stabilityDmg);
         this.player.consumeSp(15);
-        this.addLog(` > Você atacou ${target.name} causando ${dmg.hpDamage} de dano.`);
+        this.addLog(` > Ataque em ${target.name}: ${dmg.hpDamage} dano.`);
         this.applyElementalEffects(target);
         break;
 
       case 'RECOVER':
         this.player.recover();
-        this.addLog(chalk.green(' > Você assumiu uma postura defensiva e recuperou recursos.'));
+        this.addLog(chalk.green(' > Meditação científica recuperou recursos e estabilidade.'));
         break;
 
       case 'SKILL':
@@ -111,45 +96,28 @@ class Combat {
     if (name === 'Impacto de Newton' || name === 'Flecha de Hawking') {
       const dmg = this.calculateDamage(this.player, target, 'physical', 1.5 * lvlBonus);
       target.takeDamage(dmg.hpDamage, 'physical');
-      target.addPostureDamage(dmg.postureDamage * 1.5);
-      this.addLog(` > Dano causado: ${dmg.hpDamage}.`);
-    } else if (name === 'Raio de Maxwell' || name === 'Chama de Lavoisier' || name === 'Luz Primordial') {
+      target.modifyStability(-30 * lvlBonus);
+      this.addLog(` > Impacto devastador: ${dmg.hpDamage}.`);
+    } else if (name === 'Zero Absoluto') {
+      target.modifyStability(-100);
+      this.addLog(` > Zero Absoluto congelou o movimento do alvo.`);
+    } else if (name === 'Singularidade de Hawking') {
+      const dmg = Math.floor(target.hp * 0.3 * lvlBonus);
+      target.takeDamage(dmg, 'magical');
+      this.player.hp = Math.min(this.player.maxHp, this.player.hp + Math.floor(dmg * 0.5));
+      this.addLog(` > A singularidade drenou ${dmg} de vida.`);
+    } else {
       const dmg = this.calculateDamage(this.player, target, 'magical', 1.8 * lvlBonus);
       target.takeDamage(dmg.hpDamage, 'magical');
-      this.addLog(` > Dano mágico causado: ${dmg.hpDamage}.`);
       if (name === 'Chama de Lavoisier') target.addStatus('COMBUSTÃO', 3);
-      if (name === 'Luz Primordial') this.player.recover(0.05, 0, 0);
-    } else if (name === 'Cura de Hipócrates') {
-      this.player.recover(0.2 * lvlBonus, 0, 0);
-      this.addLog(` > Você recuperou vida.`);
-    } else if (name === 'Inércia de Galileu' || name === 'Relatividade de Einstein') {
-      this.player.addPostureDamage(-20 * lvlBonus);
-      this.addLog(` > Sua postura se estabilizou.`);
-    } else if (name === 'Zero Absoluto') {
-      target.isStaggered = true;
-      this.addLog(` > ${target.name} foi congelado!`);
-    } else {
-      // Fallback
-      const dmg = this.calculateDamage(this.player, target, 'physical', lvlBonus);
-      target.takeDamage(dmg.hpDamage);
     }
   }
 
   applyElementalEffects(target) {
-    if (this.player.equipment.ARMA && this.player.equipment.ARMA.tags) {
+    if (this.player.equipment.ARMA?.tags) {
       const tags = this.player.equipment.ARMA.tags;
-      if (tags.includes('CORTE') && Math.random() > 0.5) {
-        target.addStatus('SANGRAMENTO', 3);
-        this.addLog(chalk.red(` > ${target.name} está sangrando!`));
-      }
-      if (tags.includes('FOGO') && Math.random() > 0.6) {
-        target.addStatus('COMBUSTÃO', 2);
-        this.addLog(chalk.yellow(` > ${target.name} entrou em combustão!`));
-      }
-      if (tags.includes('CHOQUE') && Math.random() > 0.7) {
-        target.isStaggered = true;
-        this.addLog(chalk.cyan(` > Choque atordoou ${target.name}!`));
-      }
+      if (tags.includes('CORTE') && Math.random() > 0.5) target.addStatus('SANGRAMENTO', 3);
+      if (tags.includes('FOGO') && Math.random() > 0.6) target.addStatus('COMBUSTÃO', 2);
     }
   }
 
@@ -159,47 +127,27 @@ class Combat {
       enemy.processStatuses(this.log);
       if (enemy.isDead) return;
       if (enemy.isStaggered) {
-        this.addLog(chalk.gray(` > ${enemy.name} está atordoado e perdeu o turno.`));
-        enemy.recover(0, 0, 0);
+        this.addLog(chalk.gray(` > ${enemy.name} em Colapso (Turno Perdido).`));
+        enemy.modifyStability(40);
         return;
       }
       const dmg = this.calculateDamage(enemy, this.player);
       this.player.takeDamage(dmg.hpDamage, 'physical');
-      this.player.addPostureDamage(dmg.postureDamage);
-      this.addLog(chalk.red(` > ${enemy.name} atacou você: ${dmg.hpDamage} de dano.`));
-      if (this.player.isDead) {
-        this.isOver = true;
-        this.result = 'LOSS';
-        this.addLog(chalk.bold.red(' >>> VOCÊ MORREU <<<'));
-      }
+      this.player.modifyStability(-dmg.stabilityDmg);
+      this.addLog(chalk.red(` > ${enemy.name} atacou: ${dmg.hpDamage} dano.`));
+      if (this.player.isDead) { this.isOver = true; this.result = 'LOSS'; }
     });
     this.turn++;
     this.checkVictory();
   }
 
   checkVictory() {
-    this.enemies.forEach(e => {
-      if (e.isDead && !e.recorded) {
-        this.player.recordKill(e.name);
-        e.recorded = true; // Evita duplicar abates no mesmo combate
-      }
-    });
-
+    this.enemies.forEach(e => { if (e.isDead && !e.recorded) { this.player.recordKill(e.name); e.recorded = true; } });
     if (this.enemies.every(e => e.isDead)) {
-      this.isOver = true;
-      this.result = 'WIN';
-      const xpReward = this.enemies.reduce((acc, e) => acc + (e.level * 25), 0);
-      const leveledUp = this.player.addExperience(xpReward);
-      this.addLog(chalk.bold.green(` >>> VITÓRIA! +${xpReward} XP. <<<`));
-      if (leveledUp) this.addLog(chalk.bold.cyan(' >>> NÍVEL AUMENTADO! <<<'));
-      if (this.player.activeQuest && this.player.activeQuest.type === 'KILL' && !this.player.activeQuest.completed) {
-        this.player.activeQuest.progress += this.enemies.length;
-        if (this.player.activeQuest.progress >= this.player.activeQuest.target) {
-          this.player.activeQuest.progress = this.player.activeQuest.target;
-          this.player.activeQuest.completed = true;
-          this.addLog(chalk.bold.yellow(' [!] MISSÃO CONCLUÍDA! Retorne ao Nexus.'));
-        }
-      }
+      this.isOver = true; this.result = 'WIN';
+      const xp = this.enemies.reduce((acc, e) => acc + (e.level * 25), 0);
+      this.player.addExperience(xp);
+      this.addLog(chalk.bold.green(` >>> VITORIA CIENTIFICA! +${xp} XP. <<<`));
     }
   }
 }

@@ -1,22 +1,20 @@
 # CONTEXTO DE PROJETO: TERMINAL SOULS - THE ECHOES OF REASON
 
 ## 1. Visão Geral
-**Terminal Souls** é um TUI-ARPG focado na História da Ciência e Matemática.
-- **Estética:** Retro-terminal com sprites ASCII específicos e lore científica.
-- **Loop:** Criação -> Exploração de "Fendas de Razão" -> Puzzles (Euler/Lovelace) -> Loot (Newton/Hawking) -> Progressão (Skill Tree Científica).
-- **Hardcore:** Morte Permanente.
+**Terminal Souls** (v0.9.9.1) é um TUI-ARPG focado em estratégia científica e legado matemático.
+- **Navegação:** Teclado puro (1-0, Q/E, WASD). Mouse desativado para imersão TUI.
+- **Loop:** Criação -> Exploração -> Puzzles -> Loot -> Evolução via NPCs (Ada, Marie, Darwin).
+- **Core:** Sistema de Estabilidade Cinética e Renome Científico (Score).
 
 ## 2. Arquitetura Técnica
-- **Skill Tree:** Sistema de passivas baseadas em teorias (Cálculo, Termodinâmica, etc).
-- **Lore System:** Flavor text em itens raros/lendários referenciando personalidades históricas.
+- **Interatividade:** Listener global de teclas numéricas para componentes `List` focados.
+- **UI:** Layout dinâmico com Status, Sinergias, Legenda, Mapa/Combate, Logs e Análise de Dados.
+- **Score:** Sistema de Renome baseado em nível, atributos, itens, skills e bestiário.
 
-## 3. Mecânicas Core (v0.9.0)
-- **Ecos da Razão:** Narrativa e biomas integrados à história da ciência.
-- **Intelecto como Arma:** Puzzles matemáticos e lógicos avançados.
-- **Passivas (Legado):** Nova árvore de habilidades com 5 ramificações teóricas.
+## 3. Estado do Roadmap
+- [x] v0.9.9.1 - Renome Científico, Orbes em Destaque, Teclado Puro.
+- [ ] v1.0.0 - Boss Final (O Arquiteto), Balanceamento do Andar 100, Créditos.
+- [ ] v1.1.0+ - Multiplayer Assíncrono e Hub Social (Futuro).
 
-## 4. Roadmap Atualizado
-- [x] v0.8.5 - Polimento RPG e Puzzles.
-- [x] v0.9.0 - Ecos da Razão (Lore Científica) e Skill Tree.
-- [ ] v0.9.5 - Bestiário e Modo Boss Rush.
-- [ ] v1.0.0 - Lançamento Single Player (Boss: O Arquiteto).
+## 4. Instruções para Retomada
+O sistema de combate em `src/combat/Combat.js` utiliza `target.hasStatus`. A navegação 1-0 é tratada no fim de `src/index.js` e redireciona para a lista focada. O Prestígio é calculado em `src/entities/Entity.js`.

@@ -110,6 +110,20 @@ class Item {
     return Math.floor(rarityMult[this.rarity] * (1 + (this.floor * 0.2)));
   }
 
+  refine(newFloor) {
+    this.floor = newFloor;
+    this.stats = this.generateStats();
+    if (this.rarity === 'LENDÁRIO' && this.uniques.length === 0) this.generateUniqueEffect();
+  }
+
+  toggleRadiant() {
+    if (!this.tags.includes('RADIANTE')) {
+      this.tags.push('RADIANTE');
+      return true;
+    }
+    return false;
+  }
+
   getDetails() {
     let details = `${this.getColorizedName()}\n`;
     details += `${chalk.gray(this.type)} | Andar ${this.floor}\n`;

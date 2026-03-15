@@ -34,15 +34,16 @@ class Entity {
     this.activeQuest = stats.activeQuest || null;
 
     this.skillTree = stats.skillTree || this.initializeSkillTree();
-    this.bestiary = stats.bestiary || {}; // Registro de monstros derrotados
+    this.bestiary = stats.bestiary || {};
 
     this.proficiencies = stats.proficiencies || {
       'CORTE': 0, 'ESMAGAMENTO': 0, 'FOGO': 0, 'CHOQUE': 0, 'VAZIO': 0
     };
 
-    this.posture = stats.posture || 0;
-    this.maxPosture = stats.maxPosture || (100 + (this.dexterity * 2) + (this.background === 'Arqueiro' ? 10 : 0));
-    this.postureMode = stats.postureMode || 'BALANCED';
+    // --- REVISÃO DE POSTURA: ESTABILIDADE CINÉTICA ---
+    this.posture = stats.posture || 100; // Estabilidade agora começa em 100
+    this.maxPosture = stats.maxPosture || (100 + (this.dexterity * 5));
+    this.postureMode = stats.postureMode || 'EQUILIBRIO'; // INERCIA, MOMENTO, EQUILIBRIO
 
     this.activeStatuses = [];
     this.isDead = false;
@@ -61,32 +62,32 @@ class Entity {
   initializeSkillTree() {
     const trees = {
       'Guerreiro': {
-        'Impacto de Newton': { lvl: 0, desc: 'Dano físico massivo.', cost: 15 },
-        'Inércia de Galileu': { lvl: 0, desc: 'Aumenta defesa temporariamente.', cost: 10 },
+        'Impacto de Newton': { lvl: 0, desc: 'Dano físico massivo. Reduz estabilidade.', cost: 15 },
+        'Inércia de Galileu': { lvl: 0, desc: 'Aumenta defesa e recupera estabilidade.', cost: 10 },
         'Entropia Cinética': { lvl: 0, desc: 'Dano em área baseado em STR.', cost: 20 },
         'Força Centrípeta': { lvl: 0, desc: 'Gira a arma atingindo todos.', cost: 25 },
-        'Lei da Inércia': { lvl: 0, desc: 'Torna-se imune a Stagger.', cost: 30 }
+        'Lei da Inércia': { lvl: 0, desc: 'Imunidade a Colapso.', cost: 30 }
       },
       'Mago': {
         'Raio de Maxwell': { lvl: 0, desc: 'Dano de choque preciso.', cost: 20 },
         'Chama de Lavoisier': { lvl: 0, desc: 'Incendeia o inimigo.', cost: 15 },
-        'Zero Absoluto': { lvl: 0, desc: 'Congela e causa Stagger.', cost: 25 },
-        'Paradoxo de Schrödinger': { lvl: 0, desc: 'Chance de evitar dano ou dobrar dano.', cost: 30 },
-        'Singularidade de Hawking': { lvl: 0, desc: 'Buraco negro que suga HP.', cost: 40 }
+        'Zero Absoluto': { lvl: 0, desc: 'Gera Stagger imediato.', cost: 25 },
+        'Paradoxo de Schrödinger': { lvl: 0, desc: 'Chance de evitar dano.', cost: 30 },
+        'Singularidade de Hawking': { lvl: 0, desc: 'Dreno massivo de HP.', cost: 40 }
       },
       'Arqueiro': {
         'Flecha de Hawking': { lvl: 0, desc: 'Dano crítico garantido.', cost: 15 },
         'Diagrama de Feynman': { lvl: 0, desc: 'Disparo múltiplo.', cost: 20 },
-        'Relatividade de Einstein': { lvl: 0, desc: 'Aumenta Evasão e Postura.', cost: 15 },
-        'Óptica de Euclides': { lvl: 0, desc: 'Aumenta precisão drasticamente.', cost: 10 },
-        'Efeito Doppler': { lvl: 0, desc: 'Flechas que ganham velocidade/dano.', cost: 25 }
+        'Relatividade de Einstein': { lvl: 0, desc: 'Aumenta Evasão.', cost: 15 },
+        'Óptica de Euclides': { lvl: 0, desc: 'Precisão máxima.', cost: 10 },
+        'Efeito Doppler': { lvl: 0, desc: 'Dano aumenta com a distância.', cost: 25 }
       },
       'Clérigo': {
         'Cura de Hipócrates': { lvl: 0, desc: 'Recupera HP.', cost: 20 },
-        'Sopro de Gaia': { lvl: 0, desc: 'Remove efeitos negativos.', cost: 15 },
-        'Luz Primordial': { lvl: 0, desc: 'Dano mágico e cura leve.', cost: 25 },
-        'Teorema de Pitágoras': { lvl: 0, desc: 'Escudo triangular perfeito.', cost: 30 },
-        'Proporção Áurea': { lvl: 0, desc: 'Harmoniza todos os status.', cost: 35 }
+        'Sopro de Gaia': { lvl: 0, desc: 'Remove debuffs.', cost: 15 },
+        'Luz Primordial': { lvl: 0, desc: 'Dano e cura leve.', cost: 25 },
+        'Teorema de Pitágoras': { lvl: 0, desc: 'Escudo triangular.', cost: 30 },
+        'Proporção Áurea': { lvl: 0, desc: 'Harmoniza atributos.', cost: 35 }
       }
     };
     return trees[this.background] || trees['Guerreiro'];
@@ -96,12 +97,8 @@ class Entity {
     this.xp += amount;
     let leveledUp = false;
     while (this.xp >= this.xpToNextLevel) {
-      this.xp -= this.xpToNextLevel;
-      this.level++;
-      this.xpToNextLevel = this.level * 100;
-      this.attributePoints += 3;
-      this.proficiencyPoints += 1;
-      this.skillPoints += 1;
+      this.xp -= this.xpToNextLevel; this.level++; this.xpToNextLevel = this.level * 100;
+      this.attributePoints += 3; this.proficiencyPoints += 1; this.skillPoints += 1;
       leveledUp = true;
     }
     return leveledUp;
@@ -110,44 +107,40 @@ class Entity {
   upgradeAttribute(attr) {
     if (this.attributePoints <= 0) return false;
     if (attr === 'STR') { this.strength++; this.maxHp += 8; this.maxSp += 2; }
-    else if (attr === 'DEX') { this.dexterity++; this.maxPosture += 2; }
+    else if (attr === 'DEX') { this.dexterity++; this.maxPosture += 5; }
     else if (attr === 'INT') { this.intelligence++; this.maxMp += 2; }
-    this.attributePoints--;
-    return true;
+    this.attributePoints--; return true;
   }
 
   upgradeSkill(skillName) {
-    if (this.skillPoints > 0 && this.skillTree[skillName]) {
-      this.skillTree[skillName].lvl++;
-      this.skillPoints--;
+    if (this.skillPoints > 0 && this.skillTree[skillName]) { this.skillTree[skillName].lvl++; this.skillPoints--; return true; }
+    return false;
+  }
+
+  adaptAttribute(attr, orbCost) {
+    if (this.orbs >= orbCost) {
+      if (attr === 'STR') { this.strength++; this.maxHp += 8; }
+      else if (attr === 'DEX') { this.dexterity++; this.maxPosture += 5; }
+      else if (attr === 'INT') { this.intelligence++; this.maxMp += 2; }
+      this.orbs -= orbCost;
       return true;
     }
     return false;
   }
 
-  recordKill(monsterName) {
-    if (!this.bestiary[monsterName]) this.bestiary[monsterName] = 0;
-    this.bestiary[monsterName]++;
-  }
-
-  getLearnedSkills() {
-    return Object.keys(this.skillTree).filter(name => this.skillTree[name].lvl > 0);
-  }
-
-  upgradeProficiency(tag) {
-    if (this.proficiencyPoints <= 0) return false;
-    if (this.proficiencies[tag] !== undefined) {
-      this.proficiencies[tag]++;
-      this.proficiencyPoints--;
+  compileSkill(orbCost) {
+    if (this.orbs >= orbCost) {
+      this.skillPoints++;
+      this.orbs -= orbCost;
       return true;
     }
     return false;
   }
 
-  rehydrateItem(itemData) {
-    const Item = require('../items/Item');
-    return new Item(itemData.floor, null, itemData);
-  }
+  recordKill(monsterName) { if (!this.bestiary[monsterName]) this.bestiary[monsterName] = 0; this.bestiary[monsterName]++; }
+  getLearnedSkills() { return Object.keys(this.skillTree).filter(name => this.skillTree[name].lvl > 0); }
+  upgradeProficiency(tag) { if (this.proficiencyPoints <= 0) return false; if (this.proficiencies[tag] !== undefined) { this.proficiencies[tag]++; this.proficiencyPoints--; return true; } return false; }
+  rehydrateItem(itemData) { const Item = require('../items/Item'); return new Item(itemData.floor, null, itemData); }
 
   addStatus(name, duration) {
     const existing = this.activeStatuses.find(s => s.name === name);
@@ -158,21 +151,9 @@ class Entity {
   processStatuses(combatLog) {
     for (let i = this.activeStatuses.length - 1; i >= 0; i--) {
       const status = this.activeStatuses[i];
-      if (status.name === 'SANGRAMENTO') {
-        const dmg = Math.max(5, Math.floor(this.maxHp * 0.05));
-        this.hp -= dmg;
-        if (combatLog) combatLog.push(` > ${this.name} sofreu ${dmg} de Sangramento.`);
-      }
-      if (status.name === 'COMBUSTÃO') {
-        const dmg = Math.max(10, Math.floor(this.maxHp * 0.08));
-        this.hp -= dmg;
-        if (combatLog) combatLog.push(` > ${this.name} sofreu ${dmg} de Combustão.`);
-      }
-      status.duration--;
-      if (status.duration <= 0) {
-        if (combatLog) combatLog.push(` > [${status.name}] expirou em ${this.name}.`);
-        this.activeStatuses.splice(i, 1);
-      }
+      if (status.name === 'SANGRAMENTO') { const dmg = Math.max(5, Math.floor(this.maxHp * 0.05)); this.hp -= dmg; if (combatLog) combatLog.push(` > ${this.name} sofreu ${dmg} de Sangramento.`); }
+      if (status.name === 'COMBUSTÃO') { const dmg = Math.max(10, Math.floor(this.maxHp * 0.08)); this.hp -= dmg; if (combatLog) combatLog.push(` > ${this.name} sofreu ${dmg} de Combustão.`); }
+      status.duration--; if (status.duration <= 0) { if (combatLog) combatLog.push(` > [${status.name}] expirou.`); this.activeStatuses.splice(i, 1); }
     }
     if (this.hp <= 0) { this.hp = 0; this.isDead = true; }
   }
@@ -194,20 +175,16 @@ class Entity {
 
   getAttackPower() {
     let power = (this.level * 2) + (this.strength * 1.5);
-    if (this.equipment.ARMA) {
-      power += this.equipment.ARMA.stats.physicalDamage || 0;
-      if (this.equipment.ARMA.stats.strength) power += this.equipment.ARMA.stats.strength * 2;
-    }
+    if (this.equipment.ARMA) { power += this.equipment.ARMA.stats.physicalDamage || 0; if (this.equipment.ARMA.stats.strength) power += this.equipment.ARMA.stats.strength * 2; }
     if (this.background === 'Guerreiro') power *= 1.1;
+    if (this.postureMode === 'MOMENTO') power *= 1.5; // Bônus de Momento
     return Math.floor(power);
   }
 
   getDefense() {
     let def = 0;
-    if (this.equipment.ARMADURA) {
-      def += this.equipment.ARMADURA.stats.defense || 0;
-      if (this.equipment.ARMADURA.stats.dexterity) def += this.equipment.ARMADURA.stats.dexterity;
-    }
+    if (this.equipment.ARMADURA) { def += this.equipment.ARMADURA.stats.defense || 0; if (this.equipment.ARMADURA.stats.dexterity) def += this.equipment.ARMADURA.stats.dexterity; }
+    if (this.postureMode === 'INERCIA') def *= 2; // Bônus de Inércia
     return def;
   }
 
@@ -231,9 +208,7 @@ class Entity {
     if (item.stats.strength) this.strength += item.stats.strength;
     if (item.stats.dexterity) this.dexterity += item.stats.dexterity;
     if (item.stats.intelligence) this.intelligence += item.stats.intelligence;
-    this.hp = Math.min(this.hp, this.maxHp);
-    this.sp = Math.min(this.sp, this.maxSp);
-    this.mp = Math.min(this.mp, this.maxMp);
+    this.hp = Math.min(this.hp, this.maxHp); this.sp = Math.min(this.sp, this.maxSp); this.mp = Math.min(this.mp, this.maxMp);
     return true;
   }
 
@@ -250,8 +225,7 @@ class Entity {
   takeDamage(amount, type = 'physical') {
     let finalDamage = amount;
     if (type === 'physical') finalDamage = Math.max(1, amount - this.getDefense());
-    if (type === 'physical' && this.exhaustionPhysical) finalDamage *= 2;
-    if (type === 'magical' && this.exhaustionMagical) finalDamage *= 2;
+    if (this.exhaustionPhysical) finalDamage *= 2;
     this.hp -= finalDamage;
     if (this.hp <= 0) { this.hp = 0; this.isDead = true; }
     return finalDamage;
@@ -263,15 +237,10 @@ class Entity {
     else this.exhaustionPhysical = false;
   }
 
-  consumeMp(amount) {
-    this.mp -= amount;
-    if (this.mp < 0) { this.mp = 0; this.exhaustionMagical = true; }
-    else this.exhaustionMagical = false;
-  }
-
-  addPostureDamage(amount) {
-    this.posture += amount;
-    if (this.posture >= this.maxPosture) { this.posture = this.maxPosture; this.isStaggered = true; }
+  modifyStability(amount) {
+    this.posture = Math.min(this.maxPosture, Math.max(0, this.posture + amount));
+    if (this.posture <= 0) { this.isStaggered = true; }
+    else if (this.posture > 20) { this.isStaggered = false; }
   }
 
   recover(hpPerc = 0.1, spPerc = 0.2, mpPerc = 0.2) {
@@ -279,14 +248,33 @@ class Entity {
     this.hp = Math.min(this.maxHp, this.hp + Math.floor(this.maxHp * hpPerc * bonus));
     this.sp = Math.min(this.maxSp, this.sp + Math.floor(this.maxSp * spPerc * bonus));
     this.mp = Math.min(this.maxMp, this.mp + Math.floor(this.maxMp * mpPerc * bonus));
-    if (this.sp > 0) this.exhaustionPhysical = false;
-    if (this.mp > 0) this.exhaustionMagical = false;
-    this.posture = Math.max(0, this.posture - 20);
-    if (this.posture < this.maxPosture) this.isStaggered = false;
+    this.modifyStability(30); // Recuperação agora foca em Estabilidade
   }
 
   setPostureMode(mode) {
-    if (['ATTACK', 'BALANCED', 'DEFENCE'].includes(mode)) this.postureMode = mode;
+    if (['INERCIA', 'MOMENTO', 'EQUILIBRIO'].includes(mode)) this.postureMode = mode;
+  }
+
+  calculatePrestige() {
+    let prestige = this.level * 100;
+    prestige += (this.strength + this.dexterity + this.intelligence) * 10;
+    
+    // Prestige por Itens (Baseado no preço/raridade)
+    Object.values(this.equipment).forEach(item => {
+      if (item) prestige += Math.floor(item.getPrice() / 5);
+    });
+    
+    // Prestige por Conhecimento (Skills)
+    Object.values(this.skillTree).forEach(s => {
+      prestige += s.lvl * 50;
+    });
+
+    // Prestige por Descobertas (Bestiário)
+    Object.values(this.bestiary).forEach(count => {
+      prestige += count * 2;
+    });
+
+    return prestige;
   }
 }
 module.exports = Entity;

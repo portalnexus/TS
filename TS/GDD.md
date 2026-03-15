@@ -12,6 +12,7 @@ Terminal Souls: The Echoes of Reason é um ARPG baseado em TUI ambientado em um 
 Ecos da Razão: Narrativa integrada à história da ciência.
 Intelecto como Arma: Puzzles avançados e sistema de skills científicas.
 Progressão Diablo II Style: Árvores de habilidades ramificadas por classe.
+Renome Científico (Score): Sua fama no Exílio é baseada no acúmulo de conhecimento, itens raros e inimigos catalogados.
 Hardcore: Morte permanente com deleção de save.
 
 2. O MUNDO E O GAMEPLAY LOOP

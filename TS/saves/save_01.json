@@ -1,0 +1,706 @@
+{
+  "id": "e305de3c-14ec-47ad-a2ad-f51d6b9ae7b5",
+  "name": "Heimdall",
+  "race": "Humano",
+  "background": "Guerreiro",
+  "strength": 51,
+  "dexterity": 25,
+  "intelligence": 20,
+  "maxHp": 516,
+  "hp": 497,
+  "maxSp": 140,
+  "sp": 95,
+  "maxMp": 86,
+  "mp": 86,
+  "level": 16,
+  "xp": 1475,
+  "orbs": 0,
+  "attributePoints": 9,
+  "proficiencyPoints": 5,
+  "skillPoints": 5,
+  "proficiencies": {
+    "CORTE": 0,
+    "ESMAGAMENTO": 7,
+    "FOGO": 0,
+    "CHOQUE": 3,
+    "VAZIO": 0
+  },
+  "skillTree": {
+    "Impacto de Newton": {
+      "lvl": 0,
+      "desc": "Dano físico massivo.",
+      "cost": 15
+    },
+    "Inércia de Galileu": {
+      "lvl": 0,
+      "desc": "Aumenta defesa temporariamente.",
+      "cost": 10
+    },
+    "Entropia Cinética": {
+      "lvl": 7,
+      "desc": "Dano em área baseado em STR.",
+      "cost": 20
+    },
+    "Força Centrípeta": {
+      "lvl": 0,
+      "desc": "Gira a arma atingindo todos.",
+      "cost": 25
+    },
+    "Lei da Inércia": {
+      "lvl": 3,
+      "desc": "Torna-se imune a Stagger.",
+      "cost": 30
+    }
+  },
+  "bestiary": {
+    "Autômato de Pascal": 4,
+    "Gárgula de Euclides": 8,
+    "Esqueleto de Gauss": 4,
+    "CHEFE: O Arquiteto do Andar 1": 3,
+    "Lobo de Turing": 2,
+    "Sentinela de Maxwell": 6,
+    "CHEFE: O Arquiteto do Andar 2": 2,
+    "Espectro de Noether": 2,
+    "CHEFE: O Arquiteto do Andar 3": 2,
+    "CHEFE: O Arquiteto do Andar 4": 1,
+    "CHEFE: O Arquiteto do Andar 5": 1,
+    "CHEFE: O Arquiteto do Andar 6": 1,
+    "CHEFE: O Arquiteto do Andar 7": 1,
+    "CHEFE: O Arquiteto do Andar 8": 1,
+    "CHEFE: O Arquiteto do Andar 9": 1
+  },
+  "activeQuest": {
+    "id": "u7t6kslsz",
+    "type": "FLOOR",
+    "desc": "Alcance o Andar 2.",
+    "target": 2,
+    "progress": 1,
+    "rewardOrbs": 50,
+    "rewardXp": 200,
+    "completed": false
+  },
+  "posture": 10,
+  "maxPosture": 130,
+  "postureMode": "BALANCED",
+  "equipment": {
+    "ARMA": {
+      "id": "c580b011-2a68-460f-9e09-9341a6c056f7",
+      "floor": 4,
+      "rarity": "LENDÁRIO",
+      "type": "ARMA",
+      "name": "O Suspiro de Hawking Espada",
+      "stats": {
+        "physicalDamage": 49,
+        "strength": 6,
+        "intelligence": 4,
+        "dexterity": 6,
+        "maxHp": 30
+      },
+      "tags": [
+        "ESMAGAMENTO",
+        "VAZIO"
+      ],
+      "uniques": [
+        "Ignora 100% da Armadura Física."
+      ],
+      "flavorText": "O crivo de Eratóstenes purifica a alma do portador."
+    },
+    "ARMADURA": {
+      "id": "4d85bd7b-73b3-4fd4-9b56-3908d648c46e",
+      "floor": 3,
+      "rarity": "MÁGICO",
+      "type": "ARMADURA",
+      "name": "Abençoado Peitoral",
+      "stats": {
+        "defense": 9,
+        "dexterity": 4,
+        "maxHp": 17
+      },
+      "tags": [],
+      "uniques": [],
+      "flavorText": ""
+    },
+    "ACESSÓRIO": {
+      "id": "0963f6ca-ce12-4343-8e9d-201875736c71",
+      "floor": 1,
+      "rarity": "RARO",
+      "type": "ACESSÓRIO",
+      "name": "Eterno de Noether Bracelete",
+      "stats": {
+        "maxMp": 12,
+        "intelligence": 4,
+        "maxHp": 9
+      },
+      "tags": [],
+      "uniques": [],
+      "flavorText": "Euler encontrou a harmonia nos números que compõem este item."
+    }
+  },
+  "inventory": [
+    {
+      "id": "d49c4468-918c-4bfa-b5ad-3c7fb75d78d7",
+      "floor": 1,
+      "rarity": "COMUM",
+      "type": "ARMADURA",
+      "name": "Enferrujado Armadura",
+      "stats": {
+        "defense": 5
+      },
+      "tags": [],
+      "uniques": [],
+      "flavorText": ""
+    },
+    {
+      "id": "686a5d14-e364-4ff6-9cad-f381f3c0acb2",
+      "floor": 2,
+      "rarity": "COMUM",
+      "type": "ARMA",
+      "name": "Gasto Daga",
+      "stats": {
+        "physicalDamage": 12
+      },
+      "tags": [
+        "ESMAGAMENTO"
+      ],
+      "uniques": [],
+      "flavorText": ""
+    },
+    {
+      "id": "ed8f36d5-414d-4269-a794-5506521289e2",
+      "floor": 2,
+      "rarity": "COMUM",
+      "type": "ARMA",
+      "name": "Simples Daga",
+      "stats": {
+        "physicalDamage": 12
+      },
+      "tags": [
+        "ESMAGAMENTO"
+      ],
+      "uniques": [],
+      "flavorText": ""
+    },
+    {
+      "id": "f0a71238-5d9d-4af9-968d-9942d948f267",
+      "floor": 4,
+      "rarity": "MÁGICO",
+      "type": "ACESSÓRIO",
+      "name": "Abençoado Anel",
+      "stats": {
+        "maxMp": 10,
+        "dexterity": 3,
+        "maxHp": 1
+      },
+      "tags": [],
+      "uniques": [],
+      "flavorText": ""
+    },
+    {
+      "id": "e3504e96-bfbf-41d3-b303-8884ef2529b4",
+      "floor": 1,
+      "rarity": "COMUM",
+      "type": "ACESSÓRIO",
+      "name": "Enferrujado Talismã",
+      "stats": {
+        "maxMp": 5
+      },
+      "tags": [],
+      "uniques": [],
+      "flavorText": ""
+    },
+    {
+      "id": "be90aa33-4706-45bf-a0f1-5a06a88461d1",
+      "floor": 2,
+      "rarity": "COMUM",
+      "type": "ARMADURA",
+      "name": "Simples Peitoral",
+      "stats": {
+        "defense": 6
+      },
+      "tags": [],
+      "uniques": [],
+      "flavorText": ""
+    },
+    {
+      "id": "7653bbbf-1558-4e88-8778-3c536d08bc86",
+      "floor": 2,
+      "rarity": "COMUM",
+      "type": "ARMA",
+      "name": "Velho Daga",
+      "stats": {
+        "physicalDamage": 12
+      },
+      "tags": [
+        "CORTE"
+      ],
+      "uniques": [],
+      "flavorText": ""
+    },
+    {
+      "id": "1f1ee9ed-9eac-4a8c-b3c8-9e843c657f2a",
+      "floor": 2,
+      "rarity": "MÁGICO",
+      "type": "ACESSÓRIO",
+      "name": "Firme Talismã",
+      "stats": {
+        "maxMp": 9,
+        "intelligence": 1,
+        "maxHp": 4
+      },
+      "tags": [],
+      "uniques": [],
+      "flavorText": ""
+    },
+    {
+      "id": "558b0b5d-01b2-4733-97b9-ebd2456ea847",
+      "floor": 3,
+      "rarity": "RARO",
+      "type": "CONSUMÍVEL",
+      "name": "Sombrio de Turing Frasco de HP",
+      "stats": {
+        "recoverValue": 57
+      },
+      "tags": [],
+      "uniques": [],
+      "flavorText": "O crivo de Eratóstenes purifica a alma do portador."
+    },
+    {
+      "id": "dff770c0-934b-4f49-9866-31c5d698b31c",
+      "floor": 3,
+      "rarity": "COMUM",
+      "type": "ACESSÓRIO",
+      "name": "Enferrujado Talismã",
+      "stats": {
+        "maxMp": 6
+      },
+      "tags": [],
+      "uniques": [],
+      "flavorText": ""
+    },
+    {
+      "id": "511ebc9d-68e0-4756-9eea-6c5e19ffeb07",
+      "floor": 3,
+      "rarity": "COMUM",
+      "type": "ACESSÓRIO",
+      "name": "Velho Talismã",
+      "stats": {
+        "maxMp": 6
+      },
+      "tags": [],
+      "uniques": [],
+      "flavorText": ""
+    },
+    {
+      "id": "f72fed6a-c7be-44ef-ad47-aaf40b450a01",
+      "floor": 1,
+      "rarity": "COMUM",
+      "type": "ARMADURA",
+      "name": "Velho Armadura",
+      "stats": {
+        "defense": 5
+      },
+      "tags": [],
+      "uniques": [],
+      "flavorText": ""
+    },
+    {
+      "id": "94b93e75-b76e-4162-a42c-99d795b893a5",
+      "floor": 2,
+      "rarity": "RARO",
+      "type": "ARMADURA",
+      "name": "Sombrio de Turing Armadura",
+      "stats": {
+        "defense": 13,
+        "strength": 1,
+        "intelligence": 4,
+        "maxHp": 23
+      },
+      "tags": [],
+      "uniques": [],
+      "flavorText": "Gauss, o Príncipe, calculou a trajetória desta arma com perfeição."
+    },
+    {
+      "id": "e54c62c1-00e8-4b5a-8c33-c54b9d042f7c",
+      "floor": 4,
+      "rarity": "COMUM",
+      "type": "ARMADURA",
+      "name": "Simples Manto",
+      "stats": {
+        "defense": 7
+      },
+      "tags": [],
+      "uniques": [],
+      "flavorText": ""
+    },
+    {
+      "id": "83968d4a-843e-4e04-9c56-220806597370",
+      "floor": 2,
+      "rarity": "MÁGICO",
+      "type": "ARMA",
+      "name": "Brilhante Machado",
+      "stats": {
+        "physicalDamage": 18,
+        "intelligence": 4,
+        "maxHp": 17
+      },
+      "tags": [
+        "CORTE"
+      ],
+      "uniques": [],
+      "flavorText": ""
+    },
+    {
+      "id": "7f2af54d-3483-4a7f-836d-15e765888be3",
+      "floor": 4,
+      "rarity": "COMUM",
+      "type": "CONSUMÍVEL",
+      "name": "Gasto Poção de SP",
+      "stats": {
+        "recoverValue": 28
+      },
+      "tags": [],
+      "uniques": [],
+      "flavorText": ""
+    },
+    {
+      "id": "a11fec02-20cc-4670-a303-0c125f185403",
+      "floor": 4,
+      "rarity": "RARO",
+      "type": "ARMADURA",
+      "name": "Sombrio de Turing Túnica",
+      "stats": {
+        "defense": 15,
+        "strength": 8,
+        "maxHp": 22
+      },
+      "tags": [],
+      "uniques": [],
+      "flavorText": "Noether provou que a simetria gera leis de conservação eternas."
+    },
+    {
+      "id": "f9269d0a-76db-4afa-b9c6-ec00d880d5cc",
+      "floor": 4,
+      "rarity": "COMUM",
+      "type": "CONSUMÍVEL",
+      "name": "Velho Elicir de MP",
+      "stats": {
+        "recoverValue": 28
+      },
+      "tags": [],
+      "uniques": [],
+      "flavorText": ""
+    },
+    {
+      "id": "a2a739d3-6ab9-4c98-b172-6dbdab0d45ef",
+      "floor": 4,
+      "rarity": "LENDÁRIO",
+      "type": "CONSUMÍVEL",
+      "name": "A Ruína de Euler Elicir de MP",
+      "stats": {
+        "recoverValue": 98
+      },
+      "tags": [],
+      "uniques": [
+        "Ignora 100% da Armadura Física."
+      ],
+      "flavorText": "Newton previu que a força é proporcional à mudança de movimento."
+    },
+    {
+      "id": "c5cc0b55-98d8-4d14-88dc-5acf411165fc",
+      "floor": 5,
+      "rarity": "COMUM",
+      "type": "ARMA",
+      "name": "Simples Daga",
+      "stats": {
+        "physicalDamage": 15
+      },
+      "tags": [
+        "ESMAGAMENTO"
+      ],
+      "uniques": [],
+      "flavorText": ""
+    },
+    {
+      "id": "09ce2fa0-32a6-4c29-a5ad-ae2d88301f0c",
+      "floor": 5,
+      "rarity": "COMUM",
+      "type": "ARMADURA",
+      "name": "Enferrujado Armadura",
+      "stats": {
+        "defense": 7
+      },
+      "tags": [],
+      "uniques": [],
+      "flavorText": ""
+    },
+    {
+      "id": "2a2cc204-0895-43f4-9f9d-d080d8351ac5",
+      "floor": 6,
+      "rarity": "COMUM",
+      "type": "CONSUMÍVEL",
+      "name": "Gasto Elicir de MP",
+      "stats": {
+        "recoverValue": 32
+      },
+      "tags": [],
+      "uniques": [],
+      "flavorText": ""
+    },
+    {
+      "id": "501ec51e-9cf5-491b-aa51-859568cda02a",
+      "floor": 6,
+      "rarity": "MÁGICO",
+      "type": "ARMA",
+      "name": "Brilhante Daga",
+      "stats": {
+        "physicalDamage": 24,
+        "intelligence": 8,
+        "maxHp": 20
+      },
+      "tags": [
+        "CORTE"
+      ],
+      "uniques": [],
+      "flavorText": ""
+    },
+    {
+      "id": "db9f4795-bc83-43c4-b288-ec7893e8e319",
+      "floor": 6,
+      "rarity": "COMUM",
+      "type": "ACESSÓRIO",
+      "name": "Enferrujado Anel",
+      "stats": {
+        "maxMp": 8
+      },
+      "tags": [],
+      "uniques": [],
+      "flavorText": ""
+    },
+    {
+      "id": "b9f97779-0eef-43a6-902f-52eb5b77a4df",
+      "floor": 6,
+      "rarity": "RARO",
+      "type": "ACESSÓRIO",
+      "name": "Sombrio de Turing Talismã",
+      "stats": {
+        "maxMp": 17,
+        "intelligence": 1,
+        "dexterity": 6,
+        "maxHp": 15
+      },
+      "tags": [],
+      "uniques": [],
+      "flavorText": "Newton previu que a força é proporcional à mudança de movimento."
+    },
+    {
+      "id": "b6bbb7cd-bf85-4505-ae86-caa4e9c02e95",
+      "floor": 7,
+      "rarity": "COMUM",
+      "type": "ACESSÓRIO",
+      "name": "Enferrujado Amuleto",
+      "stats": {
+        "maxMp": 8
+      },
+      "tags": [],
+      "uniques": [],
+      "flavorText": ""
+    },
+    {
+      "id": "d514ccc3-ebe1-437b-9c88-ca67c4367c89",
+      "floor": 7,
+      "rarity": "COMUM",
+      "type": "ACESSÓRIO",
+      "name": "Gasto Bracelete",
+      "stats": {
+        "maxMp": 8
+      },
+      "tags": [],
+      "uniques": [],
+      "flavorText": ""
+    },
+    {
+      "id": "b40fb7ac-2edf-4051-bb04-a8f32d0bc477",
+      "floor": 7,
+      "rarity": "COMUM",
+      "type": "ARMADURA",
+      "name": "Gasto Peitoral",
+      "stats": {
+        "defense": 8
+      },
+      "tags": [],
+      "uniques": [],
+      "flavorText": ""
+    },
+    {
+      "id": "1336c15a-36cb-4dda-807b-420b87d665e0",
+      "floor": 7,
+      "rarity": "MÁGICO",
+      "type": "CONSUMÍVEL",
+      "name": "Agudo Frasco de HP",
+      "stats": {
+        "recoverValue": 51
+      },
+      "tags": [],
+      "uniques": [],
+      "flavorText": ""
+    },
+    {
+      "id": "06a57e74-766f-4215-b200-5fda414fa3b0",
+      "floor": 7,
+      "rarity": "COMUM",
+      "type": "ACESSÓRIO",
+      "name": "Simples Amuleto",
+      "stats": {
+        "maxMp": 8
+      },
+      "tags": [],
+      "uniques": [],
+      "flavorText": ""
+    },
+    {
+      "id": "86e79023-98e2-4a11-ba69-4871c87c8a90",
+      "floor": 8,
+      "rarity": "COMUM",
+      "type": "ARMA",
+      "name": "Gasto Daga",
+      "stats": {
+        "physicalDamage": 18
+      },
+      "tags": [
+        "ESMAGAMENTO"
+      ],
+      "uniques": [],
+      "flavorText": ""
+    },
+    {
+      "id": "e7bc7c58-1bdd-4e18-b7f5-56e9abe9f9c0",
+      "floor": 8,
+      "rarity": "COMUM",
+      "type": "ACESSÓRIO",
+      "name": "Simples Talismã",
+      "stats": {
+        "maxMp": 9
+      },
+      "tags": [],
+      "uniques": [],
+      "flavorText": ""
+    },
+    {
+      "id": "51b726f1-a2fe-4788-a5e7-ff363a902e9b",
+      "floor": 8,
+      "rarity": "COMUM",
+      "type": "ARMADURA",
+      "name": "Velho Túnica",
+      "stats": {
+        "defense": 9
+      },
+      "tags": [],
+      "uniques": [],
+      "flavorText": ""
+    },
+    {
+      "id": "5cad0224-67be-484c-9e5f-4c554a5582de",
+      "floor": 8,
+      "rarity": "COMUM",
+      "type": "ARMA",
+      "name": "Velho Espada",
+      "stats": {
+        "physicalDamage": 18
+      },
+      "tags": [
+        "CORTE"
+      ],
+      "uniques": [],
+      "flavorText": ""
+    },
+    {
+      "id": "f608fc53-dd86-49c1-a58d-61637392a50b",
+      "floor": 8,
+      "rarity": "COMUM",
+      "type": "ARMA",
+      "name": "Gasto Espada",
+      "stats": {
+        "physicalDamage": 18
+      },
+      "tags": [
+        "CORTE"
+      ],
+      "uniques": [],
+      "flavorText": ""
+    },
+    {
+      "id": "80a23a20-635e-42e8-a181-07d62441d95f",
+      "floor": 8,
+      "rarity": "COMUM",
+      "type": "CONSUMÍVEL",
+      "name": "Velho Frasco de HP",
+      "stats": {
+        "recoverValue": 36
+      },
+      "tags": [],
+      "uniques": [],
+      "flavorText": ""
+    },
+    {
+      "id": "b6dca35a-91f7-4d27-8418-f4f2fd65d6e9",
+      "floor": 9,
+      "rarity": "COMUM",
+      "type": "CONSUMÍVEL",
+      "name": "Velho Poção de SP",
+      "stats": {
+        "recoverValue": 38
+      },
+      "tags": [],
+      "uniques": [],
+      "flavorText": ""
+    },
+    {
+      "id": "f4a16476-4697-4984-a2d5-252bc609c3b4",
+      "floor": 9,
+      "rarity": "COMUM",
+      "type": "ARMADURA",
+      "name": "Gasto Túnica",
+      "stats": {
+        "defense": 9
+      },
+      "tags": [],
+      "uniques": [],
+      "flavorText": ""
+    },
+    {
+      "id": "87449662-0dd8-4a5f-b475-8734b1c8562d",
+      "floor": 9,
+      "rarity": "RARO",
+      "type": "ACESSÓRIO",
+      "name": "Ancestral de Gauss Anel",
+      "stats": {
+        "maxMp": 20,
+        "strength": 9,
+        "dexterity": 10,
+        "maxHp": 14
+      },
+      "tags": [],
+      "uniques": [],
+      "flavorText": "Noether provou que a simetria gera leis de conservação eternas."
+    },
+    {
+      "id": "ff82311e-e5cc-4025-be1e-9a46515eef32",
+      "floor": 9,
+      "rarity": "RARO",
+      "type": "ARMA",
+      "name": "Vingativo de Newton Daga",
+      "stats": {
+        "physicalDamage": 41,
+        "dexterity": 8,
+        "strength": 3,
+        "maxHp": 27
+      },
+      "tags": [
+        "ESMAGAMENTO",
+        "FOGO"
+      ],
+      "uniques": [],
+      "flavorText": "Noether provou que a simetria gera leis de conservação eternas."
+    }
+  ]
+}

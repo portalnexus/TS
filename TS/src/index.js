@@ -181,9 +181,9 @@ function showBlacksmithSell() {
   gameState = 'TRADE_SELL'; const items = player.inventory.map(it => `${it.getColorizedName()} (${Math.floor(it.getPrice()*0.4)} Orbes)`); items.push(' [ESC] Voltar');
   actionMenu.setItems(items); actionMenu.focus();
 }
-function handleTrade(choice, index) {
-  if (gameState === 'TRADE_BUY') { if (choice.includes('VENDER')) showBlacksmithSell(); else if (currentBlacksmith.buyItem(player, index)) { log(chalk.green('Comprado!')); showBlacksmith(); updateStatus(); } else log(chalk.red('Sem orbes!')); }
-  else if (gameState === 'TRADE_SELL') { if (choice.includes('Voltar')) showBlacksmith(); else { const v = currentBlacksmith.sellItem(player, index); if (v) { log(chalk.green(`Vendido: ${v}`)); showBlacksmithSell(); updateStatus(); } } }
+function handleTrade(c, index) {
+  if (gameState === 'TRADE_BUY') { if (c.includes('VENDER')) showBlacksmithSell(); else if (currentBlacksmith.buyItem(player, index)) { log(chalk.green('Comprado!')); showBlacksmith(); updateStatus(); } else log(chalk.red('Sem orbes!')); }
+  else if (gameState === 'TRADE_SELL') { if (c.includes('Voltar')) showBlacksmith(); else { const v = currentBlacksmith.sellItem(player, index); if (v) { log(chalk.green(`Vendido: ${v}`)); showBlacksmithSell(); updateStatus(); } } }
 }
 
 function renderMap() {
@@ -287,6 +287,7 @@ function startCreation() {
   });
 }
 
+// --- INPUTS ---
 screen.key(['w'], () => handleMove(0, -1)); screen.key(['s'], () => { if (gameState === 'EXPLORING') handleMove(0, 1); if (gameState === 'ATTRIBUTES') handleAttributeUpgrade('FORÇA'); });
 screen.key(['a'], () => handleMove(-1, 0)); screen.key(['d'], () => { if (gameState === 'EXPLORING') handleMove(1, 0); if (gameState === 'ATTRIBUTES') handleAttributeUpgrade('DESTREZA'); });
 screen.key(['i'], () => { if (gameState === 'EXPLORING') showInventory(); if (gameState === 'ATTRIBUTES') handleAttributeUpgrade('INTELIGÊNCIA'); });
@@ -297,6 +298,22 @@ screen.key(['b'], () => { if (gameState === 'EXPLORING' || gameState === 'MENU' 
 screen.key(['q'], () => { if (actionMenu.focused) actionMenu.up(1); if (inventoryBox.focused) inventoryBox.up(1); screen.render(); });
 screen.key(['e'], () => { if (actionMenu.focused) actionMenu.down(1); if (inventoryBox.focused) inventoryBox.down(1); screen.render(); });
 screen.key(['f', 'space'], () => { if (actionMenu.focused) actionMenu.emit('select', actionMenu.getItem(actionMenu.selected), actionMenu.selected); else if (inventoryBox.focused) inventoryBox.emit('select', inventoryBox.getItem(inventoryBox.selected), inventoryBox.selected); });
+
+// Atalhos Numéricos Dinâmicos (1-0)
+const numKeys = ['1','2','3','4','5','6','7','8','9','0'];
+numKeys.forEach((key, idx) => {
+  screen.key([key], () => {
+    const list = actionMenu.focused ? actionMenu : (inventoryBox.focused ? inventoryBox : null);
+    if (list) {
+      const realIdx = key === '0' ? 9 : idx;
+      if (realIdx < list.items.length) {
+        list.select(realIdx);
+        list.emit('select', list.getItem(realIdx), realIdx);
+        screen.render();
+      }
+    }
+  });
+});
 
 actionMenu.on('select', (item, index) => {
   const c = item.getText().trim();
@@ -309,7 +326,7 @@ actionMenu.on('select', (item, index) => {
   else if (gameState === 'SKILL_TREE') handleSkillUpgrade(c);
   else if (gameState === 'ALTAR') handleAltar(c, index);
   else if (gameState === 'QUESTS') handleQuests(c, index);
-  else if (gameState === 'TRADE_BUY' || gameState === 'TRADE_SELL') handleTrade(choice, index);
+  else if (gameState === 'TRADE_BUY' || gameState === 'TRADE_SELL') handleTrade(c, index);
 });
 
 screen.key(['escape', 'v'], () => {

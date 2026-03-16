@@ -54,7 +54,8 @@ class Entity {
     this.equipment = {
       ARMA: stats.equipment?.ARMA ? this.rehydrateItem(stats.equipment.ARMA) : null,
       ARMADURA: stats.equipment?.ARMADURA ? this.rehydrateItem(stats.equipment.ARMADURA) : null,
-      ACESSÓRIO: stats.equipment?.ACESSÓRIO ? this.rehydrateItem(stats.equipment.ACESSÓRIO) : null
+      ACESSÓRIO: stats.equipment?.ACESSÓRIO ? this.rehydrateItem(stats.equipment.ACESSÓRIO) : null,
+      RELÍQUIA: stats.equipment?.RELÍQUIA ? this.rehydrateItem(stats.equipment.RELÍQUIA) : null
     };
     this.inventory = (stats.inventory || []).map(it => this.rehydrateItem(it));
   }
@@ -176,6 +177,7 @@ class Entity {
   getAttackPower() {
     let power = (this.level * 2) + (this.strength * 1.5);
     if (this.equipment.ARMA) { power += this.equipment.ARMA.stats.physicalDamage || 0; if (this.equipment.ARMA.stats.strength) power += this.equipment.ARMA.stats.strength * 2; }
+    if (this.equipment.RELÍQUIA) { if (this.equipment.RELÍQUIA.stats.strength) power += this.equipment.RELÍQUIA.stats.strength * 2; }
     if (this.background === 'Guerreiro') power *= 1.1;
     if (this.postureMode === 'MOMENTO') power *= 1.5; // Bônus de Momento
     return Math.floor(power);
@@ -184,6 +186,7 @@ class Entity {
   getDefense() {
     let def = 0;
     if (this.equipment.ARMADURA) { def += this.equipment.ARMADURA.stats.defense || 0; if (this.equipment.ARMADURA.stats.dexterity) def += this.equipment.ARMADURA.stats.dexterity; }
+    if (this.equipment.RELÍQUIA) { if (this.equipment.RELÍQUIA.stats.dexterity) def += this.equipment.RELÍQUIA.stats.dexterity; }
     if (this.postureMode === 'INERCIA') def *= 2; // Bônus de Inércia
     return def;
   }

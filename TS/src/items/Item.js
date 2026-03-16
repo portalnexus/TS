@@ -24,22 +24,23 @@ class Item {
   }
 
   rollType() {
-    const types = ['ARMA', 'ARMADURA', 'ACESSÓRIO', 'CONSUMÍVEL'];
+    const types = ['ARMA', 'ARMADURA', 'ACESSÓRIO', 'RELÍQUIA', 'CONSUMÍVEL'];
     return types[Math.floor(Math.random() * types.length)];
   }
 
   generateName() {
     const prefixes = {
-      COMUM: ['Velho', 'Enferrujado', 'Simples', 'Gasto'],
-      MÁGICO: ['Brilhante', 'Agudo', 'Firme', 'Abençoado'],
-      RARO: ['Ancestral de Gauss', 'Vingativo de Newton', 'Sombrio de Turing', 'Eterno de Noether'],
-      LENDÁRIO: ['O Eco de Lovelace', 'A Ruína de Euler', 'O Suspiro de Hawking', 'O Legado de Pascal']
+      COMUM: ['Velho', 'Enferrujado', 'Instável', 'Simples', 'Gasto'],
+      MÁGICO: ['Brilhante', 'Polarizado', 'Reativo', 'Firme', 'Abençoado'],
+      RARO: ['Isótopo de Curie', 'Vetor de Gauss', 'Constante de Planck', 'Eterno de Noether'],
+      LENDÁRIO: ['O Horizonte de Hawking', 'A Singularidade de Penrose', 'O Cérebro de Boltzmann', 'O Legado de Pascal']
     };
     const bases = {
-      ARMA: ['Espada', 'Machado', 'Daga', 'Cetro'],
-      ARMADURA: ['Peitoral', 'Manto', 'Armadura', 'Túnica'],
-      ACESSÓRIO: ['Anel', 'Amuleto', 'Bracelete', 'Talismã'],
-      CONSUMÍVEL: ['Frasco de HP', 'Poção de SP', 'Elicir de MP']
+      ARMA: ['Catalisador', 'Bobina', 'Daga', 'Cetro de Plasma'],
+      ARMADURA: ['Revestimento', 'Manto de Fótons', 'Armadura de Grafeno', 'Túnica Quântica'],
+      ACESSÓRIO: ['Anel de Moebius', 'Lente de Fresnel', 'Pêndulo de Foucault', 'Talismã'],
+      RELÍQUIA: ['Monolito', 'Engrenagem de Babbage', 'Prisma de Newton', 'Átomo de Bohr'],
+      CONSUMÍVEL: ['Frasco de Entropia', 'Solução Saturada', 'Elixir de Spin']
     };
     const prefix = prefixes[this.rarity][Math.floor(Math.random() * prefixes[this.rarity].length)];
     const base = bases[this.type][Math.floor(Math.random() * bases[this.type].length)];
@@ -56,7 +57,9 @@ class Item {
       "Noether provou que a simetria gera leis de conservação eternas.",
       "Gauss, o Príncipe, calculou a trajetória desta arma com perfeição.",
       "Turing decifrou os segredos ocultos na fenda para forjar isto.",
-      "Hawking sentiu a radiação do vazio emanando desta peça."
+      "Hawking sentiu a radiação do vazio emanando desta peça.",
+      "Marie Curie sabia que o brilho desta peça era um aviso e um presente.",
+      "Planck descobriu que a energia aqui contida é quantizada."
     ];
     return lores[Math.floor(Math.random() * lores.length)];
   }
@@ -71,9 +74,14 @@ class Item {
     if (this.type === 'ARMA') stats.physicalDamage = Math.floor(baseVal);
     if (this.type === 'ARMADURA') stats.defense = Math.floor(baseVal / 2);
     if (this.type === 'ACESSÓRIO') stats.maxMp = Math.floor(baseVal / 2);
+    if (this.type === 'RELÍQUIA') {
+      const attrs = ['strength', 'dexterity', 'intelligence'];
+      const attr = attrs[Math.floor(Math.random() * attrs.length)];
+      stats[attr] = Math.max(1, Math.floor(baseVal / 4));
+    }
 
     // Bônus de Atributos (STR, DEX, INT) baseados na raridade
-    if (this.rarity !== 'COMUM') {
+    if (this.rarity !== 'COMUM' && this.type !== 'RELÍQUIA') {
       const attrs = ['strength', 'dexterity', 'intelligence'];
       const count = this.rarity === 'MÁGICO' ? 1 : (this.rarity === 'RARO' ? 2 : 3);
       for (let i = 0; i < count; i++) {

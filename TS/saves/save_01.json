@@ -1,0 +1,148 @@
+{
+  "id": "d3f99815-9957-443c-bfa4-d7a2a616cc9f",
+  "name": "Polka",
+  "race": "Elfo",
+  "background": "Mago",
+  "strength": 11,
+  "dexterity": 10,
+  "intelligence": 15,
+  "maxHp": 184,
+  "hp": 131,
+  "maxSp": 70,
+  "sp": 12,
+  "maxMp": 90,
+  "mp": 90,
+  "level": 2,
+  "xp": 100,
+  "orbs": 0,
+  "attributePoints": 3,
+  "proficiencyPoints": 1,
+  "skillPoints": 1,
+  "proficiencies": {
+    "CORTE": 0,
+    "ESMAGAMENTO": 0,
+    "FOGO": 0,
+    "CHOQUE": 0,
+    "VAZIO": 0
+  },
+  "skillTree": {
+    "Raio de Maxwell": {
+      "lvl": 0,
+      "desc": "Dano de choque preciso.",
+      "cost": 20
+    },
+    "Chama de Lavoisier": {
+      "lvl": 0,
+      "desc": "Incendeia o inimigo.",
+      "cost": 15
+    },
+    "Zero Absoluto": {
+      "lvl": 0,
+      "desc": "Gera Stagger imediato.",
+      "cost": 25
+    },
+    "Paradoxo de Schrödinger": {
+      "lvl": 0,
+      "desc": "Chance de evitar dano.",
+      "cost": 30
+    },
+    "Singularidade de Hawking": {
+      "lvl": 0,
+      "desc": "Dreno massivo de HP.",
+      "cost": 40
+    }
+  },
+  "bestiary": {
+    "Sentinela de Maxwell": 2,
+    "Lobo de Turing": 1,
+    "Esqueleto de Gauss": 1
+  },
+  "activeQuest": null,
+  "posture": 100,
+  "maxPosture": 150,
+  "postureMode": "EQUILIBRIO",
+  "equipment": {
+    "ARMA": {
+      "id": "3de0b140-1345-4a96-96dd-29ebacef4f2d",
+      "floor": 1,
+      "rarity": "COMUM",
+      "type": "ARMA",
+      "name": "Enferrujado Bobina",
+      "stats": {
+        "physicalDamage": 11
+      },
+      "tags": [
+        "ESMAGAMENTO"
+      ],
+      "uniques": [],
+      "flavorText": ""
+    },
+    "ARMADURA": {
+      "id": "087435fb-d722-43e3-af1d-8d87b7c1421a",
+      "floor": 1,
+      "rarity": "MÁGICO",
+      "type": "ARMADURA",
+      "name": "Polarizado Armadura de Grafeno",
+      "stats": {
+        "defense": 8,
+        "strength": 1,
+        "maxHp": 4
+      },
+      "tags": [],
+      "uniques": [],
+      "flavorText": ""
+    },
+    "ACESSÓRIO": null,
+    "RELÍQUIA": null
+  },
+  "inventory": [
+    {
+      "id": "383e82a6-5041-49de-8284-1e400e01145b",
+      "floor": 1,
+      "rarity": "LENDÁRIO",
+      "type": "ARMA",
+      "name": "A Singularidade de Penrose Daga",
+      "stats": {
+        "physicalDamage": 38,
+        "strength": 7,
+        "maxHp": 12
+      },
+      "tags": [
+        "ESMAGAMENTO",
+        "CHOQUE"
+      ],
+      "uniques": [
+        "50% dano extra contra Sangramento."
+      ],
+      "flavorText": "Noether provou que a simetria gera leis de conservação eternas."
+    },
+    {
+      "id": "959ccf38-a879-4c98-ad2a-185cdeb88878",
+      "floor": 1,
+      "rarity": "COMUM",
+      "type": "ARMA",
+      "name": "Enferrujado Bobina",
+      "stats": {
+        "physicalDamage": 11
+      },
+      "tags": [
+        "CORTE"
+      ],
+      "uniques": [],
+      "flavorText": ""
+    },
+    {
+      "id": "a5add458-118f-4a89-85d7-ccea4cd16a69",
+      "floor": 1,
+      "rarity": "RARO",
+      "type": "CONSUMÍVEL",
+      "name": "Eterno de Noether Frasco de Entropia",
+      "stats": {
+        "recoverValue": 48
+      },
+      "tags": [],
+      "uniques": [],
+      "flavorText": "Gauss, o Príncipe, calculou a trajetória desta arma com perfeição."
+    }
+  ]
+}

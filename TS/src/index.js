@@ -10,6 +10,7 @@ const SaveSystem = require('./core/SaveSystem');
 const Blacksmith = require('./items/Blacksmith');
 const CraftingAltar = require('./items/CraftingAltar');
 const QuestBoard = require('./core/QuestBoard');
+const Nexus = require('./core/Nexus');
 
 const screen = blessed.screen({ smartCSR: true, title: 'Terminal Souls - The Echoes of Reason', fullUnicode: true, mouse: false });
 
@@ -34,6 +35,7 @@ let currentAltar = new CraftingAltar();
 let questBoard = new QuestBoard();
 let currentDungeon = null;
 let currentCombat = null;
+let currentNexus = new Nexus();
 let gameState = 'MENU';
 
 // --- SISTEMA DE SAVE ---
@@ -157,8 +159,9 @@ function showBestiary() {
 
 function showNexus() {
   gameState = 'NEXUS'; mapBox.show(); logBox.show(); inventoryBox.hide(); itemDetailBox.show();
-  mapBox.setContent('\n\n    ' + chalk.bold.blue('[ O NEXUS ]') + '\n\n  Ada observa os dados.\n  Marie Curie manipula radiacao.\n  Darwin cataloga a evolucao.');
-  actionMenu.setItems([' [1] Entrar na Fenda', ' [2] Ada (Habilidades)', ' [3] Marie Curie (Alquimia)', ' [4] Darwin (Evolucao)', ' [5] Halthor (Ferreiro)', ' [6] Missões', ' [7] Inventário', ' [8] Bestiário', ' [9] Skills', ' [ESC] Sair']);
+  mapBox.setLabel(chalk.blue(' [ O NEXUS - VILA DO CONHECIMENTO ] '));
+  mapBox.setContent(currentNexus.render());
+  actionMenu.setItems([' [WASD] Mover', ' [7] Inventário', ' [8] Bestiário', ' [9] Skills', ' [ESC] Sair']);
   actionMenu.focus(); updateStatus();
 }
 
@@ -223,7 +226,24 @@ function startDungeon(floor = 1) {
   log(chalk.green(`Fenda ${floor} aberta.`)); renderMap();
 }
 
-function handleMove(dx, dy) { if (gameState === 'EXPLORING') { const t = currentDungeon.movePlayer(dx, dy); if (t) { if (t.type !== 'FLOOR') handleTileInteraction(t); renderMap(); } } }
+function handleMove(dx, dy) {
+  if (gameState === 'EXPLORING') {
+    const t = currentDungeon.movePlayer(dx, dy);
+    if (t) { if (t.type !== 'FLOOR') handleTileInteraction(t); renderMap(); }
+  } else if (gameState === 'NEXUS') {
+    const interaction = currentNexus.movePlayer(dx, dy);
+    mapBox.setContent(currentNexus.render());
+    if (interaction) {
+      log(chalk.cyan(interaction.dialogue));
+      if (interaction.name === 'Ada') showAda();
+      else if (interaction.name === 'Marie Curie') showMarie();
+      else if (interaction.name === 'Darwin') showDarwin();
+      else if (interaction.name === 'Halthor') showBlacksmith();
+      else if (interaction.name === 'Fenda') startDungeon();
+    }
+    screen.render();
+  }
+}
 function handleTileInteraction(t) {
   switch(t.type) {
     case 'ENEMY': case 'BOSS': startCombat(t.data); t.type = 'FLOOR'; break;

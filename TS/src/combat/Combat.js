@@ -336,7 +336,13 @@ class Combat {
       this.isOver = true; this.result = 'WIN';
       const xp = this.enemies.reduce((acc, e) => acc + (e.level * 25), 0);
       this.player.addExperience(xp);
-      this.addLog(chalk.bold.green(` >>> VITORIA CIENTIFICA! +${xp} XP. <<<`));
+      // Orbes por derrota: level * 3 por inimigo comum; boss dá bônus extra
+      const orbs = this.enemies.reduce((acc, e) => {
+        const isBoss = e.name.includes('CHEFE') || e.name.includes('SENHOR') || e.name.includes('ARQUITETO');
+        return acc + (isBoss ? e.level * 15 : e.level * 3);
+      }, 0);
+      this.player.orbs += orbs;
+      this.addLog(chalk.bold.green(` >>> VITORIA CIENTIFICA! +${xp} XP  +${orbs} Orbes <<<`));
     }
   }
 }

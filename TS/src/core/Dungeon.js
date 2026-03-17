@@ -126,26 +126,30 @@ class Dungeon {
       const bossName = this.floor >= 10
         ? `SENHOR DA ASCENSÃO — Andar ${this.floor}`
         : (bossNames[this.biome.key] || `CHEFE: O Arquiteto do Andar ${this.floor}`);
+      // HP do boss: curva suave — mais acessível nos andares iniciais
+      const bossHp = Math.floor(60 + (this.floor * 20) + (this.floor * this.floor * 1.5));
       return [new Entity(bossName, {
-        hp: 100 + (this.floor * 30),
-        sp: 80 + (this.floor * 15),
-        mp: 80 + (this.floor * 15),
+        hp: bossHp,
+        sp: 60 + (this.floor * 10),
+        mp: 60 + (this.floor * 10),
         level: this.floor + 1,
-        strength: 10 + this.floor,
-        dexterity: 8 + this.floor,
-        intelligence: 8 + this.floor
+        strength: 8 + Math.floor(this.floor * 1.2),
+        dexterity: 6 + Math.floor(this.floor * 0.8),
+        intelligence: 6 + Math.floor(this.floor * 0.8)
       })];
     }
 
     const t = pool[Math.floor(Math.random() * pool.length)];
-    const difficultyMult = 1 + (this.floor * 0.1);
+    // Curva suave: escala menor nos andares iniciais, mais agressiva nos tardios
+    const difficultyMult = 1 + (this.floor * 0.08);
+    const hpScale = Math.floor(this.floor * 5); // antes era *8 — menos HP inicial
     return [new Entity(t.name, {
-      hp: Math.floor((t.hp + (this.floor * 8)) * difficultyMult),
-      sp: Math.floor((t.sp + (this.floor * 8)) * difficultyMult),
-      mp: Math.floor((t.mp + (this.floor * 8)) * difficultyMult),
+      hp: Math.floor((t.hp + hpScale) * difficultyMult),
+      sp: Math.floor((t.sp + hpScale) * difficultyMult),
+      mp: Math.floor((t.mp + hpScale) * difficultyMult),
       level: this.floor,
-      strength: 5 + Math.floor(this.floor * 0.5),
-      dexterity: 5 + Math.floor(this.floor * 0.3)
+      strength: 4 + Math.floor(this.floor * 0.4),
+      dexterity: 4 + Math.floor(this.floor * 0.3)
     })];
   }
 

@@ -1,76 +1,87 @@
 # Terminal Souls — Plano de Desenvolvimento para v1.0.0
 
 > Baseado na análise do estado atual da codebase (v0.9.9.1)
+> **Concluído:** 2026-03-16
 
 ---
 
-## Diagnóstico
+## Diagnóstico (Resolvido)
 
-### Bugs Críticos (bloqueiam gameplay)
-1. `Entity.consumeMp()` — inexistente; mana nunca é consumida em skills
-2. `Entity.hasStatus()` / `removeStatus()` — inexistentes; sinergias de status nunca disparam
-3. Missões KILL/FLOOR — progresso nunca auto-incrementa; sistema inútil
-
-### Sistemas Incompletos
-4. Proficiências — definidas na Entity mas nunca aplicadas no dano (Combat.js)
-5. Skills — apenas 4 de 20 implementadas em `executeSkill()`
-6. IA inimiga — apenas ataque básico; bosses sem mecânicas únicas
-7. Puzzle Minesweeper — placeholder, retorna string não funcional
-
-### Endgame Faltando
-8. Boss Final "O Arquiteto do Exílio" (Andar 100) sem mecânicas
-9. Sem tela de vitória / créditos
-10. Biomas sem inimigos temáticos próprios
+### Bugs Críticos (bloqueavam gameplay)
+1. ✅ `Entity.consumeMp()` — implementado; mana agora consumida em skills
+2. ✅ `Entity.hasStatus()` / `removeStatus()` — implementados; sinergias funcionam
+3. ✅ Missões KILL/FLOOR — auto-progressão implementada; sistema funcional
+4. ✅ `handleDarwin` — verificação de string corrigida (`FORÇA/DESTREZA/INTELIGÊNCIA`)
+5. ✅ Inimigos sem drops de orbes — economia corrigida; kills concedem orbes
 
 ---
 
 ## Fases de Implementação
 
-### FASE 1 — Bug Fixes Críticos ✅ (Prioridade Máxima)
-- [ ] `Entity.js`: Adicionar `consumeMp()`, `hasStatus()`, `removeStatus()`
-- [ ] `Combat.js`: Integrar bônus de proficiência no cálculo de dano
-- [ ] `index.js`: Auto-incrementar progresso de missões KILL no pós-combate
-- [ ] `index.js`: Auto-incrementar progresso de missões FLOOR ao avançar andar
+### FASE 1 — Bug Fixes Críticos ✅
+- [x] `Entity.js`: Adicionado `consumeMp()`, `hasStatus()`, `removeStatus()`
+- [x] `Combat.js`: Bônus de proficiência (+5% por nível) integrado no cálculo de dano
+- [x] `index.js`: Auto-incremento de missões KILL no pós-combate
+- [x] `index.js`: Auto-incremento de missões FLOOR ao avançar andar
 
-### FASE 2 — Skills Completas + IA de Bosses
-- [ ] `Combat.js`: Implementar todas as 20 skills (5 por classe)
-- [ ] `Combat.js`: IA de boss com padrões de ataque especiais
-- [ ] `Combat.js`: Escalar dano de estabilidade com atributos do atacante
-- [ ] `Entity.js`: Status CHOQUE (paralisa 1 turno) e CONGELAMENTO (reduz estabilidade)
+### FASE 2 — Skills Completas + IA de Bosses ✅
+- [x] `Combat.js`: Todas as 20 skills implementadas (5 por classe)
+- [x] `Combat.js`: IA de boss com 3 fases (≤30%/≤60%/100% HP)
+- [x] `Combat.js`: Dano de estabilidade escala com STR do atacante
+- [x] `Entity.js`: Status CHOQUE (-20 estab/turno) e CONGELAMENTO (-15 estab/turno)
+- [x] `Combat.js`: EVASÃO funcional (Schrödinger/Einstein — 60% desvio)
+- [x] `Combat.js`: Sinergias CAUTERIZAÇÃO, FRAGMENTAÇÃO, DESCARGA
 
-### FASE 3 — Conteúdo e Profundidade
-- [ ] `Dungeon.js`: Listas de inimigos por bioma (Newton/Hawking/Turing/Noether)
-- [ ] `QuestBoard.js`: Novo tipo ITEM (coletar X drops)
-- [ ] `Puzzle.js`: Substituir Minesweeper por Sequência de Fibonacci / padrão lógico
-- [ ] `index.js`: Mostrar progresso da missão ativa durante exploração (statusBox)
+### FASE 3 — Conteúdo e Profundidade ✅
+- [x] `Dungeon.js`: Inimigos temáticos por bioma (Newton/Hawking/Turing/Noether)
+- [x] `Dungeon.js`: Bosses nomeados por bioma com STR/DEX/INT escalados
+- [x] `QuestBoard.js`: Tipo ITEM adicionado (coletar X drops)
+- [x] `Puzzle.js`: Minesweeper substituído por Sequências Lógicas (10 padrões)
+- [x] `index.js`: Progresso de missão ativa exibido no statusBox durante exploração
+- [x] `index.js`: Auto-progressão missões ITEM ao pegar tesouros
 
-### FASE 4 — Endgame e Lançamento
-- [ ] `Dungeon.js`: Boss final único no Andar 10 com mecânicas especiais (testável)
-- [ ] `Combat.js`: Fases do boss final (3 fases: 100%/60%/30% HP)
-- [ ] `index.js`: Tela de vitória com Renome final e créditos
-- [ ] Balanceamento geral da curva de dificuldade
+### FASE 4 — Endgame e Lançamento ✅
+- [x] `Dungeon.js`: Boss "SENHOR DA ASCENSÃO" aparece a partir do Andar 10
+- [x] `Combat.js`: Boss com 3 fases (duplo ataque, campo de distorção, fase normal)
+- [x] `index.js`: Tela de vitória com Renome Final e créditos
+- [x] `Dungeon.js`: Balanceamento de curva de dificuldade (HP suave nos andares iniciais)
+- [x] `Combat.js`: Inimigos dropam orbes ao morrer (level * 3; boss = level * 15)
 
 ---
 
-## Status por Arquivo
+## Critérios de Conclusão da v1.0.0 ✅
 
-| Arquivo | Estado | Prioridade |
+- [x] Todas as skills funcionando com custo de mana real
+- [x] Sinergias de status (Cauterização, Fragmentação, Descarga) disparando corretamente
+- [x] Sistema de missões rastreando progresso automaticamente (KILL/FLOOR/ITEM)
+- [x] Proficiências adicionando bônus de dano real
+- [x] Boss final com 3 fases e mecânicas únicas
+- [x] Tela de vitória exibindo Renome Final
+- [x] Testes cobrindo skills, sinergias e missões
+
+---
+
+## Cobertura de Testes — 64 testes passando
+
+| Suite | Testes | Cobertura |
 |---|---|---|
-| `src/entities/Entity.js` | Métodos faltando | CRÍTICO |
-| `src/combat/Combat.js` | Skills incompletas, sem proficiências | ALTO |
-| `src/index.js` | Quest progress, tela vitória | ALTO |
-| `src/core/Dungeon.js` | Biomas sem temas, boss sem mecânica | MÉDIO |
-| `src/core/QuestBoard.js` | Só 2 tipos de missão | MÉDIO |
-| `src/core/Puzzle.js` | Minesweeper placeholder | BAIXO |
+| `Entity.test.js` | 5 | Stats, XP, atributos, estabilidade |
+| `Combat.test.js` | 3 | Dano, stagger, vitória |
+| `Systems.test.js` | 3 | Bestiário, equipamento |
+| `Skills.test.js` | 20 | consumeMp/hasStatus/removeStatus, todas as 20 skills, sinergias, proficiências |
+| `Quests.test.js` | 15 | KILL/FLOOR/ITEM auto-progress, entrega de quest, geração |
+| `Puzzle.test.js` | 18 | MATH/EQUATION/RIDDLE/SEQUENCE, edge cases |
 
 ---
 
-## Critérios de Conclusão da v1.0.0
+## Status Final por Arquivo
 
-- [ ] Todas as skills funcionando com custo de mana real
-- [ ] Sinergias de status (Cauterização, etc.) disparando corretamente
-- [ ] Sistema de missões rastreando progresso automaticamente
-- [ ] Proficiências adicionando bônus de dano real
-- [ ] Boss final com 3 fases e mecânicas únicas
-- [ ] Tela de vitória exibindo Renome Final
-- [ ] Testes cobrindo skills, sinergias e missões
+| Arquivo | Estado |
+|---|---|
+| `src/entities/Entity.js` | ✅ Completo |
+| `src/combat/Combat.js` | ✅ Completo |
+| `src/index.js` | ✅ Completo |
+| `src/core/Dungeon.js` | ✅ Completo |
+| `src/core/QuestBoard.js` | ✅ Completo |
+| `src/core/Puzzle.js` | ✅ Completo |
+| `tests/` | ✅ 64 testes passando |

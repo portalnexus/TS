@@ -170,7 +170,7 @@ function showAda() { gameState = 'ADA'; actionMenu.setLabel(' [ ADA: ALGORITMOS 
 function handleAda(c) { if (c.includes('Compilar')) { if (player.compileSkill(50)) { log(chalk.cyan('Skill Points +1.')); showNexus(); } else log(chalk.red('Sem orbes.')); } }
 
 function showMarie() {
-  gameState = 'MARIE'; actionMenu.setLabel(` [ MARIE: ALQUIMIA ] `);
+  gameState = 'MARIE'; actionMenu.setLabel(` [ MARIE: ALQUIMIA (50 Orbes) ] `);
   actionMenu.setItems([' [ESC] Voltar']);
   const items = player.inventory.map(it => `${it.getColorizedName()}`);
   inventoryBox.setItems(items); inventoryBox.show(); inventoryBox.focus(); mapBox.hide(); itemDetailBox.show();
@@ -181,7 +181,10 @@ function handleMarieAction(index) { if (currentAltar.reRollItem(player, index)) 
 
 function showDarwin() { gameState = 'DARWIN'; actionMenu.setLabel(' [ DARWIN: EVOLUCAO ] '); actionMenu.setItems([' [1] + FORÇA (30 Orbes)', ' [2] + DESTREZA (30 Orbes)', ' [3] + INTELIGÊNCIA (30 Orbes)', ' [ESC] Voltar']); actionMenu.focus(); }
 function handleDarwin(c) {
-  let s = false; if (c.includes('Força')) s = player.adaptAttribute('STR', 30); if (c.includes('Destreza')) s = player.adaptAttribute('DEX', 30); if (c.includes('Intelecto')) s = player.adaptAttribute('INT', 30);
+  let s = false;
+  if (c.includes('FORÇA')) s = player.adaptAttribute('STR', 30);
+  else if (c.includes('DESTREZA')) s = player.adaptAttribute('DEX', 30);
+  else if (c.includes('INTELIGÊNCIA')) s = player.adaptAttribute('INT', 30);
   if (s) { log(chalk.green('Evoluído!')); updateStatus(); showNexus(); } else log(chalk.red('Sem orbes.'));
 }
 

@@ -222,6 +222,108 @@
             </section>
         </main>
 
+        <section class="box tutorial-box">
+            <h2>[ INICIALIZAÇÃO DO SISTEMA ]</h2>
+            <div class="content">
+                <div class="os-tabs">
+                    <button class="os-tab active" data-os="linux">[ 🐧 Linux ]</button>
+                    <button class="os-tab" data-os="windows">[ 🪟 Windows ]</button>
+                </div>
+
+                <div class="tutorial-panel" id="tutorial-linux">
+                    <div class="prereq-box">
+                        <p class="prereq-title">PRÉ-REQUISITOS</p>
+                        <ul>
+                            <li><span class="cyan">Node.js v18+</span> — <span class="gray">sudo apt install nodejs npm</span> <span class="gray">/ pacman -S nodejs npm</span></li>
+                            <li><span class="cyan">Git</span> — <span class="gray">sudo apt install git</span> <span class="gray">/ pacman -S git</span></li>
+                        </ul>
+                    </div>
+                    <div class="steps">
+                        <div class="step">
+                            <div class="step-num">01</div>
+                            <div class="step-body">
+                                <p class="step-title">Clonar o repositório</p>
+                                <pre class="code-block"><span class="gray">$</span> git clone https://github.com/portalnexus/TS.git
+<span class="gray">$</span> cd TS/TS</pre>
+                            </div>
+                        </div>
+                        <div class="step">
+                            <div class="step-num">02</div>
+                            <div class="step-body">
+                                <p class="step-title">Instalar dependências</p>
+                                <pre class="code-block"><span class="gray">$</span> npm install</pre>
+                            </div>
+                        </div>
+                        <div class="step">
+                            <div class="step-num">03</div>
+                            <div class="step-body">
+                                <p class="step-title">Iniciar o Exílio</p>
+                                <pre class="code-block"><span class="gray">$</span> npm start</pre>
+                            </div>
+                        </div>
+                        <div class="step">
+                            <div class="step-num">04</div>
+                            <div class="step-body">
+                                <p class="step-title">Modo desenvolvedor (hot-reload)</p>
+                                <pre class="code-block"><span class="gray">$</span> npm run dev</pre>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="tutorial-note">
+                        <p><span class="yellow">⚠ NOTA:</span> Recomendado terminal com suporte a Unicode e 256 cores: <span class="cyan">Alacritty</span>, <span class="cyan">Kitty</span>, <span class="cyan">GNOME Terminal</span> ou <span class="cyan">WezTerm</span>. Tamanho mínimo: <span class="green">120×30</span>.</p>
+                    </div>
+                </div>
+
+                <div class="tutorial-panel hidden" id="tutorial-windows">
+                    <div class="prereq-box">
+                        <p class="prereq-title">PRÉ-REQUISITOS</p>
+                        <ul>
+                            <li><span class="cyan">Node.js v18+</span> — Baixar em <span class="gray">nodejs.org/en/download</span> (LTS recomendado)</li>
+                            <li><span class="cyan">Git</span> — Baixar em <span class="gray">git-scm.com/download/win</span></li>
+                            <li><span class="cyan">Windows Terminal</span> — Microsoft Store (obrigatório para renderização correta)</li>
+                        </ul>
+                    </div>
+                    <div class="steps">
+                        <div class="step">
+                            <div class="step-num">01</div>
+                            <div class="step-body">
+                                <p class="step-title">Abrir o Windows Terminal (PowerShell) e clonar</p>
+                                <pre class="code-block"><span class="gray">PS></span> git clone https://github.com/portalnexus/TS.git
+<span class="gray">PS></span> cd TS\TS</pre>
+                            </div>
+                        </div>
+                        <div class="step">
+                            <div class="step-num">02</div>
+                            <div class="step-body">
+                                <p class="step-title">Instalar dependências</p>
+                                <pre class="code-block"><span class="gray">PS></span> npm install</pre>
+                            </div>
+                        </div>
+                        <div class="step">
+                            <div class="step-num">03</div>
+                            <div class="step-body">
+                                <p class="step-title">Iniciar o Exílio</p>
+                                <pre class="code-block"><span class="gray">PS></span> npm start</pre>
+                            </div>
+                        </div>
+                        <div class="step">
+                            <div class="step-num">04</div>
+                            <div class="step-body">
+                                <p class="step-title">Habilitar suporte a cores (caso necessário)</p>
+                                <pre class="code-block"><span class="gray">PS></span> Set-ItemProperty HKCU:\Console VirtualTerminalLevel -Type DWORD 1</pre>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="tutorial-note">
+                        <p><span class="yellow">⚠ NOTA:</span> Use sempre o <span class="cyan">Windows Terminal</span> (não o CMD legado). Habilite o modo UTF-8: <span class="gray">chcp 65001</span>. Tamanho mínimo da janela: <span class="green">120×30</span>.</p>
+                    </div>
+                    <div class="tutorial-note warn">
+                        <p><span class="red">⛔ ATENÇÃO:</span> O PowerShell ISE e o CMD clássico <strong>não</strong> renderizam corretamente os caracteres TUI. Use exclusivamente o Windows Terminal ou WSL2.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
         <footer class="footer-box">
             <p class="github-link">
                 <a href="https://portalnexus.github.io/TS/" target="_blank">[ ACESSAR_REPOSITÓRIO_GITHUB ]</a>

@@ -218,11 +218,18 @@ class Entity {
   }
 
   useConsumable(item) {
-    if (item.type !== 'CONSUMÍVEL') return false;
-    const val = item.stats.recoverValue || 20;
-    if (item.name.includes('HP')) this.hp = Math.min(this.maxHp, this.hp + val);
-    if (item.name.includes('SP')) this.sp = Math.min(this.maxSp, this.sp + val);
-    if (item.name.includes('MP')) this.mp = Math.min(this.maxMp, this.mp + val);
+    if (item.type !== 'CONSUMÍVEL' && item.type !== 'TOMO') return false;
+    // Use explicit stat fields (new system) with fallback to name-based detection (legacy)
+    if (item.stats.recoverHp) this.hp = Math.min(this.maxHp, this.hp + item.stats.recoverHp);
+    if (item.stats.recoverSp) this.sp = Math.min(this.maxSp, this.sp + item.stats.recoverSp);
+    if (item.stats.recoverMp) this.mp = Math.min(this.maxMp, this.mp + item.stats.recoverMp);
+    // Legacy fallback for saves with old item format
+    if (!item.stats.recoverHp && !item.stats.recoverSp && !item.stats.recoverMp) {
+      const val = item.stats.recoverValue || 20;
+      if (item.name.includes('HP') || item.consumableType === 'HP') this.hp = Math.min(this.maxHp, this.hp + val);
+      if (item.name.includes('SP') || item.consumableType === 'SP') this.sp = Math.min(this.maxSp, this.sp + val);
+      if (item.name.includes('MP') || item.consumableType === 'MP') this.mp = Math.min(this.maxMp, this.mp + val);
+    }
     this.inventory = this.inventory.filter(i => i.id !== item.id);
     return true;
   }

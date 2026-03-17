@@ -30,6 +30,15 @@ const itemDetailBox = blessed.box({ top: '68%', left: '20%', width: '80%', heigh
 const equipVisualBox = blessed.box({ top: 3, left: '80%', width: '20%', height: '65%', label: ' [ EQUIPAMENTO ] ', border: { type: 'line', fg: 'magenta' }, tags: true, scrollable: true });
 
 let player = null;
+
+// Gera barra de progresso ASCII colorida
+function makeBar(current, max, length = 8) {
+  const ratio = Math.max(0, Math.min(1, current / max));
+  const filled = Math.round(ratio * length);
+  const empty = length - filled;
+  return '█'.repeat(filled) + '░'.repeat(empty);
+}
+
 let currentBlacksmith = new Blacksmith(1);
 let currentAltar = new CraftingAltar();
 let questBoard = new QuestBoard();
@@ -48,35 +57,66 @@ function loadGame() {
 // --- RENDERIZAÇÃO ---
 function updateStatus() {
   if (!player) return;
-  const hpColor = player.hp < player.maxHp * 0.3 ? chalk.red : chalk.green;
   const prestige = player.calculatePrestige();
-  
-  statusBox.setContent(`
-  ${chalk.bold.cyan(player.name)}
-  ${chalk.gray(player.race + ' | ' + player.background)}
-  LVL: ${player.level} | XP: ${player.xp}/${player.level * 100}
 
-  HP: ${hpColor(player.hp + '/' + player.maxHp)}
-  SP: ${chalk.yellow(player.sp + '/' + player.maxSp)}
-  MP: ${chalk.blue(player.mp + '/' + player.maxMp)}
+  // Cores por limiar de HP
+  const hpRatio = player.hp / player.maxHp;
+  const hpColor = hpRatio < 0.25 ? chalk.red : hpRatio < 0.55 ? chalk.yellow : chalk.green;
+  const spColor = player.sp < player.maxSp * 0.3 ? chalk.red : chalk.yellow;
+  const mpColor = player.mp < player.maxMp * 0.3 ? chalk.red : chalk.blue;
 
-  STR: ${player.strength} | DEX: ${player.dexterity} | INT: ${player.intelligence}
-  ESTAB: ${player.posture}/${player.maxPosture}
+  // Cor de acento por classe
+  const classColors = { Guerreiro: chalk.red, Mago: chalk.blue, Arqueiro: chalk.yellow, Clérigo: chalk.green };
+  const accent = classColors[player.background] || chalk.cyan;
 
-  ${chalk.bold.yellow('ORBES:')} ${player.orbs}
-  ${chalk.bold.magenta('SKILLS:')} ${player.skillPoints}
-  
-  ${chalk.bold.white('RENOME:')} ${chalk.bold.green(prestige)}
-  ${player.activeQuest ? chalk.bold.yellow('MISSÃO: ') + chalk.white(`${player.activeQuest.progress}/${player.activeQuest.target}`) : ''}
-  `);
-  
-  let synergyContent = '';
+  // Barras de recursos
+  const hpBar  = hpColor(makeBar(player.hp, player.maxHp));
+  const spBar  = spColor(makeBar(player.sp, player.maxSp));
+  const mpBar  = mpColor(makeBar(player.mp, player.maxMp));
+  const stBar  = chalk.cyan(makeBar(player.posture, player.maxPosture));
+
+  // XP bar
+  const xpBar  = chalk.gray(makeBar(player.xp, player.level * 100, 8));
+
+  // Postura mode badge
+  const modeBadge = player.postureMode === 'INERCIA'   ? chalk.cyan('[INÉ]')
+                  : player.postureMode === 'MOMENTO'   ? chalk.yellow('[MOM]')
+                  : chalk.gray('[EQU]');
+
+  statusBox.setContent(
+    `\n  ${accent.bold(player.name)}\n` +
+    `  ${chalk.gray(player.race + ' · ' + player.background)}\n` +
+    `  ${chalk.gray('Lv')}${chalk.white(player.level)} ${xpBar} ${chalk.gray(player.xp+'/'+(player.level*100))}\n\n` +
+    `  ${chalk.bold('HP')} ${hpBar} ${hpColor(player.hp+'/'+player.maxHp)}\n` +
+    `  ${chalk.bold('SP')} ${spBar} ${spColor(player.sp+'/'+player.maxSp)}\n` +
+    `  ${chalk.bold('MP')} ${mpBar} ${mpColor(player.mp+'/'+player.maxMp)}\n` +
+    `  ${chalk.bold('ES')} ${stBar} ${chalk.cyan(player.posture)} ${modeBadge}\n\n` +
+    `  ${chalk.red('STR')} ${chalk.white(player.strength)}  ${chalk.cyan('DEX')} ${chalk.white(player.dexterity)}  ${chalk.blue('INT')} ${chalk.white(player.intelligence)}\n\n` +
+    `  ${chalk.bold.yellow('◈')} ${chalk.yellow(player.orbs)} Orbes  ${chalk.bold.magenta('✦')} ${chalk.magenta(player.skillPoints)} Skills\n` +
+    `  ${chalk.bold.white('RENOME')} ${chalk.bold.green(prestige)}\n` +
+    (player.activeQuest ? `  ${chalk.bold.yellow('►')} ${chalk.yellow(player.activeQuest.desc.slice(0,18)+'…')} ${chalk.white(player.activeQuest.progress+'/'+player.activeQuest.target)}\n` : '')
+  );
+
+  // Sinergias + status ativos
+  const classIcons = { Guerreiro: chalk.red('⚔ '), Mago: chalk.blue('✦ '), Arqueiro: chalk.yellow('→ '), Clérigo: chalk.green('✝ ') };
+  let synergyContent = (classIcons[player.background] || '') + accent.bold(player.background + '\n');
   if (player.background === 'Guerreiro') synergyContent += chalk.red('• +10% Dano Físico\n');
-  if (player.background === 'Mago') synergyContent += chalk.blue('• +10% Dano Mágico\n');
-  if (player.background === 'Arqueiro') synergyContent += chalk.yellow('• +10 Postura Máxima\n');
-  if (player.background === 'Clérigo') synergyContent += chalk.green('• +10% Recuperação\n');
-  if (player.postureMode === 'INERCIA') synergyContent += chalk.cyan('• INÉRCIA: +100% Def\n');
-  if (player.postureMode === 'MOMENTO') synergyContent += chalk.yellow('• MOMENTO: +50% Dmg\n');
+  if (player.background === 'Mago')      synergyContent += chalk.blue('• +10% Dano Mágico\n');
+  if (player.background === 'Arqueiro')  synergyContent += chalk.yellow('• +10 Postura Máx.\n');
+  if (player.background === 'Clérigo')   synergyContent += chalk.green('• +10% Recuperação\n');
+  if (player.postureMode === 'INERCIA')  synergyContent += chalk.cyan('• INÉRCIA: ×2 Def\n');
+  if (player.postureMode === 'MOMENTO')  synergyContent += chalk.yellow('• MOMENTO: +50% Dmg\n');
+  if (player.isStaggered)               synergyContent += chalk.bgRed.white('! COLAPSO !\n');
+
+  // Status ativos
+  if (player.activeStatuses && player.activeStatuses.length > 0) {
+    synergyContent += chalk.gray('─────────\n');
+    const statusIcons = { SANGRAMENTO: chalk.red('⬤'), COMBUSTÃO: chalk.keyword('orange')('⬤'), CHOQUE: chalk.yellow('⚡'), CONGELAMENTO: chalk.cyan('❄'), EVASÃO: chalk.white('◎'), IMUNIDADE: chalk.cyan('⬡') };
+    player.activeStatuses.forEach(s => {
+      const icon = statusIcons[s.name] || chalk.gray('•');
+      synergyContent += `${icon} ${chalk.white(s.name)} ${chalk.gray('('+s.duration+'t)')}\n`;
+    });
+  }
   synergyBox.setContent(synergyContent);
 
   let equipContent = `${chalk.bold('EQUIPADO:')}\n\n`;
@@ -138,7 +178,7 @@ function showInventory() {
 }
 
 inventoryBox.on('select', (item, index) => {
-  if (gameState === 'INVENTORY') { const it = player.inventory[index]; if (!it) return; if (it.type === 'CONSUMÍVEL') player.useConsumable(it); else player.equipItem(it); updateStatus(); showInventory(); }
+  if (gameState === 'INVENTORY') { const it = player.inventory[index]; if (!it) return; if (it.type === 'CONSUMÍVEL' || it.type === 'TOMO') { player.useConsumable(it); log(chalk.green(`Usado: ${it.name}`)); } else player.equipItem(it); updateStatus(); showInventory(); }
   else if (gameState === 'SKILL_TREE') { const n = Object.keys(player.skillTree)[index]; if (player.upgradeSkill(n)) { log(chalk.green(`Up: ${n}`)); showPassives(); } }
   else if (gameState === 'MARIE') handleMarieAction(index);
 });

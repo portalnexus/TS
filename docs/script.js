@@ -55,264 +55,232 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- GALERIA DE SPRITES ASCII ---
     const rawSprites = {
         player: {
-            'Humano': [
-                '<span class="cyan">      _____      </span>',
-                '<span class="cyan">     /     \\     </span>',
-                '<span class="cyan">    |  o o  |    </span>',
-                '<span class="cyan">    \\_  -  _/    </span>',
+            'Humano — Guerreiro': [
+                '<span class="cyan">      _[G]_      </span>',
+                '<span class="cyan">     /|   |\\     </span>',
+                '<span class="cyan">    | | ◉ ◉| |   </span>',
+                '<span class="cyan">    | |  ▼  | |   </span>',
+                '<span class="cyan">     \\|___|/     </span>',
                 '<span class="cyan">      /| |\\      </span>',
-                '<span class="cyan">     / | | \\     </span>',
-                '<span class="cyan">      /   \\      </span>'
+                '<span class="cyan">   ══╪═╪═╪╪══    </span>',
+                '<span class="cyan">     /   \\       </span>'
             ],
-            'Elfo': [
-                '<span class="green">     /|     |\\   </span>',
-                '<span class="green">    / |_____| \\  </span>',
-                '<span class="green">   |  ^     ^  | </span>',
-                '<span class="green">    \\_   -   _/  </span>',
-                '<span class="green">     --| |--     </span>',
-                '<span class="green">      /| |\\      </span>',
+            'Elfo — Mago': [
+                '<span class="green">     /|~~~|\\     </span>',
+                '<span class="green">    / |_♦_| \\    </span>',
+                '<span class="green">   |  ^ ★ ^  |   </span>',
+                '<span class="green">    \\_  ▼  _/    </span>',
+                '<span class="green">     ☽| |☽      </span>',
+                '<span class="green">      /|*|\\      </span>',
+                '<span class="green">   ~∿∿∿∿∿∿∿~    </span>',
                 '<span class="green">     /     \\     </span>'
             ],
-            'Anão': [
-                '<span class="yellow">      _____      </span>',
-                '<span class="yellow">     /     \\     </span>',
-                '<span class="yellow">    |  - -  |    </span>',
+            'Anão — Arqueiro': [
+                '<span class="yellow">      _[◈]_      </span>',
+                '<span class="yellow">     /─────\\     </span>',
+                '<span class="yellow">    | ─ ─ ─ |    </span>',
                 '<span class="yellow">    |#######|    </span>',
-                '<span class="yellow">    \\_#####_/    </span>',
-                '<span class="yellow">     [|||||]     </span>',
-                '<span class="yellow">     /     \\     </span>'
+                '<span class="yellow">    \\_#===_/    </span>',
+                '<span class="yellow">   )>( | )(     </span>',
+                '<span class="yellow">    ══╪═╪══     </span>',
+                '<span class="yellow">     /   \\      </span>'
             ],
-            'Orc': [
-                '<span class="red">     /     \\     </span>',
-                '<span class="red">    |  ^ ^  |    </span>',
-                '<span class="red">    |  \\_/  |    </span>',
+            'Orc — Clérigo': [
+                '<span class="red">     /  ✝  \\     </span>',
+                '<span class="red">    |  ◈ ◈  |    </span>',
+                '<span class="red">    |   ▽   |    </span>',
                 '<span class="red">    \\__VVV__/    </span>',
-                '<span class="red">     /|   |\\     </span>',
-                '<span class="red">    / |   | \\    </span>',
-                '<span class="red">     /     \\     </span>'
+                '<span class="red">   ✦ /| |\ ✦    </span>',
+                '<span class="red">    / | | \\     </span>',
+                '<span class="red">   ✦ /   \\ ✦   </span>',
+                '<span class="red">     /     \\    </span>'
             ]
         },
         bosses: {
             'Newton Corrompido': [
-                '<span class="gray" style="font-weight:bold">      .-------.      </span>',
-                '<span class="gray" style="font-weight:bold">     /  F=ma   \\     </span>',
-                '<span class="gray" style="font-weight:bold">    |  [ G ] [ G ] |  </span>',
-                '<span class="gray" style="font-weight:bold">    |   PRISMA   |    </span>',
-                '<span class="gray" style="font-weight:bold">    |  /  |  \\  |    </span>',
-                '<span class="gray" style="font-weight:bold">   /   --|--   \\      </span>',
-                '<span class="gray" style="font-weight:bold"> /_______________\\    </span>'
+                '<span class="gray" style="font-weight:bold">   ╔═══[F=ma]═══╗   </span>',
+                '<span class="gray" style="font-weight:bold">   ║  (◉)   (◉) ║   </span>',
+                '<span class="gray" style="font-weight:bold">   ║    ╔═══╗   ║   </span>',
+                '<span class="gray" style="font-weight:bold">   ║   ╔╩╩╩╩╩╗  ║   </span>',
+                '<span class="gray" style="font-weight:bold">   ╚═══╝PRISMA╚═══╝  </span>',
+                '<span class="gray" style="font-weight:bold">      ╔══╪══╗        </span>',
+                '<span class="gray" style="font-weight:bold">   ══╝  / \\ ╚══     </span>'
             ],
             'Sombra de Hawking': [
-                '<span class="cyan" style="font-weight:bold">      .-------.      </span>',
-                '<span class="cyan" style="font-weight:bold">     /  (   )  \\     </span>',
-                '<span class="cyan" style="font-weight:bold">    |  EVENT  HRZ |  </span>',
-                '<span class="cyan" style="font-weight:bold">    |   (( X ))   |  </span>',
-                '<span class="cyan" style="font-weight:bold">    |   -----     |  </span>',
-                '<span class="cyan" style="font-weight:bold">   /     |     \\     </span>',
-                '<span class="cyan" style="font-weight:bold"> /_______________\\   </span>'
+                '<span class="cyan" style="font-weight:bold">    ·· ╔══════╗ ··  </span>',
+                '<span class="cyan" style="font-weight:bold">  ·   ║ (◉◉) ║   · </span>',
+                '<span class="cyan" style="font-weight:bold"> ·    ║  ███  ║    · </span>',
+                '<span class="cyan" style="font-weight:bold">·     ╚══╦══╦╝     ·</span>',
+                '<span class="cyan" style="font-weight:bold">  ·    ·EVENT·   ·  </span>',
+                '<span class="cyan" style="font-weight:bold">    ··  HRZN  ··    </span>',
+                '<span class="cyan" style="font-weight:bold">       ·····        </span>'
             ],
             'A Máquina Implacável': [
-                '<span class="red" style="font-weight:bold">      _______      </span>',
-                '<span class="red" style="font-weight:bold">    |01001011|     </span>',
-                '<span class="red" style="font-weight:bold">    |10110100|     </span>',
-                '<span class="red" style="font-weight:bold">    | TURING |     </span>',
-                '<span class="red" style="font-weight:bold">    |________|     </span>',
-                '<span class="red" style="font-weight:bold">     |_|   |_|    </span>',
-                '<span class="red" style="font-weight:bold">    /       \\     </span>'
+                '<span class="red" style="font-weight:bold">   ┌──────────┐     </span>',
+                '<span class="red" style="font-weight:bold">   │01 ◉◉ 10│     </span>',
+                '<span class="red" style="font-weight:bold">   │  TURING  │     </span>',
+                '<span class="red" style="font-weight:bold">   │10110100│     </span>',
+                '<span class="red" style="font-weight:bold">   └────┬─┬────┘     </span>',
+                '<span class="red" style="font-weight:bold">      ══╪═╪══        </span>',
+                '<span class="red" style="font-weight:bold">       /   \\         </span>'
             ],
             'Guardiã do Vazio': [
-                '<span class="magenta" style="font-weight:bold">     < * * * >    </span>',
-                '<span class="magenta" style="font-weight:bold">    <  NOETHER >  </span>',
-                '<span class="magenta" style="font-weight:bold">   <--- [ ∞ ] ---> </span>',
-                '<span class="magenta" style="font-weight:bold">    <  SIMETRIA>  </span>',
-                '<span class="magenta" style="font-weight:bold">     < * * * >    </span>',
-                '<span class="magenta" style="font-weight:bold">      / | \\       </span>',
-                '<span class="magenta" style="font-weight:bold">     /  |  \\      </span>'
+                '<span class="magenta" style="font-weight:bold">   ✦ ≋≋≋≋≋≋≋ ✦    </span>',
+                '<span class="magenta" style="font-weight:bold">  ≋  ╔══◉◉══╗  ≋  </span>',
+                '<span class="magenta" style="font-weight:bold"> ≋   ║  ∞   ║   ≋ </span>',
+                '<span class="magenta" style="font-weight:bold">  ≋  ╚NOETHER╝  ≋  </span>',
+                '<span class="magenta" style="font-weight:bold">   ✦ ≋≋≋≋≋≋≋ ✦    </span>',
+                '<span class="magenta" style="font-weight:bold">       / | \\       </span>',
+                '<span class="magenta" style="font-weight:bold">      /  |  \\      </span>'
             ],
             'Senhor da Ascensão': [
-                '<span class="magenta" style="font-weight:bold">      .-------.      </span>',
-                '<span class="magenta" style="font-weight:bold">     /  VOID   \\     </span>',
-                '<span class="magenta" style="font-weight:bold">    |  [ANDAR+] |    </span>',
-                '<span class="magenta" style="font-weight:bold">    |  (  X  )  |    </span>',
-                '<span class="magenta" style="font-weight:bold">    |__| | |____|    </span>',
-                '<span class="magenta" style="font-weight:bold">   /   VOID-LORD \\   </span>',
-                '<span class="magenta" style="font-weight:bold"> /_______________\\   </span>'
+                '<span class="magenta" style="font-weight:bold">  ▓▓╔══[VOID]══╗▓▓ </span>',
+                '<span class="magenta" style="font-weight:bold">  ▓ ║ ◈ ▓▓▓ ◈ ║ ▓ </span>',
+                '<span class="magenta" style="font-weight:bold">  ▓ ║   ▼▼▼   ║ ▓ </span>',
+                '<span class="magenta" style="font-weight:bold">  ▓ ║  [∅∅∅]  ║ ▓ </span>',
+                '<span class="magenta" style="font-weight:bold">  ▓▓╚══╦═╦═╦══╝▓▓ </span>',
+                '<span class="magenta" style="font-weight:bold">    ▓▓▓╪═╪═╪▓▓▓   </span>',
+                '<span class="magenta" style="font-weight:bold">     ▓▓/   \\▓▓    </span>'
             ]
         },
         enemies: {
-            'Esqueleto Maldito': [
-                '<span class="white">      .---.      </span>',
-                '<span class="white">     / x x \\     </span>',
-                '<span class="white">     \\_ x _/     </span>',
-                '<span class="white">      _|_|_      </span>',
-                '<span class="white">     |  |  |     </span>',
-                '<span class="white">     |__|__|     </span>',
-                '<span class="white">     /     \\     </span>'
+            'Prisma Refrator': [
+                '<span class="gray">        /\\       </span>',
+                '<span class="gray">       /  \\      </span>',
+                '<span class="gray">      / ·· \\     </span>',
+                '<span class="gray">     /NEWTON\\    </span>',
+                '<span class="gray">    /________\\   </span>',
+                '<span class="gray">   ← R G B →     </span>'
+            ],
+            'Corpo Gravitacional': [
+                '<span class="gray">    . · (◉) · .  </span>',
+                '<span class="gray">  · ─── F=G ─── · </span>',
+                '<span class="gray">    · ──m/r²── ·  </span>',
+                '<span class="gray">      · ─── ·     </span>',
+                '<span class="gray">          .       </span>'
+            ],
+            'Eco de Radiação': [
+                '<span class="cyan">   ))) (( ))) (   </span>',
+                '<span class="cyan">  (  ☢ HAWKING ☢  )</span>',
+                '<span class="cyan">   ))) (( ))) (   </span>',
+                '<span class="cyan">      (( T/2 ))   </span>',
+                '<span class="cyan">       ·····      </span>'
+            ],
+            'Singularidade Menor': [
+                '<span class="cyan">    · ·(   )· ·  </span>',
+                '<span class="cyan">   ·  ( ███ )  · </span>',
+                '<span class="cyan">  ·   ( ▓▓▓ )   ·</span>',
+                '<span class="cyan">   ·  (     )  · </span>',
+                '<span class="cyan">    · · · · · ·  </span>'
+            ],
+            'Lobo de Turing': [
+                '<span class="red">    /\\0 1 0/\\    </span>',
+                '<span class="red">   / 0 1 0 1 \\   </span>',
+                '<span class="red">  ( ◉== X ==◉ )  </span>',
+                '<span class="red">   ) 1 0 1 0 (   </span>',
+                '<span class="red">  / 0 1 0 1 0 \\  </span>',
+                '<span class="red"> /1 0 1 0 1 0 1\\ </span>'
+            ],
+            'Daemon Binário': [
+                '<span class="red">  [0 1 0 1 0 1]  </span>',
+                '<span class="red">  [1 ◈ 0 1 ◈ 0]  </span>',
+                '<span class="red">  [──── ▼ ────]  </span>',
+                '<span class="red">  [  DAEMON   ]  </span>',
+                '<span class="red">   \\──┬──┬──/   </span>',
+                '<span class="red">     /   \\       </span>'
+            ],
+            'Espectro de Noether': [
+                '<span class="magenta">     ≋ ≋ ≋ ≋     </span>',
+                '<span class="magenta">   ≋ ( ∞ ∞ ) ≋   </span>',
+                '<span class="magenta">  ≋  (  ─  )  ≋  </span>',
+                '<span class="magenta">   ≋ ( ∞ ∞ ) ≋   </span>',
+                '<span class="magenta">     ≋ ≋ ≋ ≋     </span>'
+            ],
+            'Tensor de Tensão': [
+                '<span class="magenta">  [ T¹¹ T¹² T¹³] </span>',
+                '<span class="magenta">  [ T²¹ ◉── T²³] </span>',
+                '<span class="magenta">  [ T³¹ T³² ◉──] </span>',
+                '<span class="magenta">    ──── ▼ ────   </span>',
+                '<span class="magenta">       / | \\      </span>'
+            ],
+            'Autômato de Pascal': [
+                '<span class="yellow">    ┌──────┐      </span>',
+                '<span class="yellow">    │[◉][◉]│      </span>',
+                '<span class="yellow">    │  ═══ │      </span>',
+                '<span class="yellow">    │PASCAL│      </span>',
+                '<span class="yellow">    └──┬─┬──┘     </span>',
+                '<span class="yellow">       │ │         </span>',
+                '<span class="yellow">      /   \\        </span>'
             ],
             'Esqueleto de Gauss': [
                 '<span class="white">      .---.      </span>',
-                '<span class="white">     / ( ) \\     </span>',
+                '<span class="white">     / (╬) \\     </span>',
                 '<span class="white">    |  _|_  |    </span>',
-                '<span class="white">     \\_/_\\_/     </span>',
-                '<span class="white">      _|_|_      </span>',
+                '<span class="white">     \\_/†\\_/     </span>',
+                '<span class="white">      _|†|_      </span>',
                 '<span class="white">     |  |  |     </span>',
                 '<span class="white">     |__|__|     </span>'
             ],
-            'Lobo Corrompido': [
-                '<span class="gray">    /\\___/\\    </span>',
-                '<span class="gray">   / o   o \\   </span>',
-                '<span class="gray">  ( == Y == )  </span>',
-                '<span class="gray">   )       (   </span>',
-                '<span class="gray">  /         \\  </span>',
-                '<span class="gray"> /           \\ </span>'
-            ],
-            'Lobo de Turing': [
-                '<span class="cyan">    /\\___/\\    </span>',
-                '<span class="cyan">   / 0   1 \\   </span>',
-                '<span class="cyan">  ( == X == )  </span>',
-                '<span class="cyan">   ) 10101 (   </span>',
-                '<span class="cyan">  / 0101010 \\  </span>',
-                '<span class="cyan"> / 101010101 \\ </span>'
-            ],
-            'Guerreiro Caído': [
-                '<span class="red">     ._____.     </span>',
-                '<span class="red">     |#####|     </span>',
-                '<span class="red">     |#_#_#|     </span>',
-                '<span class="red">    _|_|_|_|_    </span>',
-                '<span class="red">   / |  X  | \\   </span>',
-                '<span class="red">  /  |_____|  \\  </span>',
-                '<span class="red">     |     |     </span>'
-            ],
-            'Autômato de Pascal': [
-                '<span class="yellow">     _______     </span>',
-                '<span class="yellow">    | [ ] [ ] |    </span>',
-                '<span class="yellow">    |    ^    |    </span>',
-                '<span class="yellow">    |  [===]  |    </span>',
-                '<span class="yellow">    |_________|    </span>',
-                '<span class="yellow">     |_|   |_|     </span>',
-                '<span class="yellow">     |_|   |_|     </span>'
-            ],
-            'Eco de Noether': [
-                '<span class="magenta">     < * * >     </span>',
-                '<span class="magenta">    <   |   >    </span>',
-                '<span class="magenta">   <--- o --->   </span>',
-                '<span class="magenta">    <   |   >    </span>',
-                '<span class="magenta">     < * * >     </span>',
-                '<span class="magenta">      / | \\      </span>',
-                '<span class="magenta">     /  |  \\     </span>'
-            ],
-            'Fractal de Mandelbrot': [
-                '<span class="magenta">      { & % }     </span>',
-                '<span class="magenta">    { % # @ & }   </span>',
-                '<span class="magenta">   { & @ % # @ }  </span>',
-                '<span class="magenta">    { % # @ & }   </span>',
-                '<span class="magenta">      { & % }     </span>'
-            ],
-            'Prisma de Pitágoras': [
-                '<span class="yellow">        /\\       </span>',
-                '<span class="yellow">       /  \\      </span>',
-                '<span class="yellow">      /____\\     </span>',
-                '<span class="yellow">     | a²+b²|    </span>',
-                '<span class="yellow">     |  =c² |    </span>',
-                '<span class="yellow">     |______|    </span>'
-            ],
-            'Matriz de Cayley': [
-                '<span class="blue">     [ a  b ]    </span>',
-                '<span class="blue">     [ c  d ]    </span>',
-                '<span class="blue">     [ e  f ]    </span>',
-                '<span class="blue">      Vektor     </span>',
-                '<span class="blue">     <------>    </span>'
-            ],
             'Coelho de Fibonacci': [
-                '<span class="white">      (\\_/)      </span>',
-                '<span class="white">      (o.o)      </span>',
-                '<span class="white">     (>1,1<)     </span>',
-                '<span class="white">      (2,3)      </span>',
-                '<span class="white">      (5,8)      </span>'
+                '<span class="white">      (\\(\\ )     </span>',
+                '<span class="white">      ( ◉.◉)     </span>',
+                '<span class="white">     c(>1,1<)    </span>',
+                '<span class="white">      ( 2,3 )    </span>',
+                '<span class="white">       (5,8)     </span>',
+                '<span class="white">     (13, 21)    </span>'
             ],
             'Diferencial de Leibniz': [
-                '<span class="green">      dy / dx     </span>',
-                '<span class="green">     ∫ (f(x))     </span>',
-                '<span class="green">    |   ||   |    </span>',
-                '<span class="green">    |   ||   |    </span>',
-                '<span class="green">     -------     </span>'
+                '<span class="green">     d  f(x)     </span>',
+                '<span class="green">    ─── ────      </span>',
+                '<span class="green">     dx   1      </span>',
+                '<span class="green">    ┌─────────┐  </span>',
+                '<span class="green">    │ ∫ f(x)dx│  </span>',
+                '<span class="green">    └─────────┘  </span>'
             ],
-            'Crivo de Eratóstenes': [
-                '<span class="red">    [2][3][5]    </span>',
-                '<span class="red">    [7][11][13]  </span>',
-                '<span class="red">    [17][19][23] </span>',
-                '<span class="red">     # PRIMES #  </span>',
-                '<span class="red">     ##########  </span>'
+            'Euler (Arquiteto)': [
+                '<span class="yellow" style="font-weight:bold">   ╔═[e^iπ+1=0]═╗  </span>',
+                '<span class="yellow" style="font-weight:bold">   ║  (◉)   (◉) ║  </span>',
+                '<span class="yellow" style="font-weight:bold">   ║   ╔═════╗  ║  </span>',
+                '<span class="yellow" style="font-weight:bold">   ║   ║ ∑ Σ║  ║  </span>',
+                '<span class="yellow" style="font-weight:bold">   ╚═══╝   ╚═══╝  </span>',
+                '<span class="yellow" style="font-weight:bold">      ╔═╪═╪═╗     </span>',
+                '<span class="yellow" style="font-weight:bold">      ╝ / \\ ╚     </span>'
             ],
-            'Euler (Arquiteto da Identidade)': [
-                '<span class="yellow" style="font-weight:bold">      .-------.      </span>',
-                '<span class="yellow" style="font-weight:bold">     / e^iπ+1=0 \\     </span>',
-                '<span class="yellow" style="font-weight:bold">    |   ( ∑ )   |    </span>',
-                '<span class="yellow" style="font-weight:bold">    |   / | \\   |    </span>',
-                '<span class="yellow" style="font-weight:bold">    |  /  |  \\  |    </span>',
-                '<span class="yellow" style="font-weight:bold">   /   --|--   \\   </span>',
-                '<span class="yellow" style="font-weight:bold">  /    /   \\    \\  </span>',
-                '<span class="yellow" style="font-weight:bold"> /_______________\\  </span>'
+            'Lovelace (Tecelã)': [
+                '<span class="green" style="font-weight:bold">   ╔═[10101010]═╗  </span>',
+                '<span class="green" style="font-weight:bold">   ║  (◈)   (◈) ║  </span>',
+                '<span class="green" style="font-weight:bold">   ║  {LOOP:∞}  ║  </span>',
+                '<span class="green" style="font-weight:bold">   ║  [ < ALG > ]║  </span>',
+                '<span class="green" style="font-weight:bold">   ╚═══╝   ╚═══╝  </span>',
+                '<span class="green" style="font-weight:bold">      ╔═╪═╪═╗     </span>',
+                '<span class="green" style="font-weight:bold">      ╝ / \\ ╚     </span>'
             ],
-            'Lovelace (Tecelã da Lógica)': [
-                '<span class="green" style="font-weight:bold">      .-------.      </span>',
-                '<span class="green" style="font-weight:bold">     / [10101] \\     </span>',
-                '<span class="green" style="font-weight:bold">    |  { LOOP } |    </span>',
-                '<span class="green" style="font-weight:bold">    |   ( < > ) |    </span>',
-                '<span class="green" style="font-weight:bold">    |  /  |  \\  |    </span>',
-                '<span class="green" style="font-weight:bold">   /   --|--   \\   </span>',
-                '<span class="green" style="font-weight:bold">  /    /   \\    \\  </span>',
-                '<span class="green" style="font-weight:bold"> /_______________\\  </span>'
+            'Newton (Gravidade)': [
+                '<span class="red" style="font-weight:bold">   ╔═══[G]═══╗   </span>',
+                '<span class="red" style="font-weight:bold">   ║ (◉)  (◉)║   </span>',
+                '<span class="red" style="font-weight:bold">   ║  F = ma  ║   </span>',
+                '<span class="red" style="font-weight:bold">   ║  ( apple )║  </span>',
+                '<span class="red" style="font-weight:bold">   ╚═══╝   ╚══╝  </span>',
+                '<span class="red" style="font-weight:bold">      ╔═╪═╪═╗    </span>',
+                '<span class="red" style="font-weight:bold">      ╝ / \\ ╚    </span>'
             ],
-            'Riemann (Guardião da Hipótese)': [
-                '<span class="blue" style="font-weight:bold">      .-------.      </span>',
-                '<span class="blue" style="font-weight:bold">     /  ζ(s)=0  \\     </span>',
-                '<span class="blue" style="font-weight:bold">    |  (  ∞  )  |    </span>',
-                '<span class="blue" style="font-weight:bold">    |   / | \\   |    </span>',
-                '<span class="blue" style="font-weight:bold">    |  /  |  \\  |    </span>',
-                '<span class="blue" style="font-weight:bold">   /   --|--   \\   </span>',
-                '<span class="blue" style="font-weight:bold">  /    /   \\    \\  </span>',
-                '<span class="blue" style="font-weight:bold"> /_______________\\  </span>'
-            ],
-            'Newton (Arquiteto da Gravidade)': [
-                '<span class="red" style="font-weight:bold">      .-------.      </span>',
-                '<span class="red" style="font-weight:bold">     /   [G]   \\     </span>',
-                '<span class="red" style="font-weight:bold">    |  F = ma   |    </span>',
-                '<span class="red" style="font-weight:bold">    |   ( O )   |    </span>',
-                '<span class="red" style="font-weight:bold">    |  /  |  \\  |    </span>',
-                '<span class="red" style="font-weight:bold">   /   --|--   \\   </span>',
-                '<span class="red" style="font-weight:bold">  /    /   \\    \\  </span>',
-                '<span class="red" style="font-weight:bold"> /_______________\\  </span>'
-            ],
-            'Hawking (Senhor da Singularidade)': [
-                '<span class="blue" style="font-weight:bold">      .-------.      </span>',
-                '<span class="blue" style="font-weight:bold">     /  (   )  \\     </span>',
-                '<span class="blue" style="font-weight:bold">    |   ( X )   |    </span>',
-                '<span class="blue" style="font-weight:bold">    |  (     )  |    </span>',
-                '<span class="blue" style="font-weight:bold">    |   -----   |    </span>',
-                '<span class="blue" style="font-weight:bold">   /     |     \\   </span>',
-                '<span class="blue" style="font-weight:bold">  /    /   \\    \\  </span>',
-                '<span class="blue" style="font-weight:bold"> /_______________\\  </span>'
-            ],
-            'Maxwell (Tecelão do Eletromagnetismo)': [
-                '<span class="cyan" style="font-weight:bold">      .-------.      </span>',
-                '<span class="cyan" style="font-weight:bold">     /  ~ ~ ~  \\     </span>',
-                '<span class="cyan" style="font-weight:bold">    |  E -> B   |    </span>',
-                '<span class="cyan" style="font-weight:bold">    |  (  ⚡  )  |    </span>',
-                '<span class="cyan" style="font-weight:bold">    |  /  |  \\  |    </span>',
-                '<span class="cyan" style="font-weight:bold">   /   --|--   \\   </span>',
-                '<span class="cyan" style="font-weight:bold">  /    /   \\    \\  </span>',
-                '<span class="cyan" style="font-weight:bold"> /_______________\\  </span>'
+            'Hawking (Singularidade)': [
+                '<span class="blue" style="font-weight:bold">   ╔═══(   )═══╗  </span>',
+                '<span class="blue" style="font-weight:bold">   ║   ( ◉ )   ║  </span>',
+                '<span class="blue" style="font-weight:bold">   ║  (BLACK H) ║  </span>',
+                '<span class="blue" style="font-weight:bold">   ║   (     )  ║  </span>',
+                '<span class="blue" style="font-weight:bold">   ╚══ ─────══╝  </span>',
+                '<span class="blue" style="font-weight:bold">       ╔═╪═╗     </span>',
+                '<span class="blue" style="font-weight:bold">       ╝ / \\ ╚   </span>'
             ],
             'Senhor das Fendas': [
-                '<span class="magenta" style="font-weight:bold">      .-------.      </span>',
-                '<span class="magenta" style="font-weight:bold">     /  RIP    \\     </span>',
-                '<span class="magenta" style="font-weight:bold">    |   _|_     |    </span>',
-                '<span class="magenta" style="font-weight:bold">    |  | | |    |    </span>',
-                '<span class="magenta" style="font-weight:bold">    |__| | |____|    </span>',
-                '<span class="magenta" style="font-weight:bold">   /            \\    </span>',
-                '<span class="magenta" style="font-weight:bold">  /   VOID-LORD  \\   </span>',
-                '<span class="magenta" style="font-weight:bold"> /________________\\  </span>'
+                '<span class="magenta" style="font-weight:bold">  ▓╔══[VOID-LORD]══╗▓</span>',
+                '<span class="magenta" style="font-weight:bold">  ▓║ (◈)  RIP  (◈) ║▓</span>',
+                '<span class="magenta" style="font-weight:bold">  ▓║   ─── ▓ ───   ║▓</span>',
+                '<span class="magenta" style="font-weight:bold">  ▓║  [ ∅ ▓▓▓ ∅ ]  ║▓</span>',
+                '<span class="magenta" style="font-weight:bold">  ▓╚═════╦═╦═╦═════╝▓</span>',
+                '<span class="magenta" style="font-weight:bold">    ▓▓▓▓╪═╪═╪▓▓▓▓   </span>',
+                '<span class="magenta" style="font-weight:bold">     ▓▓▓/   \\▓▓▓    </span>'
             ]
         }
     };
@@ -341,6 +309,18 @@ document.addEventListener('DOMContentLoaded', () => {
             spriteBtns.forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
             renderSprites(btn.dataset.type);
+        });
+    });
+
+    // --- OS TAB SWITCHING ---
+    const osTabs = document.querySelectorAll('.os-tab');
+    osTabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+            osTabs.forEach(t => t.classList.remove('active'));
+            tab.classList.add('active');
+            document.querySelectorAll('.tutorial-panel').forEach(p => p.classList.add('hidden'));
+            const panel = document.getElementById(`tutorial-${tab.dataset.os}`);
+            if (panel) panel.classList.remove('hidden');
         });
     });
 

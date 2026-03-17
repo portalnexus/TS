@@ -1,7 +1,7 @@
 # Terminal Souls — CLAUDE.md
 
 > TUI-ARPG (Text User Interface Action RPG) / Souls-like + Path of Exile + História da Ciência
-> **Versão atual:** v1.0.0 — "A Ascensão do Exilado"
+> **Versão atual:** v1.0.0 — "A Ascensão do Exilado" *(lançado)*
 > **Autor:** João Pedro Melloni Tardif Germano
 
 ---
@@ -141,9 +141,11 @@ Renome = (Nível × 100) + (TotalAtributos × 10) + BonusSkills + DescobertasBes
 
 ### Sistema de Itens
 - Raridades: Comum → Incomum → Raro → Lendário
-- Tipos: ARMA, ARMADURA, ACESSÓRIO, RELÍQUIA
-- Tags: CORTE, ESMAGAMENTO, FOGO, CHOQUE, VAZIO
+- Tipos: ARMA, ARMADURA, ACESSÓRIO, RELÍQUIA, CONSUMÍVEL, TOMO
+- Tags: CORTE, ESMAGAMENTO, FOGO, CHOQUE, VAZIO, ESCUDO, REFLEXO, ABSORÇÃO
 - Proficiências: Cada tag tem nível (0-5); cada ponto = +5% dano com aquela tag
+- **CONSUMÍVEL** tem subtipos: HP, SP, MP, MISTO (campos `recoverHp/recoverSp/recoverMp`); fallback em `recoverValue`
+- **TOMO** restaura HP+SP+MP igualmente; processado via `useConsumable()` em Entity.js
 
 ### Biomas das Fendas
 | Bioma | Cientista | Tema Visual |
@@ -164,36 +166,49 @@ Renome = (Nível × 100) + (TotalAtributos × 10) + BonusSkills + DescobertasBes
 ## 7. Pontos de Atenção no Código
 
 - **Navegação 1-0**: Tratada no final de `src/index.js`; redireciona para a `List` que está em foco (focused list)
-- **Status effects**: `Combat.js` usa `target.hasStatus(nome)` para verificar efeitos ativos
+- **Status effects**: `Combat.js` usa `target.hasStatus(nome)` / `target.removeStatus(nome)` — métodos em `Entity.js`
 - **Prestígio**: Calculado em `Entity.js` — não duplicar lógica
-- **Layout TUI**: Modificações no blessed devem respeitar o layout de 6 painéis (Status, Sinergias, Legenda, Mapa/Combate, Logs, Análise de Dados)
+- **HUD / updateStatus()**: Usa `makeBar(current, max, 8)` com `█`/`░`; respeitar os 6 painéis (Status, Sinergias, Legenda, Mapa/Combate, Logs, Análise de Dados)
+- **Consumíveis**: `useConsumable()` em Entity.js lê `recoverHp/recoverSp/recoverMp` primeiro; fallback em `recoverValue + consumableType`
 - **Mouse desativado**: Intencionalmente. Nunca habilitar — quebra a imersão TUI
 - **Persistência**: Saves em `/saves/*.json` via `SaveSystem.js`; não alterar estrutura do JSON sem migração
+- **Darwin**: Verifica `c.includes('FORÇA')`, `c.includes('DESTREZA')`, `c.includes('INTELIGÊNCIA')` — maiúsculas obrigatórias
 
 ---
 
-## 8. Estado Atual (v0.9.9.1) — O que está FEITO
+## 8. Estado Atual (v1.0.0) — O que está FEITO
 
-- [x] Combate turn-based com efeitos de status elemental
-- [x] Geração procedural de dungeons com biomas temáticos
+- [x] Combate turn-based com efeitos de status elemental (CHOQUE, CONGELAMENTO, EVASÃO, IMUNIDADE)
+- [x] Sinergias de status: CAUTERIZAÇÃO, FRAGMENTAÇÃO, DESCARGA
+- [x] Geração procedural de dungeons com biomas temáticos (newton/hawking/turing/noether)
+- [x] Inimigos temáticos por bioma (4 por bioma, 16 no total) + bosses nomeados
+- [x] Boss final "SENHOR DA ASCENSÃO" com IA de 3 fases (andar ≥10)
 - [x] Progressão RPG completa (atributos, skills, proficiências)
-- [x] Sistema de itens com raridades e crafting
+- [x] 20 skills implementadas (5 por classe: Guerreiro, Mago, Arqueiro, Clérigo)
+- [x] Sistema de itens expandido: TOMO, consumíveis tipados, 12 efeitos lendários, 20 flavor texts
 - [x] Sistema de save persistente (JSON)
-- [x] Hub Nexus com NPCs vendedores e upgrades
+- [x] Hub Nexus com NPCs vendedores e upgrades (Halthor, Marie, Ada, Darwin)
+- [x] Darwin fix: upgrades de STR/DEX/INT funcionando corretamente
 - [x] Sistema de Bestiário (tecla B)
 - [x] Score de Renome Científico
 - [x] Navegação unificada por teclado (1-0 universal)
-- [x] Boss por andar
-- [x] Website landing page com calculadora de Renome e galeria de sprites
+- [x] Boss por andar + drops de Orbes (level×3 / boss level×15)
+- [x] Sistema de missões (KILL, FLOOR, ITEM) com auto-progressão
+- [x] Puzzles de Sequência (10 padrões matemáticos) substituindo Minesweeper
+- [x] Tela de Vitória com Renome Final e créditos
+- [x] HUD: barras `makeBar()` com cor por threshold, ícones de status (⚡❄◎⬡), badge de postura
+- [x] Website: tutorial Linux/Windows com abas, seções de sistemas core e biomas
+- [x] Website: sprites ASCII completos — 4 combos classe+raça, 5 bosses, 14 inimigos
+- [x] 64 testes automatizados (6 suítes: Entity, Combat, Systems, Skills, Quests, Puzzle)
 
 ---
 
 ## 9. Roadmap — O que FALTA
 
-### v1.0.0 — Lançamento Single-Player
-- [ ] **Boss Final**: "O Arquiteto do Exílio" (Andar 100)
-- [ ] **Balanceamento** da curva de dificuldade até o Andar 100
-- [ ] **Créditos** e sequência de finalização do jogo
+### v1.0.1 — Polimento Pós-Lançamento
+- [ ] Balanceamento fino da curva de dificuldade andares 10–100
+- [ ] Mais variação de puzzles (novos padrões de sequência)
+- [ ] Tela de Game Over com Renome registrado
 
 ### v1.1.0+ — Pós-Lançamento (Multiplayer)
 - [ ] **Nexus Online**: Hub compartilhado via Socket.io

@@ -1,7 +1,7 @@
 {
   "name": "terminal-souls",
-  "version": "0.8.0",
-  "description": "TUI-ARPG inspirado em Dark Souls x Path of Exile — The Echoes of Exile",
+  "version": "1.0.0",
+  "description": "TUI-ARPG inspirado em Dark Souls x Path of Exile — The Echoes of Reason",
   "main": "src/index.js",
   "scripts": {
     "start": "node src/index.js",

@@ -1,7 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
     console.log('%c TERMINAL SOULS: THE ECHOES OF REASON ', 'background: #ff5555; color: #000; font-weight: bold; font-size: 20px;');
     console.log('%c [SISTEMA] Inicializando interface de documentação científica... ', 'color: #55ffff;');
-    console.log('%c [NÚCLEO] Versão 0.9.9.1 carregada com sucesso. ', 'color: #55ff55;');
+    console.log('%c [NÚCLEO] Versão 1.0.0 — A Ascensão do Exilado. ', 'color: #55ff55;');
 
     // Typing effect for the vision text
     const visionText = document.querySelector('.vision-box p');
@@ -90,6 +90,53 @@ document.addEventListener('DOMContentLoaded', () => {
                 '<span class="red">     /|   |\\     </span>',
                 '<span class="red">    / |   | \\    </span>',
                 '<span class="red">     /     \\     </span>'
+            ]
+        },
+        bosses: {
+            'Newton Corrompido': [
+                '<span class="gray" style="font-weight:bold">      .-------.      </span>',
+                '<span class="gray" style="font-weight:bold">     /  F=ma   \\     </span>',
+                '<span class="gray" style="font-weight:bold">    |  [ G ] [ G ] |  </span>',
+                '<span class="gray" style="font-weight:bold">    |   PRISMA   |    </span>',
+                '<span class="gray" style="font-weight:bold">    |  /  |  \\  |    </span>',
+                '<span class="gray" style="font-weight:bold">   /   --|--   \\      </span>',
+                '<span class="gray" style="font-weight:bold"> /_______________\\    </span>'
+            ],
+            'Sombra de Hawking': [
+                '<span class="cyan" style="font-weight:bold">      .-------.      </span>',
+                '<span class="cyan" style="font-weight:bold">     /  (   )  \\     </span>',
+                '<span class="cyan" style="font-weight:bold">    |  EVENT  HRZ |  </span>',
+                '<span class="cyan" style="font-weight:bold">    |   (( X ))   |  </span>',
+                '<span class="cyan" style="font-weight:bold">    |   -----     |  </span>',
+                '<span class="cyan" style="font-weight:bold">   /     |     \\     </span>',
+                '<span class="cyan" style="font-weight:bold"> /_______________\\   </span>'
+            ],
+            'A Máquina Implacável': [
+                '<span class="red" style="font-weight:bold">      _______      </span>',
+                '<span class="red" style="font-weight:bold">    |01001011|     </span>',
+                '<span class="red" style="font-weight:bold">    |10110100|     </span>',
+                '<span class="red" style="font-weight:bold">    | TURING |     </span>',
+                '<span class="red" style="font-weight:bold">    |________|     </span>',
+                '<span class="red" style="font-weight:bold">     |_|   |_|    </span>',
+                '<span class="red" style="font-weight:bold">    /       \\     </span>'
+            ],
+            'Guardiã do Vazio': [
+                '<span class="magenta" style="font-weight:bold">     < * * * >    </span>',
+                '<span class="magenta" style="font-weight:bold">    <  NOETHER >  </span>',
+                '<span class="magenta" style="font-weight:bold">   <--- [ ∞ ] ---> </span>',
+                '<span class="magenta" style="font-weight:bold">    <  SIMETRIA>  </span>',
+                '<span class="magenta" style="font-weight:bold">     < * * * >    </span>',
+                '<span class="magenta" style="font-weight:bold">      / | \\       </span>',
+                '<span class="magenta" style="font-weight:bold">     /  |  \\      </span>'
+            ],
+            'Senhor da Ascensão': [
+                '<span class="magenta" style="font-weight:bold">      .-------.      </span>',
+                '<span class="magenta" style="font-weight:bold">     /  VOID   \\     </span>',
+                '<span class="magenta" style="font-weight:bold">    |  [ANDAR+] |    </span>',
+                '<span class="magenta" style="font-weight:bold">    |  (  X  )  |    </span>',
+                '<span class="magenta" style="font-weight:bold">    |__| | |____|    </span>',
+                '<span class="magenta" style="font-weight:bold">   /   VOID-LORD \\   </span>',
+                '<span class="magenta" style="font-weight:bold"> /_______________\\   </span>'
             ]
         },
         enemies: {
@@ -305,10 +352,44 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!container) return;
 
         try {
-            // Em produção: const response = await fetch('../TS/patchnotes.md');
-            // Simulando fetch para esta demonstração com o conteúdo que acabamos de ler
             const markdown = `
 # 📜 PATCH NOTES - TERMINAL SOULS
+
+---
+
+## [v1.0.0] - A Ascensão do Exilado
+*O Exílio está completo. O Arquiteto aguarda no Andar 10.*
+
+### ⚔️ Sistema de Skills Completo
+- **20 Skills Implementadas:** Todas as habilidades das 4 classes com custo de mana real.
+- **Guerreiro:** Entropia Cinética (AoE por STR), Lei da Inércia (imunidade + postura máxima).
+- **Mago:** Raio de Maxwell (CHOQUE), Paradoxo de Schrödinger (EVASÃO 60%).
+- **Arqueiro:** Diagrama de Feynman (multi-hit 3-5x), Óptica de Euclides (ignora defesa).
+- **Clérigo:** Sopro de Gaia (remove todos os debuffs), Proporção Áurea (equaliza HP/SP/MP).
+
+### 🔮 Novos Status e Sinergias
+- **CHOQUE:** -20 Estabilidade/turno. Combina com CORTE → DESCARGA (+30% dano).
+- **CONGELAMENTO:** -15 Estabilidade/turno. Combina com ESMAGAMENTO → FRAGMENTAÇÃO (+50%).
+- **EVASÃO:** 60% de chance de desviar do próximo ataque.
+
+### 🗡️ IA de Boss — 3 Fases
+- **Fase 1:** Ataque reforçado com recuperação de postura a cada 4 turnos.
+- **Fase 2 (≤60%):** Campo de Distorção — aplica CHOQUE + COMBUSTÃO.
+- **Fase 3 (≤30%):** Colapso Dimensional — ataque duplo nos turnos pares.
+
+### 🧬 Biomas com Inimigos Temáticos
+- **Newton:** Prisma Refrator, Corpo Gravitacional, Arco Espectral — BOSS: Newton Corrompido.
+- **Hawking:** Eco de Radiação, Singularidade Menor — BOSS: Sombra de Hawking.
+- **Turing:** Autômato de Pascal, Daemon Binário — BOSS: A Máquina Implacável.
+- **Noether:** Espectro de Noether, Tensor de Tensão — BOSS: Guardiã do Vazio.
+
+### ⚖️ Economia e Balanceamento
+- **Drops de Orbes:** Inimigos dropam Orbes ao morrer (level×3; boss level×15).
+- **Curva suave:** HP reduzido nos andares iniciais para progressão fluida.
+
+### 🏆 Endgame
+- **SENHOR DA ASCENSÃO:** Boss final a partir do Andar 10 com 3 fases.
+- **Tela de Vitória:** Renome Final, bestiário e créditos.
 
 ---
 
@@ -316,12 +397,12 @@ document.addEventListener('DOMContentLoaded', () => {
 *Seu impacto no mundo agora é quantificado pelo seu legado científico.*
 
 ### 🏅 Sistema de Renome (Score)
-- **Cálculo de Prestígio:** Implementado um score global ("RENOME") que escala com seu nível, atributos totais, raridade dos itens equipados, nível de habilidades e descobertas no bestiário.
-- **Visibilidade:** O Renome é exibido permanentemente na caixa de Status, servindo como sua pontuação de "fama" no exílio.
+- **Cálculo de Prestígio:** Score global que escala com nível, atributos, itens equipados, skills e bestiário.
+- **Visibilidade:** Renome exibido permanentemente na caixa de Status.
 
 ### 💎 Economia & UI
-- **Orbes em Destaque:** A quantidade de Orbes agora possui uma linha dedicada e colorida na interface de Status para facilitar a gestão financeira durante a exploração.
-- **Layout de Status:** Reorganização dos atributos para melhor leitura em resoluções variadas.
+- **Orbes em Destaque:** Linha dedicada na interface de Status.
+- **Layout de Status:** Reorganização para melhor leitura.
 
 ---
 
@@ -329,18 +410,15 @@ document.addEventListener('DOMContentLoaded', () => {
 *O combate agora exige precisão matemática e gestão de momentum.*
 
 ### ⚙️ NPCs e Hub Expandido
-- **Ada (Algoritmos):** Permite a "Compilação de Dados" para ganhar pontos de Skill extras em troca de Orbes.
-- **Marie Curie (Alquimia):** Gerencia a transmutação radiante de itens e reroll de atributos.
-- **Darwin (Evolução):** Permite a "Seleção Natural", trocando Orbes por aumentos permanentes de atributos (STR, DEX, INT).
+- **Ada (Algoritmos):** Compilação de Dados para Skill Points extras.
+- **Marie Curie (Alquimia):** Transmutação e reroll de atributos de itens.
+- **Darwin (Evolução):** Seleção Natural — Orbes por atributos permanentes.
 
-### ⚔️ Estabilidade Cinética (Rework de Postura)
-- **Novo Recurso:** A Postura agora é sua **Estabilidade**. Começa em 100% e é consumida por ações agressivas.
-- **Inércia (Defensivo):** Dobra sua defesa mas reduz o dano. Ótimo para observar inimigos.
-- **Momento (Ofensivo):** Aumenta o dano em 50%, mas drena Estabilidade a cada turno.
-- **Equilíbrio (Neutro):** O estado estável para combos de reação.
+### ⚔️ Estabilidade Cinética
+- **INÉRCIA:** Dobra defesa, reduz dano. **MOMENTO:** +50% dano, drena Estabilidade. **EQUILÍBRIO:** Estado neutro.
 
 ### ⌨️ Navegação Unificada
-- **Teclas 1-0:** Agora funcionam em **todos os menus** (Inventário, Skills, Bestiário, Atributos). Você pode jogar inteiramente pelo teclado numérico.
+- **Teclas 1-0:** Funcionam em todos os menus do jogo.
 `;
 
             // Parser Markdown ultra-simples para o formato do projeto
@@ -427,13 +505,13 @@ document.addEventListener('DOMContentLoaded', () => {
         const dex = isNaN(parsedDex) ? 10 : parsedDex;
         const int = isNaN(parsedInt) ? 10 : parsedInt;
         
-        // Lógica simplificada de Entity.js: (Lvl * 100) + (Stats Sum * 10)
+        // Fórmula exata de Entity.js: calculatePrestige()
+        // (Nível × 100) + (Atributos × 10) + SkillBonus + BestiárioBonus
         let prestige = (level * 100) + (str + dex + int) * 10;
-        
-        // Simular prestige de skills (assumindo que o player comprou algumas)
-        prestige += Math.floor(level / 2) * 50; 
-        
-        prestigeValue.innerText = prestige;
+        prestige += Math.floor(level / 2) * 50; // estimativa de skills
+        prestige += Math.floor(level * 3);       // estimativa de bestiário
+
+        prestigeValue.innerText = prestige.toLocaleString('pt-BR');
     };
 
     const updateSkillTree = () => {

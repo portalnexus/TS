@@ -1,7 +1,7 @@
 📜 GAME DESIGN DOCUMENT: TERMINAL SOULS
 Subtítulo: The Echoes of Reason
 Gênero: TUI-ARPG (Text User Interface Action RPG) com foco em História da Ciência e Matemática.
-Versão: 0.9.5
+Versão: 1.0.0
 Autor: João Pedro Melloni Tardif Germano
 Tecnologias Core: Node.js, Chalk (Cores), Blessed (Layout TUI), Math.js (Geração de Puzzles).
 
@@ -29,5 +29,6 @@ Cada classe possui 5 habilidades únicas que escalam com o nível:
 
 4. SISTEMA DE ITENS
 Os itens possuem raridades (Comum a Lendário) e atributos randômicos (STR, DEX, INT). Itens raros carregam Flavor Text com citações históricas.
-- Sistema de Tooltip: Hover do mouse no inventário revela detalhes imediatos.
-- Exibição de Equipamento: Painel dedicado para conferência de stats em tempo real.
+- Exibição de Equipamento: Painel dedicado para conferência de stats em tempo real (tecla I).
+- Crafting: Altar de Marie Curie realinha atributos de itens Raros e Lendários (50 Orbes).
+- Mouse DESATIVADO intencionalmente — navegação 100% via teclado (WASD, 1-0, Q/E).

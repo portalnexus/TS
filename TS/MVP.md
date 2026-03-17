@@ -1,6 +1,6 @@
 # MVP - TERMINAL SOULS
-**Versão:** 0.9.0
-**Status:** **POLIMENTO CIENTÍFICO** (Fase Single Player Avançada)
+**Versão:** 1.0.0
+**Status:** **LANÇADO** — Single Player Completo
 
 ---
 
@@ -17,22 +17,25 @@ O protótipo evoluiu para um simulador de combate e intelecto:
 
 ## 2. NOVO ROADMAP (Foco Single-Player)
 
-### Fase 1: Profundidade e Progressão (v0.9.0)
-- [ ] **Árvore de Habilidades (Passive Tree):** Sistema de especialização de pontos.
-- [ ] **Expansão de Biomas:** Novos tiles de armadilhas e obstáculos ambientais.
-- [ ] **Sistema de Bestiário:** Registro de fraquezas e drops de inimigos derrotados.
+### Fase 1: Profundidade e Progressão (v0.9.x) ✅
+- [x] **Árvore de Habilidades:** 20 skills (5 por classe) completamente implementadas com custo de mana real.
+- [x] **Inimigos Temáticos por Bioma:** Newton, Hawking, Turing, Noether com pools exclusivos.
+- [x] **Sistema de Bestiário:** Registro de abates com tecla B.
+- [x] **Sistema de Missões:** 3 tipos (KILL, FLOOR, ITEM) com auto-progressão.
+- [x] **Sinergias de Status:** CAUTERIZAÇÃO, FRAGMENTAÇÃO, DESCARGA — reações encadeadas.
+- [x] **IA de Boss:** 3 fases de comportamento por limiar de HP.
+- [x] **Proficiências:** Bônus de dano por tag da arma (+5% por nível).
 
-### Fase 2: Conteúdo Final e Balanceamento (v0.9.5)
-- [ ] **Modo Boss Rush:** Desafio de sobrevivência pós-jogo.
-- [ ] **Lore & Crônicas:** Itens de leitura que contam a história do Exílio.
-- [ ] **Maestria de Crafting:** Níveis para o Altar de Transmutação.
+### Fase 2: Conteúdo Final e Balanceamento (v1.0.0) ✅
+- [x] Balanceamento da curva de dificuldade (HP suave nos andares iniciais).
+- [x] Drops de Orbes em combate (inimigo: level×3, boss: level×15).
+- [x] Boss Final: "SENHOR DA ASCENSÃO" — aparece a partir do Andar 10.
+- [x] Tela de vitória com Renome Final e créditos.
+- [x] 64 testes automatizados passando (6 suites).
 
-### Fase 3: Lançamento Single-Player (v1.0.0)
-- [ ] Balanceamento final da curva de dificuldade até o Andar 100.
-- [ ] Boss Final: "O Arquiteto do Exílio".
-- [ ] Créditos e Finalização do Jogo.
-
-### Fase 4: Pós-Lançamento (v1.1.0+)
+### Fase 3: Pós-Lançamento (v1.1.0+)
 - [ ] **Multiplayer (Nexus Online):** Hub compartilhado via Socket.io.
 - [ ] **Mercado Global:** Sistema de Trade entre jogadores.
 - [ ] **Espectros Assíncronos:** Visualizar a morte de outros jogadores no mapa.
+- [ ] **Boss Rush:** Modo de desafio pós-jogo.
+- [ ] **Maestria de Crafting:** Níveis para o Altar de Transmutação.

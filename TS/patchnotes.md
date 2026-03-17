@@ -2,6 +2,53 @@
 
 ---
 
+## [v1.0.0] - A Ascensão do Exilado
+*O Exílio está completo. O Arquiteto aguarda no Andar 10.*
+
+### ⚔️ Sistema de Skills Completo
+- **20 Skills Implementadas:** Todas as habilidades das 4 classes agora funcionam com custo de mana real e efeitos únicos.
+- **Guerreiro:** Entropia Cinética (AoE por STR), Força Centrípeta (todos os inimigos), Lei da Inércia (estabilidade máxima + IMUNIDADE).
+- **Mago:** Raio de Maxwell (CHOQUE), Zero Absoluto (CONGELAMENTO), Paradoxo de Schrödinger (EVASÃO 60%).
+- **Arqueiro:** Diagrama de Feynman (multi-hit 3-5x), Óptica de Euclides (ignora defesa), Efeito Doppler (escala com andar).
+- **Clérigo:** Cura de Hipócrates (heal 25% HP), Sopro de Gaia (remove todos os debuffs), Proporção Áurea (equaliza HP/SP/MP).
+
+### 🔮 Novos Status e Sinergias
+- **CHOQUE:** Drena -20 Estabilidade por turno. Combina com CORTE → DESCARGA (+30% dano).
+- **CONGELAMENTO:** Drena -15 Estabilidade por turno. Combina com ESMAGAMENTO → FRAGMENTAÇÃO (+50% dano).
+- **EVASÃO:** 60% de chance de desviar do próximo ataque (Schrödinger, Einstein).
+- **IMUNIDADE:** Bloqueia dano de status por N turnos (Lei da Inércia).
+
+### 🗡️ IA de Boss — 3 Fases
+- **Fase 1 (>60% HP):** Ataque reforçado (×1.2) com recuperação de postura a cada 4 turnos.
+- **Fase 2 (≤60% HP):** Campo de Distorção — aplica CHOQUE + COMBUSTÃO ao jogador a cada 3 turnos.
+- **Fase 3 (≤30% HP):** Colapso Dimensional — ataque duplo nos turnos pares.
+
+### 🧬 Biomas com Inimigos Temáticos
+- **Newton:** Prisma Refrator, Corpo Gravitacional, Arco Espectral, Força Centrífuga.
+- **Hawking:** Eco de Radiação, Singularidade Menor, Horizonte de Eventos, Pulsar Binário.
+- **Turing:** Lobo de Turing, Autômato de Pascal, Bomba de Colapso, Daemon Binário.
+- **Noether:** Espectro de Noether, Vazio Simétrico, Sombra da Simetria, Tensor de Tensão.
+- **Bosses temáticos:** Newton Corrompido, Sombra de Hawking, A Máquina Implacável, Guardiã do Vazio.
+
+### 📋 Sistema de Missões Funcional
+- **Novo tipo ITEM:** Coletar X drops de Tesouros nas Fendas.
+- **Auto-progressão:** KILL, FLOOR e ITEM agora incrementam automaticamente durante o gameplay.
+- **Progresso visível:** Missão ativa exibida no painel de Status.
+
+### ⚖️ Economia e Balanceamento
+- **Drops de Orbes:** Inimigos agora dropam Orbes ao morrer (level × 3; boss level × 15).
+- **Curva suave:** HP de inimigos nos andares iniciais reduzido para melhor progressão.
+- **Darwin corrigido:** Upgrade de INT agora funciona corretamente via Nexus.
+
+### 🏆 Endgame
+- **SENHOR DA ASCENSÃO:** Boss final aparece a partir do Andar 10 com mecânicas de 3 fases.
+- **Tela de Vitória:** Exibe Renome Final, nível, bestiário catalogado e créditos.
+
+### 🧪 Testes
+- **64 testes automatizados** cobrindo skills, sinergias, missões, puzzles e entidades.
+
+---
+
 ## [v0.9.9.1] - O Renome do Exilado
 *Seu impacto no mundo agora é quantificado pelo seu legado científico.*
 

@@ -1,7 +1,7 @@
 # Terminal Souls — CLAUDE.md
 
 > TUI-ARPG (Text User Interface Action RPG) / Souls-like + Path of Exile + História da Ciência
-> **Versão atual:** v0.9.9.1 — "O Renome do Exilado"
+> **Versão atual:** v1.0.0 — "A Ascensão do Exilado"
 > **Autor:** João Pedro Melloni Tardif Germano
 
 ---

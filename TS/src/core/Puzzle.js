@@ -7,7 +7,7 @@ class Puzzle {
     this.difficulty = Math.min(10, Math.floor(floor / 2) + 1);
     
     // Pick random type for variety if not specifically requested
-    const types = ['MATH', 'EQUATION', 'RIDDLE'];
+    const types = ['MATH', 'EQUATION', 'RIDDLE', 'SEQUENCE'];
     this.type = type || types[Math.floor(Math.random() * types.length)];
     
     this.isSolved = false;
@@ -29,8 +29,8 @@ class Puzzle {
       case 'RIDDLE':
         this.generateRiddle();
         break;
-      case 'MINESWEEPER':
-        this.generateMinesweeper();
+      case 'SEQUENCE':
+        this.generateSequence();
         break;
       default:
         this.generateMath();
@@ -81,11 +81,27 @@ class Puzzle {
     this.hint = "Dica: Responda com uma única palavra ou número inteiro.";
   }
 
-  generateMinesweeper() {
-    this.size = 4 + Math.min(2, Math.floor(this.difficulty / 4));
-    this.mines = Math.floor(this.size * 1.5);
-    this.question = `Campo Minado (${this.size}x${this.size}) - Sobreviva!`;
-    this.answer = 'MINESWEEPER_STATE'; // Handled by TUI.js
+  generateSequence() {
+    // Gera sequências lógicas com padrão reconhecível
+    const sequences = [
+      { seq: [1, 1, 2, 3, 5, 8, 13, '?'], a: '21', desc: 'Fibonacci' },
+      { seq: [2, 4, 8, 16, 32, '?'], a: '64', desc: 'Potências de 2' },
+      { seq: [1, 4, 9, 16, 25, '?'], a: '36', desc: 'Quadrados perfeitos' },
+      { seq: [1, 8, 27, 64, '?'], a: '125', desc: 'Cubos' },
+      { seq: [2, 3, 5, 7, 11, 13, '?'], a: '17', desc: 'Primos' },
+      { seq: [0, 1, 3, 6, 10, 15, '?'], a: '21', desc: 'Triangulares' },
+      { seq: [1, 2, 4, 7, 11, 16, '?'], a: '22', desc: '+1,+2,+3,+4,+5,+6' },
+      { seq: [3, 6, 12, 24, 48, '?'], a: '96', desc: 'Dobro' },
+      { seq: [100, 91, 82, 73, 64, '?'], a: '55', desc: '-9 a cada termo' },
+      { seq: [1, 3, 7, 15, 31, '?'], a: '63', desc: '2^n - 1' }
+    ];
+    const difficulty = Math.min(this.difficulty, sequences.length - 1);
+    const pool = sequences.slice(0, Math.max(3, difficulty + 1));
+    const picked = pool[Math.floor(Math.random() * pool.length)];
+    const display = picked.seq.join(', ');
+    this.question = `SEQUÊNCIA [${picked.desc}]: ${display} — Qual é o próximo número?`;
+    this.answer = picked.a;
+    this.hint = 'Dica: Analise o padrão numérico e responda com um inteiro.';
   }
 
   checkAnswer(userAnswer) {

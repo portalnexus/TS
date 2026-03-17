@@ -10,31 +10,43 @@ class QuestBoard {
   }
 
   generateQuest() {
-    const types = ['KILL', 'FLOOR'];
+    const types = ['KILL', 'FLOOR', 'ITEM'];
     const type = types[Math.floor(Math.random() * types.length)];
-    
+
     if (type === 'KILL') {
       const target = Math.floor(Math.random() * 5) + 3; // 3 a 7
       return {
         id: Math.random().toString(36).substr(2, 9),
         type: 'KILL',
-        desc: `Derrote ${target} inimigos.`,
+        desc: `Derrote ${target} inimigos nas Fendas.`,
         target: target,
         progress: 0,
-        rewardOrbs: target * 10,
+        rewardOrbs: target * 10 + 50,
         rewardXp: target * 50,
         completed: false
       };
-    } else {
+    } else if (type === 'FLOOR') {
       const target = Math.floor(Math.random() * 3) + 2; // 2 a 4 andares
       return {
         id: Math.random().toString(36).substr(2, 9),
         type: 'FLOOR',
-        desc: `Alcance o Andar ${target}.`,
+        desc: `Alcance o Andar ${target} da Fenda.`,
         target: target,
         progress: 1,
-        rewardOrbs: target * 25,
+        rewardOrbs: target * 25 + 75,
         rewardXp: target * 100,
+        completed: false
+      };
+    } else {
+      const target = Math.floor(Math.random() * 3) + 2; // 2 a 4 itens
+      return {
+        id: Math.random().toString(36).substr(2, 9),
+        type: 'ITEM',
+        desc: `Colete ${target} itens das Fendas.`,
+        target: target,
+        progress: 0,
+        rewardOrbs: target * 20 + 100,
+        rewardXp: target * 75,
         completed: false
       };
     }

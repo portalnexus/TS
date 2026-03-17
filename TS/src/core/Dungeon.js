@@ -21,10 +21,10 @@ class Dungeon {
     this.bossDefeated = false;
 
     const biomes = [
-      { name: 'O Prisma de Newton', color: 'gray' },
-      { name: 'A Singularidade de Hawking', color: 'cyan' },
-      { name: 'O Motor de Turing', color: 'red' },
-      { name: 'O Vazio de Noether', color: 'magenta' }
+      { name: 'O Prisma de Newton', color: 'gray', key: 'newton' },
+      { name: 'A Singularidade de Hawking', color: 'cyan', key: 'hawking' },
+      { name: 'O Motor de Turing', color: 'red', key: 'turing' },
+      { name: 'O Vazio de Noether', color: 'magenta', key: 'noether' }
     ];
     this.biome = biomes[Math.floor(Math.random() * biomes.length)];
 
@@ -77,33 +77,75 @@ class Dungeon {
   }
 
   generateEnemyData(isBoss = false) {
-    const templates = [
+    // Inimigos por bioma — cada bioma tem suas criaturas temáticas
+    const biomeEnemies = {
+      newton: [
+        { name: 'Prisma Refrator', hp: 18, sp: 30, mp: 10 },
+        { name: 'Corpo Gravitacional', hp: 35, sp: 15, mp: 0 },
+        { name: 'Arco Espectral', hp: 20, sp: 20, mp: 20 },
+        { name: 'Força Centrífuga', hp: 28, sp: 25, mp: 0 }
+      ],
+      hawking: [
+        { name: 'Eco de Radiação', hp: 15, sp: 10, mp: 50 },
+        { name: 'Singularidade Menor', hp: 40, sp: 5, mp: 30 },
+        { name: 'Horizonte de Eventos', hp: 25, sp: 20, mp: 25 },
+        { name: 'Pulsar Binário', hp: 22, sp: 35, mp: 10 }
+      ],
+      turing: [
+        { name: 'Lobo de Turing', hp: 15, sp: 40, mp: 0 },
+        { name: 'Autômato de Pascal', hp: 30, sp: 30, mp: 0 },
+        { name: 'Bomba de Colapso', hp: 20, sp: 20, mp: 30 },
+        { name: 'Daemon Binário', hp: 18, sp: 15, mp: 40 }
+      ],
+      noether: [
+        { name: 'Espectro de Noether', hp: 15, sp: 10, mp: 50 },
+        { name: 'Vazio Simétrico', hp: 25, sp: 15, mp: 35 },
+        { name: 'Sombra da Simetria', hp: 20, sp: 20, mp: 30 },
+        { name: 'Tensor de Tensão', hp: 35, sp: 10, mp: 20 }
+      ]
+    };
+
+    // Fallback para inimigos genéricos se bioma não mapeado
+    const genericEnemies = [
       { name: 'Esqueleto de Gauss', hp: 20, sp: 20, mp: 0 },
-      { name: 'Lobo de Turing', hp: 15, sp: 40, mp: 0 },
-      { name: 'Autômato de Pascal', hp: 30, sp: 30, mp: 0 },
-      { name: 'Espectro de Noether', hp: 15, sp: 10, mp: 50 },
       { name: 'Sentinela de Maxwell', hp: 25, sp: 20, mp: 30 },
-      { name: 'Gárgula de Euclides', hp: 40, sp: 15, mp: 0 }
+      { name: 'Gárgula de Euclides', hp: 40, sp: 15, mp: 0 },
+      { name: 'Diferencial de Leibniz', hp: 22, sp: 22, mp: 22 }
     ];
 
+    const pool = biomeEnemies[this.biome.key] || genericEnemies;
+
     if (isBoss) {
-      const bossName = this.floor === 10 ? 'SENHOR DA ASCENSÃO' : `CHEFE: O Arquiteto do Andar ${this.floor}`;
+      // Bosses temáticos por bioma
+      const bossNames = {
+        newton: `CHEFE: Isaac Newton Corrompido`,
+        hawking: `CHEFE: Sombra de Hawking`,
+        turing: `CHEFE: A Máquina Implacável`,
+        noether: `CHEFE: Guardiã do Vazio`
+      };
+      const bossName = this.floor >= 10
+        ? `SENHOR DA ASCENSÃO — Andar ${this.floor}`
+        : (bossNames[this.biome.key] || `CHEFE: O Arquiteto do Andar ${this.floor}`);
       return [new Entity(bossName, {
         hp: 100 + (this.floor * 30),
         sp: 80 + (this.floor * 15),
         mp: 80 + (this.floor * 15),
-        level: this.floor + 1
+        level: this.floor + 1,
+        strength: 10 + this.floor,
+        dexterity: 8 + this.floor,
+        intelligence: 8 + this.floor
       })];
     }
 
-    const t = templates[Math.floor(Math.random() * templates.length)];
-    // Multiplicador de Dificuldade Balanceado
+    const t = pool[Math.floor(Math.random() * pool.length)];
     const difficultyMult = 1 + (this.floor * 0.1);
     return [new Entity(t.name, {
       hp: Math.floor((t.hp + (this.floor * 8)) * difficultyMult),
       sp: Math.floor((t.sp + (this.floor * 8)) * difficultyMult),
       mp: Math.floor((t.mp + (this.floor * 8)) * difficultyMult),
-      level: this.floor
+      level: this.floor,
+      strength: 5 + Math.floor(this.floor * 0.5),
+      dexterity: 5 + Math.floor(this.floor * 0.3)
     })];
   }
 

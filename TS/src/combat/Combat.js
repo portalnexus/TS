@@ -17,17 +17,35 @@ class Combat {
 
   calculateDamage(attacker, target, moveType = 'physical', skillMultiplier = 1) {
     let baseDamage = attacker.getAttackPower() + Math.floor(Math.random() * 5);
-    let stabilityDmg = 15;
+    let stabilityDmg = Math.max(10, 15 + Math.floor((attacker.strength || 0) * 0.3));
 
     if (moveType === 'physical') {
       baseDamage = Math.max(attacker.level, baseDamage - target.getDefense());
     }
 
+    // Bônus de Proficiência por tags da arma
+    if (attacker.equipment?.ARMA?.tags && attacker.proficiencies) {
+      attacker.equipment.ARMA.tags.forEach(tag => {
+        const lvl = attacker.proficiencies[tag] || 0;
+        if (lvl > 0) baseDamage = Math.floor(baseDamage * (1 + lvl * 0.05));
+      });
+    }
+
     // Sinergias de Reação
-    if (typeof target.hasStatus === 'function' && target.hasStatus('SANGRAMENTO') && attacker.equipment.ARMA?.tags.includes('FOGO')) {
+    if (target.hasStatus && target.hasStatus('SANGRAMENTO') && attacker.equipment?.ARMA?.tags.includes('FOGO')) {
       baseDamage *= 2;
       target.removeStatus('SANGRAMENTO');
       this.addLog(chalk.bold.red(' >>> CAUTERIZAÇÃO: Dano térmico massivo!'));
+    }
+    if (target.hasStatus && target.hasStatus('CONGELAMENTO') && attacker.equipment?.ARMA?.tags.includes('ESMAGAMENTO')) {
+      baseDamage = Math.floor(baseDamage * 1.5);
+      target.removeStatus('CONGELAMENTO');
+      this.addLog(chalk.bold.cyan(' >>> FRAGMENTAÇÃO: Alvo despedaçado!'));
+    }
+    if (target.hasStatus && target.hasStatus('CHOQUE') && attacker.equipment?.ARMA?.tags.includes('CORTE')) {
+      baseDamage = Math.floor(baseDamage * 1.3);
+      target.removeStatus('CHOQUE');
+      this.addLog(chalk.bold.yellow(' >>> DESCARGA: Condução potencializada!'));
     }
 
     if (target.isStaggered) {
@@ -46,6 +64,10 @@ class Combat {
     if (!target) return;
 
     this.player.processStatuses(this.log);
+    // IMUNIDADE: bloqueia dano de status no turno ativo
+    if (this.player.hasStatus('IMUNIDADE')) {
+      this.addLog(chalk.bold.cyan(' > IMUNIDADE ativa: dano de status bloqueado.'));
+    }
     if (this.player.isDead) { this.isOver = true; this.result = 'LOSS'; return; }
 
     // Penalidade de Estabilidade por Ação no modo MOMENTO
@@ -93,23 +115,133 @@ class Combat {
     const lvlBonus = 1 + (skill.lvl * 0.2);
     this.addLog(chalk.bold.cyan(` > [${name}] NIVEL ${skill.lvl}!`));
 
-    if (name === 'Impacto de Newton' || name === 'Flecha de Hawking') {
+    // --- GUERREIRO ---
+    if (name === 'Impacto de Newton') {
       const dmg = this.calculateDamage(this.player, target, 'physical', 1.5 * lvlBonus);
       target.takeDamage(dmg.hpDamage, 'physical');
       target.modifyStability(-30 * lvlBonus);
-      this.addLog(` > Impacto devastador: ${dmg.hpDamage}.`);
+      this.addLog(` > Impacto devastador: ${dmg.hpDamage} dano.`);
+
+    } else if (name === 'Inércia de Galileu') {
+      const stability = Math.floor(40 * lvlBonus);
+      this.player.modifyStability(stability);
+      this.player.recover(0.05, 0.3, 0.05);
+      this.addLog(chalk.cyan(` > Inércia restaurou +${stability} Estabilidade.`));
+
+    } else if (name === 'Entropia Cinética') {
+      const strBonus = Math.floor(this.player.strength * 0.8 * lvlBonus);
+      this.enemies.forEach(e => {
+        if (!e.isDead) { e.takeDamage(strBonus, 'physical'); e.modifyStability(-10); }
+      });
+      this.addLog(` > Entropia atingiu todos por ${strBonus} dano.`);
+
+    } else if (name === 'Força Centrípeta') {
+      this.enemies.forEach(e => {
+        if (!e.isDead) {
+          const dmg = this.calculateDamage(this.player, e, 'physical', 1.2 * lvlBonus);
+          e.takeDamage(dmg.hpDamage, 'physical');
+          e.modifyStability(-20);
+        }
+      });
+      this.addLog(` > Rotação atingiu todos os inimigos!`);
+
+    } else if (name === 'Lei da Inércia') {
+      this.player.modifyStability(this.player.maxPosture);
+      this.player.addStatus('IMUNIDADE', Math.ceil(1 + skill.lvl * 0.5));
+      this.addLog(chalk.bold.cyan(` > Lei da Inércia: Estabilidade máxima restaurada!`));
+
+    // --- MAGO ---
+    } else if (name === 'Raio de Maxwell') {
+      const dmg = this.calculateDamage(this.player, target, 'magical', 1.6 * lvlBonus);
+      target.takeDamage(dmg.hpDamage, 'magical');
+      target.addStatus('CHOQUE', 2);
+      this.addLog(` > Raio de Maxwell: ${dmg.hpDamage} + CHOQUE aplicado.`);
+
+    } else if (name === 'Chama de Lavoisier') {
+      const dmg = this.calculateDamage(this.player, target, 'magical', 1.8 * lvlBonus);
+      target.takeDamage(dmg.hpDamage, 'magical');
+      target.addStatus('COMBUSTÃO', 3);
+      this.addLog(` > Chama de Lavoisier: ${dmg.hpDamage} + COMBUSTÃO (3t).`);
+
     } else if (name === 'Zero Absoluto') {
-      target.modifyStability(-100);
-      this.addLog(` > Zero Absoluto congelou o movimento do alvo.`);
+      target.addStatus('CONGELAMENTO', Math.ceil(1 + skill.lvl * 0.5));
+      target.modifyStability(-80 * lvlBonus);
+      this.addLog(chalk.bold.blue(` > Zero Absoluto: CONGELAMENTO + colapso de estabilidade!`));
+
+    } else if (name === 'Paradoxo de Schrödinger') {
+      this.player.addStatus('EVASÃO', Math.ceil(1 + skill.lvl));
+      this.addLog(chalk.bold.magenta(` > Paradoxo: Próximos ${Math.ceil(1+skill.lvl)} ataques têm 60% de desvio.`));
+
     } else if (name === 'Singularidade de Hawking') {
       const dmg = Math.floor(target.hp * 0.3 * lvlBonus);
       target.takeDamage(dmg, 'magical');
       this.player.hp = Math.min(this.player.maxHp, this.player.hp + Math.floor(dmg * 0.5));
-      this.addLog(` > A singularidade drenou ${dmg} de vida.`);
-    } else {
-      const dmg = this.calculateDamage(this.player, target, 'magical', 1.8 * lvlBonus);
+      this.addLog(` > Singularidade drenou ${dmg} de vida (+${Math.floor(dmg*0.5)} HP absorvido).`);
+
+    // --- ARQUEIRO ---
+    } else if (name === 'Flecha de Hawking') {
+      const dmg = this.calculateDamage(this.player, target, 'physical', 2.0 * lvlBonus);
+      target.takeDamage(dmg.hpDamage, 'physical');
+      target.modifyStability(-25 * lvlBonus);
+      this.addLog(` > Flecha crítica: ${dmg.hpDamage} dano perfurante.`);
+
+    } else if (name === 'Diagrama de Feynman') {
+      const hits = Math.min(2 + skill.lvl, 5);
+      let total = 0;
+      for (let i = 0; i < hits; i++) {
+        const dmg = this.calculateDamage(this.player, target, 'physical', 0.6 * lvlBonus);
+        target.takeDamage(dmg.hpDamage, 'physical');
+        total += dmg.hpDamage;
+      }
+      this.addLog(` > Diagrama: ${hits} disparos, ${total} dano total.`);
+
+    } else if (name === 'Relatividade de Einstein') {
+      const boost = Math.floor(20 * lvlBonus);
+      this.player.modifyStability(boost);
+      this.player.addStatus('EVASÃO', 2);
+      this.addLog(chalk.yellow(` > Relatividade: +${boost} Estabilidade + EVASÃO.`));
+
+    } else if (name === 'Óptica de Euclides') {
+      const dmg = Math.floor((this.player.getAttackPower() * 2.5 * lvlBonus));
+      target.takeDamage(dmg, 'physical');
+      this.addLog(` > Precisão absoluta: ${dmg} dano (ignora defesa).`);
+
+    } else if (name === 'Efeito Doppler') {
+      const floorBonus = this.enemies[0]?.level || 1;
+      const dmg = this.calculateDamage(this.player, target, 'physical', (1.2 + floorBonus * 0.1) * lvlBonus);
+      target.takeDamage(dmg.hpDamage, 'physical');
+      this.addLog(` > Doppler: ${dmg.hpDamage} dano (escala com andar).`);
+
+    // --- CLÉRIGO ---
+    } else if (name === 'Cura de Hipócrates') {
+      const heal = Math.floor(this.player.maxHp * 0.25 * lvlBonus);
+      this.player.hp = Math.min(this.player.maxHp, this.player.hp + heal);
+      this.addLog(chalk.green(` > Hipócrates restaurou ${heal} HP.`));
+
+    } else if (name === 'Sopro de Gaia') {
+      const removed = this.player.activeStatuses.length;
+      this.player.activeStatuses = [];
+      this.player.modifyStability(Math.floor(20 * lvlBonus));
+      this.addLog(chalk.green(` > Sopro de Gaia removeu ${removed} debuff(s).`));
+
+    } else if (name === 'Luz Primordial') {
+      const dmg = this.calculateDamage(this.player, target, 'magical', 1.3 * lvlBonus);
       target.takeDamage(dmg.hpDamage, 'magical');
-      if (name === 'Chama de Lavoisier') target.addStatus('COMBUSTÃO', 3);
+      const heal = Math.floor(dmg.hpDamage * 0.3);
+      this.player.hp = Math.min(this.player.maxHp, this.player.hp + heal);
+      this.addLog(` > Luz Primordial: ${dmg.hpDamage} dano / +${heal} HP.`);
+
+    } else if (name === 'Teorema de Pitágoras') {
+      const shield = Math.floor(this.player.maxPosture * 0.5 * lvlBonus);
+      this.player.modifyStability(shield);
+      this.addLog(chalk.bold.white(` > Escudo triangular: +${shield} Estabilidade.`));
+
+    } else if (name === 'Proporção Áurea') {
+      const avg = Math.floor((this.player.hp/this.player.maxHp + this.player.sp/this.player.maxSp + this.player.mp/this.player.maxMp) / 3 * 100);
+      this.player.hp = Math.floor(this.player.maxHp * avg / 100);
+      this.player.sp = Math.floor(this.player.maxSp * avg / 100);
+      this.player.mp = Math.floor(this.player.maxMp * avg / 100);
+      this.addLog(chalk.bold.yellow(` > Proporção Áurea: HP/SP/MP harmonizados em ${avg}%.`));
     }
   }
 
@@ -118,7 +250,19 @@ class Combat {
       const tags = this.player.equipment.ARMA.tags;
       if (tags.includes('CORTE') && Math.random() > 0.5) target.addStatus('SANGRAMENTO', 3);
       if (tags.includes('FOGO') && Math.random() > 0.6) target.addStatus('COMBUSTÃO', 2);
+      if (tags.includes('CHOQUE') && Math.random() > 0.65) target.addStatus('CHOQUE', 2);
+      if (tags.includes('VAZIO') && Math.random() > 0.7) target.modifyStability(-25);
     }
+  }
+
+  // Verifica se o jogador desvia com EVASÃO
+  playerEvades() {
+    if (this.player.hasStatus('EVASÃO') && Math.random() < 0.6) {
+      this.player.removeStatus('EVASÃO');
+      this.addLog(chalk.bold.yellow(' > DESVIO! O ataque foi evitado!'));
+      return true;
+    }
+    return false;
   }
 
   enemyTurn() {
@@ -131,10 +275,55 @@ class Combat {
         enemy.modifyStability(40);
         return;
       }
-      const dmg = this.calculateDamage(enemy, this.player);
-      this.player.takeDamage(dmg.hpDamage, 'physical');
-      this.player.modifyStability(-dmg.stabilityDmg);
-      this.addLog(chalk.red(` > ${enemy.name} atacou: ${dmg.hpDamage} dano.`));
+
+      const isBoss = enemy.name.includes('CHEFE') || enemy.name.includes('SENHOR') || enemy.name.includes('ARQUITETO');
+
+      // IA de Boss: padrões especiais por fase de HP
+      if (isBoss) {
+        const hpPercent = enemy.hp / enemy.maxHp;
+
+        // Fase 3 (≤30% HP): ataque frenético duplo
+        if (hpPercent <= 0.30 && this.turn % 2 === 0) {
+          this.addLog(chalk.bold.bgRed.white(` !! ${enemy.name}: COLAPSO DIMENSIONAL !!`));
+          const dmg1 = this.calculateDamage(enemy, this.player);
+          const dmg2 = this.calculateDamage(enemy, this.player);
+          this.player.takeDamage(dmg1.hpDamage, 'physical');
+          this.player.takeDamage(dmg2.hpDamage, 'physical');
+          this.player.modifyStability(-(dmg1.stabilityDmg + dmg2.stabilityDmg));
+          this.addLog(chalk.red(` > DUPLO ATAQUE: ${dmg1.hpDamage} + ${dmg2.hpDamage} dano!`));
+        // Fase 2 (≤60% HP): aplica status especial a cada 3 turnos
+        } else if (hpPercent <= 0.60 && this.turn % 3 === 0) {
+          this.addLog(chalk.bold.magenta(` !! ${enemy.name}: CAMPO DE DISTORÇÃO !!`));
+          this.player.addStatus('CHOQUE', 2);
+          this.player.addStatus('COMBUSTÃO', 2);
+          const dmg = this.calculateDamage(enemy, this.player, 'magical', 1.3);
+          this.player.takeDamage(dmg.hpDamage, 'magical');
+          this.addLog(chalk.magenta(` > Distorção: ${dmg.hpDamage} + CHOQUE + COMBUSTÃO aplicados!`));
+        // Fase 1: ataque com recuperação de estabilidade
+        } else {
+          if (this.turn % 4 === 0) {
+            enemy.modifyStability(30);
+            this.addLog(chalk.gray(` > ${enemy.name} recuperou postura.`));
+          }
+          const dmg = this.calculateDamage(enemy, this.player, 'physical', 1.2);
+          this.player.takeDamage(dmg.hpDamage, 'physical');
+          this.player.modifyStability(-dmg.stabilityDmg);
+          this.addLog(chalk.red(` > ${enemy.name} atacou com força: ${dmg.hpDamage} dano.`));
+        }
+      } else {
+        // Inimigo comum
+        if (this.playerEvades()) return;
+        const dmg = this.calculateDamage(enemy, this.player);
+        // Efeito elemental do inimigo (30% chance para inimigos avançados)
+        if (enemy.level >= 5 && Math.random() > 0.7) {
+          this.player.addStatus('SANGRAMENTO', 2);
+          this.addLog(chalk.red(` > ${enemy.name} causou SANGRAMENTO!`));
+        }
+        this.player.takeDamage(dmg.hpDamage, 'physical');
+        this.player.modifyStability(-dmg.stabilityDmg);
+        this.addLog(chalk.red(` > ${enemy.name} atacou: ${dmg.hpDamage} dano.`));
+      }
+
       if (this.player.isDead) { this.isOver = true; this.result = 'LOSS'; }
     });
     this.turn++;

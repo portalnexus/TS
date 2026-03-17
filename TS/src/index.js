@@ -67,6 +67,7 @@ function updateStatus() {
   ${chalk.bold.magenta('SKILLS:')} ${player.skillPoints}
   
   ${chalk.bold.white('RENOME:')} ${chalk.bold.green(prestige)}
+  ${player.activeQuest ? chalk.bold.yellow('MISSÃO: ') + chalk.white(`${player.activeQuest.progress}/${player.activeQuest.target}`) : ''}
   `);
   
   let synergyContent = '';
@@ -223,7 +224,18 @@ function startDungeon(floor = 1) {
   currentDungeon = new Dungeon(floor); gameState = 'EXPLORING'; mapBox.setLabel(chalk[currentDungeon.biome.color](` [ ${currentDungeon.biome.name} - ${floor} ] `));
   mapBox.show(); combatVisualBox.hide(); inventoryBox.hide(); itemDetailBox.show(); logBox.show();
   actionMenu.setLabel(' [ EXPLORACAO ] '); actionMenu.setItems([' [1] Norte', ' [2] Sul', ' [3] Oeste', ' [4] Leste', ' [5] Inv', ' [6] Skills', ' [ESC] Fugir']);
-  log(chalk.green(`Fenda ${floor} aberta.`)); renderMap();
+  log(chalk.green(`Fenda ${floor} aberta.`));
+
+  // Auto-progresso de missão FLOOR
+  if (player && player.activeQuest && player.activeQuest.type === 'FLOOR' && !player.activeQuest.completed) {
+    player.activeQuest.progress = floor;
+    if (floor >= player.activeQuest.target) {
+      player.activeQuest.completed = true;
+      log(chalk.bold.green(`>>> MISSÃO CONCLUÍDA! Andar ${floor} alcançado! <<<`));
+    }
+  }
+
+  renderMap();
 }
 
 function handleMove(dx, dy) {
@@ -248,7 +260,23 @@ function handleTileInteraction(t) {
   switch(t.type) {
     case 'ENEMY': case 'BOSS': startCombat(t.data); t.type = 'FLOOR'; break;
     case 'EXIT': startDungeon(currentDungeon.floor + 1); break;
-    case 'TREASURE': const l = new Item(currentDungeon.floor); player.inventory.push(l); log(chalk.yellow(`Loot: ${l.name}`)); t.type = 'FLOOR'; break;
+    case 'TREASURE': {
+      const l = new Item(currentDungeon.floor);
+      player.inventory.push(l);
+      log(chalk.yellow(`Loot: ${l.name}`));
+      t.type = 'FLOOR';
+      // Auto-progresso de missão ITEM
+      if (player.activeQuest && player.activeQuest.type === 'ITEM' && !player.activeQuest.completed) {
+        player.activeQuest.progress++;
+        if (player.activeQuest.progress >= player.activeQuest.target) {
+          player.activeQuest.completed = true;
+          log(chalk.bold.green('>>> MISSÃO CONCLUÍDA! Retorne ao Quadro de Missões. <<<'));
+        } else {
+          log(chalk.yellow(`Missão: ${player.activeQuest.progress}/${player.activeQuest.target} itens coletados.`));
+        }
+      }
+      break;
+    }
     case 'PUZZLE': startPuzzle(t); break;
     case 'REST': player.recover(0.5, 0.5, 0.5); log(chalk.green('Descansou.')); t.type = 'FLOOR'; break;
   }
@@ -267,9 +295,61 @@ function processCombatTurn(s = null) {
   if (s) currentCombat.playerAction('SKILL', 0, s);
   currentCombat.log.forEach(m => logBox.log(m)); currentCombat.log = []; updateStatus(); renderCombat();
   if (currentCombat.isOver) {
-    if (currentCombat.result === 'WIN') { gameState = 'EXPLORING'; combatVisualBox.hide(); mapBox.show(); if (currentCombat.enemies.some(e => e.name.includes('CHEFE'))) { log(chalk.magenta('GUARDIÃO CAIU!')); const t = currentDungeon.getTile(currentDungeon.playerPos.x, currentDungeon.playerPos.y); if (t) t.type = 'EXIT'; renderMap(); } }
-    else { log(chalk.red('MORTE.')); SaveSystem.deleteSave(); setTimeout(() => process.exit(0), 3000); }
+    if (currentCombat.result === 'WIN') {
+      // Auto-progresso de missão KILL
+      if (player.activeQuest && player.activeQuest.type === 'KILL' && !player.activeQuest.completed) {
+        player.activeQuest.progress += currentCombat.enemies.length;
+        if (player.activeQuest.progress >= player.activeQuest.target) {
+          player.activeQuest.completed = true;
+          log(chalk.bold.green('>>> MISSÃO CONCLUÍDA! Retorne ao Quadro de Missões. <<<'));
+        } else {
+          log(chalk.yellow(`Missão: ${player.activeQuest.progress}/${player.activeQuest.target} inimigos.`));
+        }
+      }
+      gameState = 'EXPLORING'; combatVisualBox.hide(); mapBox.show();
+      const isFinalBoss = currentCombat.enemies.some(e => e.name.includes('SENHOR DA ASCENSÃO'));
+      if (isFinalBoss) {
+        showVictory();
+        return;
+      }
+      if (currentCombat.enemies.some(e => e.name.includes('CHEFE') || e.name.includes('SENHOR') || e.name.includes('ARQUITETO'))) {
+        log(chalk.magenta('GUARDIÃO CAIU! A Escada se abre...'));
+        const t = currentDungeon.getTile(currentDungeon.playerPos.x, currentDungeon.playerPos.y);
+        if (t) t.type = 'EXIT';
+        renderMap();
+      }
+    } else {
+      log(chalk.red('MORTE. O Exílio reclama sua alma.'));
+      SaveSystem.deleteSave();
+      setTimeout(() => process.exit(0), 3000);
+    }
   }
+}
+
+function showVictory() {
+  gameState = 'VICTORY';
+  const prestige = player.calculatePrestige();
+  const bestiaryCount = Object.keys(player.bestiary).length;
+  mapBox.hide(); combatVisualBox.hide(); inventoryBox.hide();
+  logBox.show(); itemDetailBox.show();
+  itemDetailBox.setLabel(' [ O FIM DO EXÍLIO ] ');
+  itemDetailBox.setContent(
+    chalk.bold.yellow('\n  ╔══════════════════════════════════╗\n') +
+    chalk.bold.yellow('  ║   TERMINAL SOULS: CONCLUÍDO!     ║\n') +
+    chalk.bold.yellow('  ╚══════════════════════════════════╝\n\n') +
+    chalk.bold.white(`  ${player.name}, o Exilado, quebrou as Correntes do Nexus.\n\n`) +
+    chalk.bold.cyan(`  RENOME FINAL: ${prestige}\n`) +
+    chalk.green(`  Nível Alcançado: ${player.level}\n`) +
+    chalk.green(`  Criaturas Catalogadas: ${bestiaryCount}\n`) +
+    chalk.green(`  Orbes Acumulados: ${player.orbs}\n\n`) +
+    chalk.gray('  "O conhecimento é a única arma que\n   o Exílio jamais poderá confiscar."\n\n') +
+    chalk.bold.red('  [ESC] Retornar ao Menu Principal')
+  );
+  log(chalk.bold.yellow('=== O SENHOR DA ASCENSÃO FOI DERROTADO! ==='));
+  log(chalk.bold.cyan(`=== RENOME ETERNO: ${prestige} ===`));
+  actionMenu.setItems([' [ESC] Menu Principal']);
+  actionMenu.focus();
+  screen.render();
 }
 
 function startPuzzle(t) {

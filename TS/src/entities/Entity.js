@@ -154,6 +154,8 @@ class Entity {
       const status = this.activeStatuses[i];
       if (status.name === 'SANGRAMENTO') { const dmg = Math.max(5, Math.floor(this.maxHp * 0.05)); this.hp -= dmg; if (combatLog) combatLog.push(` > ${this.name} sofreu ${dmg} de Sangramento.`); }
       if (status.name === 'COMBUSTÃO') { const dmg = Math.max(10, Math.floor(this.maxHp * 0.08)); this.hp -= dmg; if (combatLog) combatLog.push(` > ${this.name} sofreu ${dmg} de Combustão.`); }
+      if (status.name === 'CHOQUE') { this.modifyStability(-20); if (combatLog) combatLog.push(` > ${this.name} foi eletrocutado! (-20 Estabilidade)`); }
+      if (status.name === 'CONGELAMENTO') { this.modifyStability(-15); if (combatLog) combatLog.push(` > ${this.name} está congelado! (-15 Estabilidade)`); }
       status.duration--; if (status.duration <= 0) { if (combatLog) combatLog.push(` > [${status.name}] expirou.`); this.activeStatuses.splice(i, 1); }
     }
     if (this.hp <= 0) { this.hp = 0; this.isDead = true; }
@@ -238,6 +240,20 @@ class Entity {
     this.sp -= amount;
     if (this.sp < 0) { this.sp = 0; this.exhaustionPhysical = true; }
     else this.exhaustionPhysical = false;
+  }
+
+  consumeMp(amount) {
+    this.mp -= amount;
+    if (this.mp < 0) { this.mp = 0; this.exhaustionMagical = true; }
+    else this.exhaustionMagical = false;
+  }
+
+  hasStatus(name) {
+    return this.activeStatuses.some(s => s.name === name);
+  }
+
+  removeStatus(name) {
+    this.activeStatuses = this.activeStatuses.filter(s => s.name !== name);
   }
 
   modifyStability(amount) {

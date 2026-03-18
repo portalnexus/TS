@@ -15,19 +15,21 @@ const Nexus = require('./core/Nexus');
 const screen = blessed.screen({ smartCSR: true, title: 'Terminal Souls - The Echoes of Reason', fullUnicode: true, mouse: false });
 
 // --- COMPONENTES UI ---
-const titleBox = blessed.box({ top: 0, left: 'center', width: '100%', height: 3, content: chalk.bold.red(' TERMINAL SOULS: THE ECHOES OF REASON '), align: 'center', border: { type: 'line', fg: 'red' } });
-const statusBox = blessed.box({ top: 3, left: 0, width: '20%', height: 13, label: ' [ STATUS ] ', border: { type: 'line', fg: 'cyan' } });
-const synergyBox = blessed.box({ top: 16, left: 0, width: '20%', height: 8, label: ' [ SINERGIAS ] ', border: { type: 'line', fg: 'magenta' }, tags: true });
-const legendBox = blessed.box({ top: 24, left: 0, width: '20%', height: '30%', label: ' [ LEGENDA ] ', border: { type: 'line', fg: 'white' }, tags: true });
-const mapBox = blessed.box({ top: 3, left: '20%', width: '60%', height: '65%', label: ' [ MAPA DA FENDA ] ', border: { type: 'line', fg: 'white' }, tags: true });
-const combatVisualBox = blessed.box({ top: 3, left: '20%', width: '60%', height: '65%', label: ' [ COMBATE ] ', border: { type: 'line', fg: 'red' }, hidden: true, tags: true });
+const titleBox = blessed.box({ top: 0, left: 'center', width: '100%', height: 5,
+  content: chalk.bold.red('\n ⚔  T E R M I N A L   S O U L S  ⚔ \n') + chalk.gray(' ◈  The Echoes of Reason  ◈') + chalk.white('                                            v1.0.0'),
+  align: 'center', border: { type: 'line', fg: 'red' } });
+const statusBox = blessed.box({ top: 5, left: 0, width: '20%', height: 13, label: ' [ STATUS ] ', border: { type: 'line', fg: 'cyan' } });
+const synergyBox = blessed.box({ top: 18, left: 0, width: '20%', height: 8, label: ' [ SINERGIAS ] ', border: { type: 'line', fg: 'magenta' }, tags: true });
+const legendBox = blessed.box({ top: 26, left: 0, width: '20%', height: '30%', label: ' [ LEGENDA ] ', border: { type: 'line', fg: 'white' }, tags: true });
+const mapBox = blessed.box({ top: 5, left: '20%', width: '60%', height: '65%', label: ' [ MAPA DA FENDA ] ', border: { type: 'line', fg: 'white' }, tags: true });
+const combatVisualBox = blessed.box({ top: 5, left: '20%', width: '60%', height: '65%', label: ' [ COMBATE ] ', border: { type: 'line', fg: 'red' }, hidden: true, tags: true });
 const logBox = blessed.log({ top: '68%', left: '20%', width: '80%', height: '30%', label: ' [ CRÔNICAS ] ', border: { type: 'line', fg: 'yellow' }, scrollable: true, alwaysScroll: true });
 const actionMenu = blessed.list({ top: '68%', left: 0, width: '20%', height: '30%', label: ' [ AÇÕES ] ', border: { type: 'line', fg: 'green' }, keys: true, vi: true, style: { selected: { bg: 'red', bold: true } } });
 const interactBox = blessed.box({ top: 'center', left: 'center', width: '50%', height: 9, label: ' [ INTERAÇÃO ] ', border: { type: 'line', fg: 'white' }, hidden: true, tags: true });
 const inputField = blessed.textbox({ parent: interactBox, top: 5, left: 2, width: '90%', height: 1, inputOnFocus: true, style: { bg: 'blue' } });
-const inventoryBox = blessed.list({ top: 3, left: '20%', width: '60%', height: '65%', label: ' [ LISTA ] ', border: { type: 'line', fg: 'cyan' }, keys: true, vi: true, style: { selected: { bg: 'blue', bold: true } }, hidden: true });
+const inventoryBox = blessed.list({ top: 5, left: '20%', width: '60%', height: '65%', label: ' [ LISTA ] ', border: { type: 'line', fg: 'cyan' }, keys: true, vi: true, style: { selected: { bg: 'blue', bold: true } }, hidden: true });
 const itemDetailBox = blessed.box({ top: '68%', left: '20%', width: '80%', height: '30%', label: ' [ ANALISE DE DADOS ] ', border: { type: 'line', fg: 'yellow' }, tags: true, hidden: true });
-const equipVisualBox = blessed.box({ top: 3, left: '80%', width: '20%', height: '65%', label: ' [ EQUIPAMENTO ] ', border: { type: 'line', fg: 'magenta' }, tags: true, scrollable: true });
+const equipVisualBox = blessed.box({ top: 5, left: '80%', width: '20%', height: '65%', label: ' [ EQUIPAMENTO ] ', border: { type: 'line', fg: 'magenta' }, tags: true, scrollable: true });
 
 let player = null;
 
@@ -246,8 +248,20 @@ function renderMap() {
   if (!currentDungeon) return; let d = '';
   for (let y = 0; y < currentDungeon.height; y++) {
     for (let x = 0; x < currentDungeon.width; x++) {
-      if (x === currentDungeon.playerPos.x && y === currentDungeon.playerPos.y) d += chalk.bold.cyan('@ ');
-      else { const t = currentDungeon.grid[y][x]; switch(t.type) { case 'WALL': d += Sprites.objects.wall; break; case 'FLOOR': d += Sprites.objects.floor; break; case 'TREASURE': d += Sprites.objects.treasure; break; case 'ENEMY': d += Sprites.objects.enemy; break; case 'BOSS': d += Sprites.objects.boss; break; case 'PUZZLE': d += Sprites.objects.puzzle; break; case 'EXIT': d += Sprites.objects.door; break; case 'REST': d += Sprites.objects.rest; break; } }
+      if (x === currentDungeon.playerPos.x && y === currentDungeon.playerPos.y) { d += chalk.bold.cyan('@ '); continue; }
+      const t = currentDungeon.grid[y][x];
+      if (!t.discovered) { d += chalk.gray('░░'); continue; }
+      switch(t.type) {
+        case 'WALL':     d += Sprites.objects.wall; break;
+        case 'FLOOR':    d += Sprites.objects.floor; break;
+        case 'TREASURE': d += Sprites.objects.treasure; break;
+        case 'ENEMY':    d += Sprites.objects.enemy; break;
+        case 'BOSS':     d += Sprites.objects.boss; break;
+        case 'PUZZLE':   d += Sprites.objects.puzzle; break;
+        case 'EXIT':     d += Sprites.objects.door; break;
+        case 'REST':     d += Sprites.objects.rest; break;
+        default:         d += Sprites.objects.floor; break;
+      }
     }
     d += '\n';
   }
@@ -255,16 +269,34 @@ function renderMap() {
 }
 
 function renderCombat() {
-  if (!currentCombat) return; const e = currentCombat.enemies[0]; const es = Sprites.getEnemySprite(e.name); const ps = Sprites.getPlayerSprite(player.race);
-  let d = '\n'; es.forEach(l => { d += ' '.repeat(35) + l + '\n'; }); d += ' '.repeat(33) + chalk.bold.red(e.name) + '\n';
-  const hpP = Math.min(10, Math.max(0, Math.floor(e.hp/e.maxHp*10))); d += ' '.repeat(33) + `HP: [${'#'.repeat(hpP)}${'.'.repeat(10-hpP)}]\n\n` + ' '.repeat(5) + '-'.repeat(50) + '\n\n';
-  ps.forEach(l => { d += ' '.repeat(5) + l + '\n'; }); combatVisualBox.setContent(d); updateLegend(); screen.render();
+  if (!currentCombat) return;
+  const e = currentCombat.enemies[0];
+  const es = Sprites.getEnemySprite(e.name);
+  const ps = Sprites.getPlayerSprite(player.race);
+  const boxW = Math.floor(screen.width * 0.60) - 4;
+  const spriteW = 24;
+  const enemyPad = Math.max(2, Math.floor(boxW * 0.60) - spriteW);
+  const playerPad = Math.max(2, Math.floor(boxW * 0.04));
+  const dividerLen = Math.min(boxW - playerPad, 55);
+  let d = '\n';
+  es.forEach(l => { d += ' '.repeat(enemyPad) + l + '\n'; });
+  d += ' '.repeat(enemyPad) + chalk.bold.red(e.name) + '\n';
+  const hpP = Math.min(10, Math.max(0, Math.floor(e.hp / e.maxHp * 10)));
+  d += ' '.repeat(enemyPad) + `HP: [${'#'.repeat(hpP)}${'.'.repeat(10 - hpP)}]\n\n`;
+  d += ' '.repeat(playerPad) + '-'.repeat(dividerLen) + '\n\n';
+  ps.forEach(l => { d += ' '.repeat(playerPad) + l + '\n'; });
+  d += ' '.repeat(playerPad) + chalk.bold.green(player.name) + '\n';
+  d += ' '.repeat(playerPad) + `HP: ${makeBar(player.hp, player.maxHp, 12)} ${chalk.green(player.hp + '/' + player.maxHp)}\n`;
+  combatVisualBox.setContent(d); updateLegend(); screen.render();
 }
 
 function log(msg) { logBox.log(msg); screen.render(); }
 
 function startDungeon(floor = 1) {
-  currentDungeon = new Dungeon(floor); gameState = 'EXPLORING'; mapBox.setLabel(chalk[currentDungeon.biome.color](` [ ${currentDungeon.biome.name} - ${floor} ] `));
+  // Calcula quantos tiles cabem no mapBox (cada tile = 2 chars, descontar bordas)
+  const availW = Math.max(20, Math.floor((screen.width * 0.60 - 4) / 2));
+  const availH = Math.max(10, Math.floor(screen.height * 0.65 - 2));
+  currentDungeon = new Dungeon(floor, availW, availH); gameState = 'EXPLORING'; mapBox.setLabel(chalk[currentDungeon.biome.color](` [ ${currentDungeon.biome.name} - ${floor} ] `));
   mapBox.show(); combatVisualBox.hide(); inventoryBox.hide(); itemDetailBox.show(); logBox.show();
   actionMenu.setLabel(' [ EXPLORACAO ] '); actionMenu.setItems([' [1] Norte', ' [2] Sul', ' [3] Oeste', ' [4] Leste', ' [5] Inv', ' [6] Skills', ' [ESC] Fugir']);
   log(chalk.green(`Fenda ${floor} aberta.`));

@@ -11,11 +11,11 @@ class Tile {
 }
 
 class Dungeon {
-  constructor(floor = 1) {
+  constructor(floor = 1, maxW = 40, maxH = 18) {
     this.floor = floor;
-    // Aumenta o mapa conforme o andar
-    this.width = Math.min(60, 25 + floor * 2);
-    this.height = Math.min(20, 10 + Math.floor(floor / 2));
+    // Aumenta o mapa conforme o andar, limitado pelo espaço disponível no terminal
+    this.width = Math.min(maxW, 20 + floor * 2);
+    this.height = Math.min(maxH, 10 + Math.floor(floor / 2));
     this.grid = [];
     this.playerPos = { x: 2, y: 2 };
     this.bossDefeated = false;
@@ -29,6 +29,15 @@ class Dungeon {
     this.biome = biomes[Math.floor(Math.random() * biomes.length)];
 
     this.generate();
+  }
+
+  revealAround(x, y, radius = 4) {
+    for (let dy = -radius; dy <= radius; dy++) {
+      for (let dx = -radius; dx <= radius; dx++) {
+        const tile = this.getTile(x + dx, y + dy);
+        if (tile) tile.discovered = true;
+      }
+    }
   }
 
   generate() {
@@ -59,6 +68,8 @@ class Dungeon {
     this.addRandomObject('REST', 1 + Math.floor(this.floor / 5));
     this.addRandomObject('ENEMY', 3 + Math.floor(this.floor / 2));
     this.addRandomObject('BOSS', 1);
+    // Revelar área inicial ao redor do jogador
+    this.revealAround(this.playerPos.x, this.playerPos.y, 3);
   }
 
   addRandomObject(type, count) {
@@ -160,6 +171,7 @@ class Dungeon {
     if (tile && tile.type !== 'WALL') {
       this.playerPos.x = newX;
       this.playerPos.y = newY;
+      this.revealAround(newX, newY, 4);
       return tile;
     }
     return null;

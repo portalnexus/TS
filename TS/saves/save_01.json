@@ -1,20 +1,20 @@
 {
-  "id": "d3f99815-9957-443c-bfa4-d7a2a616cc9f",
-  "name": "Polka",
-  "race": "Elfo",
-  "background": "Mago",
-  "strength": 11,
-  "dexterity": 10,
-  "intelligence": 15,
-  "maxHp": 184,
-  "hp": 131,
-  "maxSp": 70,
-  "sp": 12,
-  "maxMp": 90,
-  "mp": 90,
+  "id": "5ae18b13-ce4c-4356-ab74-d71bbd26c3f9",
+  "name": "Magnus",
+  "race": "Humano",
+  "background": "Guerreiro",
+  "strength": 12,
+  "dexterity": 12,
+  "intelligence": 12,
+  "maxHp": 196,
+  "hp": 159,
+  "maxSp": 74,
+  "sp": 14,
+  "maxMp": 74,
+  "mp": 74,
   "level": 2,
-  "xp": 100,
-  "orbs": 0,
+  "xp": 50,
+  "orbs": 42,
   "attributePoints": 3,
   "proficiencyPoints": 1,
   "skillPoints": 1,
@@ -26,123 +26,82 @@
     "VAZIO": 0
   },
   "skillTree": {
-    "Raio de Maxwell": {
+    "Impacto de Newton": {
       "lvl": 0,
-      "desc": "Dano de choque preciso.",
-      "cost": 20
-    },
-    "Chama de Lavoisier": {
-      "lvl": 0,
-      "desc": "Incendeia o inimigo.",
+      "desc": "Dano físico massivo. Reduz estabilidade.",
       "cost": 15
     },
-    "Zero Absoluto": {
+    "Inércia de Galileu": {
       "lvl": 0,
-      "desc": "Gera Stagger imediato.",
+      "desc": "Aumenta defesa e recupera estabilidade.",
+      "cost": 10
+    },
+    "Entropia Cinética": {
+      "lvl": 0,
+      "desc": "Dano em área baseado em STR.",
+      "cost": 20
+    },
+    "Força Centrípeta": {
+      "lvl": 0,
+      "desc": "Gira a arma atingindo todos.",
       "cost": 25
     },
-    "Paradoxo de Schrödinger": {
+    "Lei da Inércia": {
       "lvl": 0,
-      "desc": "Chance de evitar dano.",
+      "desc": "Imunidade a Colapso.",
       "cost": 30
-    },
-    "Singularidade de Hawking": {
-      "lvl": 0,
-      "desc": "Dreno massivo de HP.",
-      "cost": 40
     }
   },
   "bestiary": {
-    "Sentinela de Maxwell": 2,
-    "Lobo de Turing": 1,
-    "Esqueleto de Gauss": 1
+    "CHEFE: Guardiã do Vazio": 1,
+    "Espectro de Noether": 1,
+    "Sombra da Simetria": 1,
+    "Força Centrífuga": 2
   },
   "activeQuest": null,
-  "posture": 100,
-  "maxPosture": 150,
+  "posture": 112,
+  "maxPosture": 160,
   "postureMode": "EQUILIBRIO",
   "equipment": {
-    "ARMA": {
-      "id": "3de0b140-1345-4a96-96dd-29ebacef4f2d",
-      "floor": 1,
-      "rarity": "COMUM",
-      "type": "ARMA",
-      "name": "Enferrujado Bobina",
-      "stats": {
-        "physicalDamage": 11
-      },
-      "tags": [
-        "ESMAGAMENTO"
-      ],
-      "uniques": [],
-      "flavorText": ""
-    },
-    "ARMADURA": {
-      "id": "087435fb-d722-43e3-af1d-8d87b7c1421a",
-      "floor": 1,
-      "rarity": "MÁGICO",
-      "type": "ARMADURA",
-      "name": "Polarizado Armadura de Grafeno",
-      "stats": {
-        "defense": 8,
-        "strength": 1,
-        "maxHp": 4
-      },
-      "tags": [],
-      "uniques": [],
-      "flavorText": ""
-    },
+    "ARMA": null,
+    "ARMADURA": null,
     "ACESSÓRIO": null,
     "RELÍQUIA": null
   },
   "inventory": [
     {
-      "id": "383e82a6-5041-49de-8284-1e400e01145b",
+      "id": "8eff2de9-514e-4986-8b0b-6d5eac881bfb",
       "floor": 1,
       "rarity": "LENDÁRIO",
-      "type": "ARMA",
-      "name": "A Singularidade de Penrose Daga",
+      "type": "ARMADURA",
+      "consumableType": null,
+      "name": "A Hipótese de Riemann Malha de Fibonacci",
       "stats": {
-        "physicalDamage": 38,
-        "strength": 7,
-        "maxHp": 12
+        "defense": 19,
+        "maxHp": 30,
+        "strength": 5
       },
       "tags": [
-        "ESMAGAMENTO",
-        "CHOQUE"
+        "ESCUDO"
       ],
       "uniques": [
-        "50% dano extra contra Sangramento."
+        "A cada 5 turnos em MOMENTO, o próximo ataque é garantidamente crítico."
       ],
-      "flavorText": "Noether provou que a simetria gera leis de conservação eternas."
+      "flavorText": "Lovelace viu poesia nos algoritmos desta relíquia."
     },
     {
-      "id": "959ccf38-a879-4c98-ad2a-185cdeb88878",
+      "id": "d7a73b70-e79e-4717-9ad8-3e00961ddd3a",
       "floor": 1,
       "rarity": "COMUM",
-      "type": "ARMA",
-      "name": "Enferrujado Bobina",
+      "type": "ARMADURA",
+      "consumableType": null,
+      "name": "Enferrujado Veste de Entropia",
       "stats": {
-        "physicalDamage": 11
-      },
-      "tags": [
-        "CORTE"
-      ],
-      "uniques": [],
-      "flavorText": ""
-    },
-    {
-      "id": "a5add458-118f-4a89-85d7-ccea4cd16a69",
-      "floor": 1,
-      "rarity": "RARO",
-      "type": "CONSUMÍVEL",
-      "name": "Eterno de Noether Frasco de Entropia",
-      "stats": {
-        "recoverValue": 48
+        "defense": 5
       },
       "tags": [],
       "uniques": [],
-      "flavorText": "Gauss, o Príncipe, calculou a trajetória desta arma com perfeição."
+      "flavorText": ""
     }
   ]
 }

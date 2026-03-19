@@ -13,10 +13,10 @@ describe('Combat System', () => {
   });
 
   test('should calculate damage correctly based on level and scale', () => {
-    player.setPostureMode('MOMENTO');
+    player.setPostureMode('ATAQUE');
     const dmg = combat.calculateDamage(player, enemy);
     // Base power = (1 * 2) + (12 * 1.5) = 20
-    // Momento = 20 * 1.5 = 30.
+    // Ataque = 20 * 1.5 = 30.
     // Class Guerreiro = 30 * 1.1 = 33.
     expect(dmg.hpDamage).toBeGreaterThanOrEqual(33);
   });

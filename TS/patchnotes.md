@@ -2,6 +2,28 @@
 
 ---
 
+## [v1.0.1] - Polimento do Exilado
+*Controles corrigidos, postura redesenhada, criação instrutiva.*
+
+### 🛠️ Correções Críticas
+- **Menu pós-combate:** Após vencer um combate, o menu de exploração (Norte/Sul/Inv/Skills) é restaurado corretamente.
+- **Teclas [5] Inv e [6] Skills** agora funcionam durante a exploração da Fenda.
+
+### 🎨 Visual
+- **Sprite do jogador `@@`:** O exilado ocupa um bloco 2×2 no mapa para maior visibilidade.
+
+### ⚡ Sistema de Postura Remodelado
+- **Nomes simplificados:** INÉRCIA → **DEFESA**, MOMENTO → **ATAQUE**, EQUILÍBRIO → **NEUTRO**.
+- **SP dinâmica em combate:** DEFESA +12% SP/turno, NEUTRO +5% SP/turno, ATAQUE −10% SP/turno.
+- **SP regenera ao caminhar:** +5% maxSP a cada passo na exploração.
+
+### 📋 Criação de Personagem Instrutiva
+- **Raças com stats inline:** Cada raça exibe seus bônus na lista de seleção.
+- **Hover com fichas completas:** Navegar pela lista de raças e classes exibe descrição, estilo e sinergias recomendadas.
+- **Tela de confirmação:** Resumo final do exilado antes de iniciar a jornada.
+
+---
+
 ## [v1.0.0] - A Ascensão do Exilado
 *O Exílio está completo. O Arquiteto aguarda no Andar 10.*
 

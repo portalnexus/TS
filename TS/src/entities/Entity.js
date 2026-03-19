@@ -43,7 +43,7 @@ class Entity {
     // --- REVISÃO DE POSTURA: ESTABILIDADE CINÉTICA ---
     this.posture = stats.posture || 100; // Estabilidade agora começa em 100
     this.maxPosture = stats.maxPosture || (100 + (this.dexterity * 5));
-    this.postureMode = stats.postureMode || 'EQUILIBRIO'; // INERCIA, MOMENTO, EQUILIBRIO
+    this.postureMode = stats.postureMode || 'NEUTRO'; // DEFESA, ATAQUE, NEUTRO
 
     this.activeStatuses = [];
     this.isDead = false;
@@ -181,7 +181,7 @@ class Entity {
     if (this.equipment.ARMA) { power += this.equipment.ARMA.stats.physicalDamage || 0; if (this.equipment.ARMA.stats.strength) power += this.equipment.ARMA.stats.strength * 2; }
     if (this.equipment.RELÍQUIA) { if (this.equipment.RELÍQUIA.stats.strength) power += this.equipment.RELÍQUIA.stats.strength * 2; }
     if (this.background === 'Guerreiro') power *= 1.1;
-    if (this.postureMode === 'MOMENTO') power *= 1.5; // Bônus de Momento
+    if (this.postureMode === 'ATAQUE') power *= 1.5; // Bônus de Ataque
     return Math.floor(power);
   }
 
@@ -189,7 +189,7 @@ class Entity {
     let def = 0;
     if (this.equipment.ARMADURA) { def += this.equipment.ARMADURA.stats.defense || 0; if (this.equipment.ARMADURA.stats.dexterity) def += this.equipment.ARMADURA.stats.dexterity; }
     if (this.equipment.RELÍQUIA) { if (this.equipment.RELÍQUIA.stats.dexterity) def += this.equipment.RELÍQUIA.stats.dexterity; }
-    if (this.postureMode === 'INERCIA') def *= 2; // Bônus de Inércia
+    if (this.postureMode === 'DEFESA') def *= 2; // Bônus de Defesa
     return def;
   }
 
@@ -278,7 +278,7 @@ class Entity {
   }
 
   setPostureMode(mode) {
-    if (['INERCIA', 'MOMENTO', 'EQUILIBRIO'].includes(mode)) this.postureMode = mode;
+    if (['DEFESA', 'ATAQUE', 'NEUTRO'].includes(mode)) this.postureMode = mode;
   }
 
   calculatePrestige() {

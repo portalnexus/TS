@@ -70,10 +70,10 @@ class Combat {
     }
     if (this.player.isDead) { this.isOver = true; this.result = 'LOSS'; return; }
 
-    // Penalidade de Estabilidade por Ação no modo MOMENTO
-    if (this.player.postureMode === 'MOMENTO') {
+    // Penalidade de Estabilidade por Ação no modo ATAQUE
+    if (this.player.postureMode === 'ATAQUE') {
       this.player.modifyStability(-10);
-      this.addLog(chalk.gray(' > Momento reduz estabilidade (-10).'));
+      this.addLog(chalk.gray(' > Ataque reduz estabilidade (-10).'));
     }
 
     switch (action) {

@@ -1,7 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
     console.log('%c TERMINAL SOULS: THE ECHOES OF REASON ', 'background: #ff5555; color: #000; font-weight: bold; font-size: 20px;');
     console.log('%c [SISTEMA] Inicializando interface de documentação científica... ', 'color: #55ffff;');
-    console.log('%c [NÚCLEO] Versão 1.0.0 — A Ascensão do Exilado. ', 'color: #55ff55;');
+    console.log('%c [NÚCLEO] Versão 1.0.1 — Polimento do Exilado. ', 'color: #55ff55;');
 
     // Typing effect for the vision text
     const visionText = document.querySelector('.vision-box p');
@@ -334,6 +334,28 @@ document.addEventListener('DOMContentLoaded', () => {
         try {
             const markdown = `
 # 📜 PATCH NOTES - TERMINAL SOULS
+
+---
+
+## [v1.0.1] - Polimento do Exilado
+*Controles corrigidos, postura redesenhada, criação instrutiva.*
+
+### 🛠️ Correções Críticas
+- **Menu pós-combate corrigido:** Após vencer um combate, o menu de exploração (Norte/Sul/Inv/Skills) agora é restaurado corretamente.
+- **Teclas [5] Inv e [6] Skills** funcionam durante a exploração.
+
+### 🎨 Visual
+- **Sprite do jogador `@@`:** O exilado agora ocupa um bloco 2×2 no mapa, mais visível na dungeon.
+
+### ⚡ Sistema de Postura Remodelado
+- **Nomes simplificados:** INÉRCIA → **DEFESA**, MOMENTO → **ATAQUE**, EQUILÍBRIO → **NEUTRO**.
+- **SP dinâmica por postura em combate:** DEFESA +12% SP/turno, NEUTRO +5% SP/turno, ATAQUE −10% SP/turno.
+- **SP regenera ao caminhar:** +5% maxSP a cada passo na exploração.
+
+### 📋 Criação de Personagem Instrutiva
+- **Raças com stats inline:** Cada raça exibe seus bônus diretamente na lista de seleção.
+- **Descrições ao navegar:** Passar pelo item de raça ou classe exibe uma ficha completa com estilo e sinergias recomendadas.
+- **Tela de confirmação:** Antes de iniciar a jornada, um resumo do exilado permite recomeçar se necessário.
 
 ---
 

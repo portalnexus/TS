@@ -48,6 +48,7 @@ let currentDungeon = null;
 let currentCombat = null;
 let currentNexus = new Nexus();
 let gameState = 'MENU';
+let creationData = {};
 
 // --- SISTEMA DE SAVE ---
 function saveGame() { if (player && SaveSystem.save(player.serialize())) log(chalk.green('💾 Alma vinculada (Salvo).')); }
@@ -81,9 +82,9 @@ function updateStatus() {
   const xpBar  = chalk.gray(makeBar(player.xp, player.level * 100, 8));
 
   // Postura mode badge
-  const modeBadge = player.postureMode === 'INERCIA'   ? chalk.cyan('[INÉ]')
-                  : player.postureMode === 'MOMENTO'   ? chalk.yellow('[MOM]')
-                  : chalk.gray('[EQU]');
+  const modeBadge = player.postureMode === 'DEFESA' ? chalk.cyan('[DEF]')
+                  : player.postureMode === 'ATAQUE' ? chalk.yellow('[ATK]')
+                  : chalk.gray('[NEU]');
 
   statusBox.setContent(
     `\n  ${accent.bold(player.name)}\n` +
@@ -106,8 +107,8 @@ function updateStatus() {
   if (player.background === 'Mago')      synergyContent += chalk.blue('• +10% Dano Mágico\n');
   if (player.background === 'Arqueiro')  synergyContent += chalk.yellow('• +10 Postura Máx.\n');
   if (player.background === 'Clérigo')   synergyContent += chalk.green('• +10% Recuperação\n');
-  if (player.postureMode === 'INERCIA')  synergyContent += chalk.cyan('• INÉRCIA: ×2 Def\n');
-  if (player.postureMode === 'MOMENTO')  synergyContent += chalk.yellow('• MOMENTO: +50% Dmg\n');
+  if (player.postureMode === 'DEFESA')  synergyContent += chalk.cyan('• DEFESA: ×2 Def, +12% SP/turno\n');
+  if (player.postureMode === 'ATAQUE') synergyContent += chalk.yellow('• ATAQUE: +60% Dmg, -10% SP/turno\n');
   if (player.isStaggered)               synergyContent += chalk.bgRed.white('! COLAPSO !\n');
 
   // Status ativos
@@ -167,6 +168,25 @@ actionMenu.on('element focus', (el) => {
     const text = el.getText();
     itemDetailBox.setContent(chalk.bold.yellow('Acao Selecionada:\n\n') + text + '\n\nNavegue com Q/E ou 1-0.');
     screen.render();
+  } else if (gameState === 'CREATION_RACE') {
+    const raceDetails = {
+      'Humano':  'HUMANO — Versátil\n\n+2 STR | +2 DEX | +2 INT\n\nEquilibrado em tudo. Funciona com\nqualquer classe. Ideal para iniciantes\nou builds híbridas.',
+      'Elfo':    'ELFO — Feiticeiro Nato\n\n+5 INT\n\nPoder mágico superior. Combina com\nMago para máximo dano elemental.\nFraco em combate corpo a corpo.',
+      'Anão':    'ANÃO — Fortaleza Viva\n\n+5 STR\n\nResistência e força bruta. Melhor com\nGuerreiro ou Clérigo. SP alto e dano\nfísico máximo.',
+      'Orc':     'ORC — Predador Ágil\n\n+5 DEX\n\nReflexos e velocidade superiores.\nSinérgico com Arqueiro. Evade ataques\ne golpeia com precisão letal.'
+    };
+    const key = el.getText().trim().split(/\s+/)[0];
+    itemDetailBox.setContent(raceDetails[key] || '');
+    itemDetailBox.show(); screen.render();
+  } else if (gameState === 'CREATION_CLASS') {
+    const classDetails = {
+      'Guerreiro': 'GUERREIRO — Força e Impacto\n\nAtributo: STR\nEstilo: Tanque agressivo\n\nSkills iniciais:\n• Impacto de Newton — Golpe massivo\n• Inércia de Galileu — Recupera SP\n\nUse DEFESA para tankar, ATAQUE\npara explosões de dano.',
+      'Mago':      'MAGO — Poder Elemental\n\nAtributo: INT\nEstilo: Dano em área, efeitos\n\nSkills iniciais:\n• Raio de Maxwell — Choque elétrico\n• Chama de Lavoisier — Fogo/combustão\n\nAltíssimo dano, baixa resistência.',
+      'Arqueiro':  'ARQUEIRO — Precisão e Velocidade\n\nAtributo: DEX\nEstilo: Controle e mobilidade\n\nSkills iniciais:\n• Flecha de Hawking — Projétil preciso\n• Óptica de Euclides — Aumenta alcance\n\nEvita dano, ataca a distância.',
+      'Clérigo':   'CLÉRIGO — Suporte e Cura\n\nAtributo: INT/STR híbrido\nEstilo: Sustentação e resistência\n\nSkills iniciais:\n• Cura de Hipócrates — Restaura HP\n• Sopro de Gaia — Cura de emergência\n\nBônus +10% em todas as recuperações.'
+    };
+    itemDetailBox.setContent(classDetails[el.getText().trim()] || '');
+    itemDetailBox.show(); screen.render();
   }
 });
 
@@ -248,7 +268,7 @@ function renderMap() {
   if (!currentDungeon) return; let d = '';
   for (let y = 0; y < currentDungeon.height; y++) {
     for (let x = 0; x < currentDungeon.width; x++) {
-      if (x === currentDungeon.playerPos.x && y === currentDungeon.playerPos.y) { d += chalk.bold.cyan('@ '); continue; }
+      if (x === currentDungeon.playerPos.x && (y === currentDungeon.playerPos.y || y === currentDungeon.playerPos.y + 1)) { d += chalk.bold.cyan('@@'); continue; }
       const t = currentDungeon.grid[y][x];
       if (!t.discovered) { d += chalk.gray('░░'); continue; }
       switch(t.type) {
@@ -316,7 +336,12 @@ function startDungeon(floor = 1) {
 function handleMove(dx, dy) {
   if (gameState === 'EXPLORING') {
     const t = currentDungeon.movePlayer(dx, dy);
-    if (t) { if (t.type !== 'FLOOR') handleTileInteraction(t); renderMap(); }
+    if (t) {
+      player.sp = Math.min(player.maxSp, player.sp + Math.floor(player.maxSp * 0.05));
+      if (t.type !== 'FLOOR') handleTileInteraction(t);
+      renderMap();
+      updateStatus();
+    }
   } else if (gameState === 'NEXUS') {
     const interaction = currentNexus.movePlayer(dx, dy);
     mapBox.setContent(currentNexus.render());
@@ -362,13 +387,25 @@ function handleCombatAction(c) {
   if (currentCombat.isOver) return; if (c.includes('ATACAR')) currentCombat.playerAction('ATTACK');
   else if (c.includes('SKILLS')) { const l = player.getLearnedSkills(); if (l.length === 0) log(chalk.red('Sem skills!')); else { gameState = 'COMBAT_SKILLS'; actionMenu.setItems([...l, ' [ESC] Voltar']); actionMenu.focus(); return; } }
   else if (c.includes('RECUPERAR')) currentCombat.playerAction('RECOVER');
-  else if (c.includes('POSTURA')) { const m = ['INERCIA', 'EQUILIBRIO', 'MOMENTO']; player.setPostureMode(m[(m.indexOf(player.postureMode)+1)%3]); log(chalk.cyan(`Postura: ${player.postureMode}`)); }
+  else if (c.includes('POSTURA')) { const m = ['NEUTRO', 'DEFESA', 'ATAQUE']; player.setPostureMode(m[(m.indexOf(player.postureMode)+1)%3]); log(chalk.cyan(`Postura: ${player.postureMode}`)); }
   processCombatTurn();
 }
 
 function processCombatTurn(s = null) {
   if (s) currentCombat.playerAction('SKILL', 0, s);
   currentCombat.log.forEach(m => logBox.log(m)); currentCombat.log = []; updateStatus(); renderCombat();
+  if (!currentCombat.isOver) {
+    const spDelta = { DEFESA: 0.12, NEUTRO: 0.05, ATAQUE: -0.10 };
+    const rate = spDelta[player.postureMode] ?? 0;
+    const delta = Math.floor(player.maxSp * Math.abs(rate));
+    if (rate > 0) {
+      player.sp = Math.min(player.maxSp, player.sp + delta);
+      if (rate >= 0.10) log(chalk.cyan(`Postura DEFESA recuperou ${delta} SP.`));
+    } else if (rate < 0) {
+      player.sp = Math.max(0, player.sp - delta);
+      log(chalk.yellow(`Postura ATAQUE consumiu ${delta} SP.`));
+    }
+  }
   if (currentCombat.isOver) {
     if (currentCombat.result === 'WIN') {
       // Auto-progresso de missão KILL
@@ -382,6 +419,10 @@ function processCombatTurn(s = null) {
         }
       }
       gameState = 'EXPLORING'; combatVisualBox.hide(); mapBox.show();
+      inventoryBox.hide(); itemDetailBox.hide(); logBox.show();
+      actionMenu.setLabel(' [ EXPLORAÇÃO ] ');
+      actionMenu.setItems([' [1] Norte', ' [2] Sul', ' [3] Oeste', ' [4] Leste', ' [5] Inv', ' [6] Skills', ' [ESC] Fugir']);
+      actionMenu.focus();
       const isFinalBoss = currentCombat.enemies.some(e => e.name.includes('SENHOR DA ASCENSÃO'));
       if (isFinalBoss) {
         showVictory();
@@ -433,14 +474,39 @@ function startPuzzle(t) {
 }
 
 function startCreation() {
+  creationData = {};
   gameState = 'CREATION_NAME'; interactBox.setLabel(' [ NOME ] '); interactBox.show(); inputField.focus(); inputField.setValue(''); screen.render();
   inputField.once('submit', (n) => {
     if (!n || n.trim() === '') n = 'Exilado';
-    gameState = 'CREATION_RACE'; interactBox.hide(); actionMenu.setLabel(' [ RAÇA ] '); actionMenu.setItems([' Humano', ' Elfo', ' Anão', ' Orc']); actionMenu.focus(); screen.render();
+    creationData.name = n;
+    gameState = 'CREATION_RACE'; interactBox.hide();
+    actionMenu.setLabel(' [ RAÇA ] ');
+    actionMenu.setItems([
+      ' Humano       [+2 STR  +2 DEX  +2 INT]',
+      ' Elfo         [+5 INT             ]',
+      ' Anão         [+5 STR             ]',
+      ' Orc          [+5 DEX             ]'
+    ]);
+    itemDetailBox.show(); actionMenu.focus(); screen.render();
     actionMenu.once('select', (i) => {
-      const r = i.getText().trim();
-      gameState = 'CREATION_CLASS'; actionMenu.setLabel(' [ CLASSE ] '); actionMenu.setItems([' Guerreiro', ' Mago', ' Arqueiro', ' Clérigo']); actionMenu.focus(); screen.render();
-      actionMenu.once('select', (c) => { player = new Entity(n, { race: r, background: c.getText().trim() }); showNexus(); });
+      const r = i.getText().trim().split(/\s+/)[0];
+      creationData.race = r;
+      gameState = 'CREATION_CLASS';
+      actionMenu.setLabel(' [ CLASSE ] ');
+      actionMenu.setItems([' Guerreiro', ' Mago', ' Arqueiro', ' Clérigo']);
+      actionMenu.focus(); screen.render();
+      actionMenu.once('select', (c) => {
+        const cls = c.getText().trim();
+        creationData.cls = cls;
+        gameState = 'CREATION_CONFIRM';
+        actionMenu.setLabel(' [ CONFIRMAR ] ');
+        actionMenu.setItems([' [1] Começar Jornada', ' [2] Recomeçar']);
+        itemDetailBox.setContent(
+          chalk.bold.cyan(`\n  ${n} — ${r} ${cls}\n\n`) +
+          chalk.gray('  Confirme seu exilado ou recomece\n  a criação do personagem.\n')
+        );
+        itemDetailBox.show(); actionMenu.focus(); screen.render();
+      });
     });
   });
 }
@@ -486,6 +552,18 @@ actionMenu.on('select', (item, index) => {
   else if (gameState === 'ATTRIBUTES') { if (c.includes('FORÇA')) player.upgradeAttribute('STR'); if (c.includes('DESTREZA')) player.upgradeAttribute('DEX'); if (c.includes('INTELIGÊNCIA')) player.upgradeAttribute('INT'); updateStatus(); }
   else if (gameState === 'TRADE_BUY' || gameState === 'TRADE_SELL') handleTrade(c, index);
   else if (gameState === 'QUESTS') handleQuests(c, index);
+  else if (gameState === 'EXPLORING') {
+    if (c.includes('Inv')) showInventory();
+    else if (c.includes('Skills')) showPassives();
+  }
+  else if (gameState === 'CREATION_CONFIRM') {
+    if (c.includes('Começar')) {
+      player = new Entity(creationData.name, { race: creationData.race, background: creationData.cls });
+      showNexus();
+    } else if (c.includes('Recomeçar')) {
+      startCreation();
+    }
+  }
 });
 
 screen.on('resize', () => screen.render());

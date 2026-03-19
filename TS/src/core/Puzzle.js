@@ -7,7 +7,7 @@ class Puzzle {
     this.difficulty = Math.min(10, Math.floor(floor / 2) + 1);
     
     // Pick random type for variety if not specifically requested
-    const types = ['MATH', 'EQUATION', 'RIDDLE', 'SEQUENCE'];
+    const types = ['MATH', 'EQUATION', 'RIDDLE', 'SEQUENCE', 'BINARY', 'LOGIC_TABLE', 'FORMULA', 'PRIME_CHECK', 'MODULO'];
     this.type = type || types[Math.floor(Math.random() * types.length)];
     
     this.isSolved = false;
@@ -31,6 +31,21 @@ class Puzzle {
         break;
       case 'SEQUENCE':
         this.generateSequence();
+        break;
+      case 'BINARY':
+        this.generateBinary();
+        break;
+      case 'LOGIC_TABLE':
+        this.generateLogicTable();
+        break;
+      case 'FORMULA':
+        this.generateFormula();
+        break;
+      case 'PRIME_CHECK':
+        this.generatePrimeCheck();
+        break;
+      case 'MODULO':
+        this.generateModulo();
         break;
       default:
         this.generateMath();
@@ -102,6 +117,105 @@ class Puzzle {
     this.question = `SEQUÊNCIA [${picked.desc}]: ${display} — Qual é o próximo número?`;
     this.answer = picked.a;
     this.hint = 'Dica: Analise o padrão numérico e responda com um inteiro.';
+  }
+
+  generateBinary() {
+    const bits = Math.min(6, 3 + Math.floor(this.difficulty / 2));
+    const useBinToDec = Math.random() > 0.5;
+    if (useBinToDec) {
+      const num = Math.floor(Math.random() * (Math.pow(2, bits) - 1)) + 1;
+      const binary = num.toString(2);
+      this.question = `TURING questiona: Qual o decimal de "${binary}"?`;
+      this.answer = num.toString();
+      this.hint = 'Dica: Converta o número binário para base 10.';
+    } else {
+      const max = Math.pow(2, Math.min(bits, 5)) - 1;
+      const num = Math.floor(Math.random() * max) + 1;
+      this.question = `TURING questiona: Qual o binário de "${num}"?`;
+      this.answer = num.toString(2);
+      this.hint = 'Dica: Divida por 2 repetidamente e registre os restos.';
+    }
+  }
+
+  generateLogicTable() {
+    const useXor = this.difficulty >= 4;
+    const ops = useXor
+      ? [{ name: 'AND', fn: (a, b) => a & b }, { name: 'OR', fn: (a, b) => a | b }, { name: 'XOR', fn: (a, b) => a ^ b }]
+      : [{ name: 'AND', fn: (a, b) => a & b }, { name: 'OR', fn: (a, b) => a | b }];
+    const op = ops[Math.floor(Math.random() * ops.length)];
+    const a = Math.floor(Math.random() * 2);
+    const b = Math.floor(Math.random() * 2);
+    this.question = `Lovelace computa: ${a} ${op.name} ${b} = ?  (Responda 0 ou 1)`;
+    this.answer = op.fn(a, b).toString();
+    this.hint = `Dica: Operação lógica ${op.name}. AND=1 só se ambos=1. OR=1 se qualquer=1.`;
+  }
+
+  generateFormula() {
+    const formulas = [
+      () => {
+        const m = Math.floor(Math.random() * 10) + 1;
+        const a = Math.floor(Math.random() * 10) + 1;
+        return { q: `Newton exige: F = m×a. Se m=${m} e a=${a}, qual F?`, a: (m * a).toString() };
+      },
+      () => {
+        const r = Math.floor(Math.random() * 5) + 1;
+        return { q: `Euler pergunta: Área = π×r². Se r=${r}, qual a área? (use π≈3)`, a: (3 * r * r).toString() };
+      },
+      () => {
+        const v = Math.floor(Math.random() * 8) + 2;
+        const t = Math.floor(Math.random() * 5) + 1;
+        return { q: `Einstein mede: d = v×t. Se v=${v} e t=${t}, qual d?`, a: (v * t).toString() };
+      },
+      () => {
+        const m = Math.floor(Math.random() * 5) + 1;
+        return { q: `Einstein revela: E = m×c². Se c=3 e m=${m}, qual E?`, a: (m * 9).toString() };
+      }
+    ];
+    const f = formulas[Math.floor(Math.random() * formulas.length)]();
+    this.question = f.q;
+    this.answer = f.a;
+    this.hint = 'Dica: Substitua os valores na fórmula e calcule.';
+  }
+
+  generatePrimeCheck() {
+    const isPrime = n => { if (n < 2) return false; for (let i = 2; i <= Math.sqrt(n); i++) if (n % i === 0) return false; return true; };
+    const nextPrime = n => { let i = n + 1; while (!isPrime(i)) i++; return i; };
+    const variant = this.difficulty >= 6 ? 'COUNT' : this.difficulty >= 3 ? 'NEXT' : 'IS_PRIME';
+    if (variant === 'IS_PRIME') {
+      const primes = [2, 3, 5, 7, 11, 13, 17, 19, 23, 29];
+      const composites = [4, 6, 8, 9, 10, 12, 14, 15, 16, 18];
+      const usesPrime = Math.random() > 0.5;
+      const n = (usesPrime ? primes : composites)[Math.floor(Math.random() * 10)];
+      this.question = `Eratóstenes questiona: ${n} é primo? Responda "sim" ou "nao".`;
+      this.answer = usesPrime ? 'sim' : 'nao';
+      this.hint = 'Dica: Um primo só é divisível por 1 e por ele mesmo.';
+    } else if (variant === 'NEXT') {
+      const bases = [10, 20, 30, 40, 50, 60, 70];
+      const base = bases[Math.floor(Math.random() * bases.length)];
+      this.question = `Riemann pergunta: Qual o primeiro primo maior que ${base}?`;
+      this.answer = nextPrime(base).toString();
+      this.hint = 'Dica: Teste divisibilidade para cada número acima do dado.';
+    } else {
+      const limit = 10 + Math.floor(Math.random() * 10);
+      const count = [2, 3, 5, 7, 11, 13, 17, 19, 23, 29].filter(p => p <= limit).length;
+      this.question = `O Crivo de Eratóstenes: Quantos primos existem de 1 a ${limit}?`;
+      this.answer = count.toString();
+      this.hint = 'Dica: Liste 2,3,5,7,11... e conte os menores ou iguais ao limite.';
+    }
+  }
+
+  generateModulo() {
+    const a = Math.floor(Math.random() * (15 * this.difficulty)) + 10;
+    const b = Math.floor(Math.random() * 9) + 2;
+    const result = a % b;
+    const templates = [
+      `Gauss calcula: ${a} mod ${b} = ?`,
+      `O relógio de Gauss: Qual o resto de ${a} ÷ ${b}?`,
+      `Aritmética modular: ${a} ≡ ? (mod ${b})`
+    ];
+    this.question = templates[Math.floor(Math.random() * templates.length)];
+    this.answer = result.toString();
+    this.hint = `Dica: Divida ${a} por ${b} e pegue o resto inteiro.`;
   }
 
   checkAnswer(userAnswer) {

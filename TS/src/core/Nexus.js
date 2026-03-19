@@ -27,7 +27,8 @@ class Nexus {
       { name: 'Marie Curie', x: 17, y: 9, char: 'M', color: 'magenta', dialogue: 'Marie Curie: "A radiacao revela a verdade dos itens."' },
       { name: 'Darwin', x: 11, y: 9, char: 'D', color: 'green', dialogue: 'Darwin: "Apenas os mais fortes evoluem no Exilio."' },
       { name: 'Halthor', x: 1, y: 1, char: 'H', color: 'yellow', dialogue: 'Halthor: "Aço e ciência, a combinação perfeita."' },
-      { name: 'Fenda', x: 22, y: 5, char: 'Ω', color: 'red', dialogue: 'Uma fenda instavel para o desconhecido.' }
+      { name: 'Fenda', x: 22, y: 5, char: 'Ω', color: 'red', dialogue: 'Uma fenda instavel para o desconhecido.' },
+      { name: 'Arena', x: 22, y: 2, char: 'β', color: 'red', dialogue: 'A Arena dos Arquitetos pulsa com poder ancestral. [Boss Rush]' }
     ];
   }
 

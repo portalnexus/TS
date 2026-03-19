@@ -49,6 +49,17 @@ let currentCombat = null;
 let currentNexus = new Nexus();
 let gameState = 'MENU';
 let creationData = {};
+let bossRushWave = 0;
+let bossRushScore = 0;
+const BOSS_RUSH_SEQUENCE = [
+  { floor: 5,  name: 'BOSS RUSH: Isaac Newton Corrompido',       mult: 1.0 },
+  { floor: 10, name: 'BOSS RUSH: Sombra de Hawking',             mult: 1.1 },
+  { floor: 15, name: 'BOSS RUSH: A Máquina Implacável',          mult: 1.2 },
+  { floor: 20, name: 'BOSS RUSH: Guardiã do Vazio',              mult: 1.3 },
+  { floor: 25, name: 'BOSS RUSH: Euler, Arquiteto da Identidade',mult: 1.4 },
+  { floor: 30, name: 'BOSS RUSH: Lovelace, Tecelã da Lógica',   mult: 1.5 },
+  { floor: 50, name: 'BOSS RUSH: SENHOR DA ASCENSÃO — Forma Pura', mult: 2.0 }
+];
 
 // --- SISTEMA DE SAVE ---
 function saveGame() { if (player && SaveSystem.save(player.serialize())) log(chalk.green('💾 Alma vinculada (Salvo).')); }
@@ -232,14 +243,34 @@ function showAda() { gameState = 'ADA'; actionMenu.setLabel(' [ ADA: ALGORITMOS 
 function handleAda(c) { if (c.includes('Compilar')) { if (player.compileSkill(50)) { log(chalk.cyan('Skill Points +1.')); showNexus(); } else log(chalk.red('Sem orbes.')); } }
 
 function showMarie() {
-  gameState = 'MARIE'; actionMenu.setLabel(` [ MARIE: ALQUIMIA (50 Orbes) ] `);
-  actionMenu.setItems([' [ESC] Voltar']);
+  gameState = 'MARIE';
+  const config = currentAltar.getMasteryConfig(player.craftingMastery);
+  actionMenu.setLabel(currentAltar.getMenuLabel(player));
+  const menuItems = [' [ESC] Voltar'];
+  if (config.upgradeLabel) menuItems.unshift(` [U] ${config.upgradeLabel}`);
+  actionMenu.setItems(menuItems);
+  itemDetailBox.setContent(
+    chalk.bold.magenta(`\n  Maestria: ${config.label} (Nível ${player.craftingMastery || 0})\n`) +
+    chalk.white(`  Efeito: ${config.effectDesc}\n`) +
+    chalk.yellow(`  Custo de Transmutação: ${config.cost} Orbes\n`) +
+    chalk.gray(`  Elegíveis: ${config.rarityReq.join(', ')}\n\n`) +
+    chalk.gray('  Selecione um item do inventário para transmutar.')
+  );
   const items = player.inventory.map(it => `${it.getColorizedName()}`);
   inventoryBox.setItems(items); inventoryBox.show(); inventoryBox.focus(); mapBox.hide(); itemDetailBox.show();
   updateDetailSection(inventoryBox);
 }
 
-function handleMarieAction(index) { if (currentAltar.reRollItem(player, index)) { log(chalk.green('Realinhado!')); showMarie(); updateStatus(); } else log(chalk.red('Falha.')); }
+function handleMarieAction(index) {
+  const result = currentAltar.reRollItem(player, index);
+  if (result && result.success) {
+    if (result.promoted) log(chalk.bold.yellow('PROMOÇÃO! Item elevado para RARO!'));
+    else log(chalk.green('Transmutação concluída!'));
+    showMarie(); updateStatus();
+  } else {
+    log(chalk.red('Falha: Orbes insuficientes ou item inelegível.'));
+  }
+}
 
 function showDarwin() { gameState = 'DARWIN'; actionMenu.setLabel(' [ DARWIN: EVOLUCAO ] '); actionMenu.setItems([' [1] + FORÇA (30 Orbes)', ' [2] + DESTREZA (30 Orbes)', ' [3] + INTELIGÊNCIA (30 Orbes)', ' [ESC] Voltar']); actionMenu.focus(); }
 function handleDarwin(c) {
@@ -352,6 +383,7 @@ function handleMove(dx, dy) {
       else if (interaction.name === 'Darwin') showDarwin();
       else if (interaction.name === 'Halthor') showBlacksmith();
       else if (interaction.name === 'Fenda') startDungeon();
+      else if (interaction.name === 'Arena') showBossRush();
     }
     screen.render();
   }
@@ -385,7 +417,7 @@ function handleTileInteraction(t) {
 function startCombat(e) { gameState = 'COMBAT'; currentCombat = new Combat(player, e); mapBox.hide(); combatVisualBox.show(); renderCombat(); actionMenu.setItems([' [1] ATACAR', ' [2] SKILLS', ' [3] RECUPERAR', ' [4] POSTURA', ' [ESC] Fugir']); actionMenu.focus(); }
 function handleCombatAction(c) {
   if (currentCombat.isOver) return; if (c.includes('ATACAR')) currentCombat.playerAction('ATTACK');
-  else if (c.includes('SKILLS')) { const l = player.getLearnedSkills(); if (l.length === 0) log(chalk.red('Sem skills!')); else { gameState = 'COMBAT_SKILLS'; actionMenu.setItems([...l, ' [ESC] Voltar']); actionMenu.focus(); return; } }
+  else if (c.includes('SKILLS')) { const l = player.getLearnedSkills(); if (l.length === 0) log(chalk.red('Sem skills!')); else { gameState = gameState === 'BOSS_RUSH' ? 'BOSS_RUSH_SKILLS' : 'COMBAT_SKILLS'; actionMenu.setItems([...l, ' [ESC] Voltar']); actionMenu.focus(); return; } }
   else if (c.includes('RECUPERAR')) currentCombat.playerAction('RECOVER');
   else if (c.includes('POSTURA')) { const m = ['NEUTRO', 'DEFESA', 'ATAQUE']; player.setPostureMode(m[(m.indexOf(player.postureMode)+1)%3]); log(chalk.cyan(`Postura: ${player.postureMode}`)); }
   processCombatTurn();
@@ -407,6 +439,25 @@ function processCombatTurn(s = null) {
     }
   }
   if (currentCombat.isOver) {
+    // Boss Rush: tratar separadamente sem afetar o save nem a dungeon normal
+    if (gameState === 'BOSS_RUSH') {
+      if (currentCombat.result === 'WIN') {
+        bossRushScore += BOSS_RUSH_SEQUENCE[bossRushWave].floor * 100;
+        bossRushWave++;
+        player.recover(0.3, 0.3, 0.3);
+        updateStatus();
+        log(chalk.green(`Guardião derrotado! Recuperação concedida. Score: ${bossRushScore}`));
+        if (bossRushWave >= BOSS_RUSH_SEQUENCE.length) { showBossRushVictory(); return; }
+        startBossRushWave();
+      } else {
+        log(chalk.red(`Boss Rush encerrado na Onda ${bossRushWave + 1}.`));
+        bossRushWave = 0; bossRushScore = 0;
+        combatVisualBox.hide(); logBox.show();
+        showNexus();
+      }
+      return;
+    }
+
     if (currentCombat.result === 'WIN') {
       // Auto-progresso de missão KILL
       if (player.activeQuest && player.activeQuest.type === 'KILL' && !player.activeQuest.completed) {
@@ -435,11 +486,100 @@ function processCombatTurn(s = null) {
         renderMap();
       }
     } else {
-      log(chalk.red('MORTE. O Exílio reclama sua alma.'));
+      const entry = {
+        name: player.name, race: player.race, background: player.background,
+        level: player.level, prestige: player.calculatePrestige(),
+        floor: currentDungeon ? currentDungeon.floor : 1,
+        date: new Date().toLocaleDateString('pt-BR')
+      };
+      const hall = SaveSystem.saveHallOfFame(entry);
       SaveSystem.deleteSave();
-      setTimeout(() => process.exit(0), 3000);
+      showGameOver(entry, hall);
     }
   }
+}
+
+function showGameOver(entry, hall) {
+  gameState = 'GAME_OVER';
+  combatVisualBox.hide(); mapBox.hide(); inventoryBox.hide(); logBox.show(); itemDetailBox.show();
+  itemDetailBox.setLabel(' [ O EXÍLIO RECLAMA SUA ALMA ] ');
+  const top5 = hall.slice(0, 5);
+  const medals = ['◈', '✦', '★', '•', '·'];
+  let content = chalk.bold.red('\n  ✦ GAME OVER ✦\n\n');
+  content += chalk.white(`  ${entry.name} (${entry.race} ${entry.background}) sucumbiu no Andar ${entry.floor}.\n`);
+  content += chalk.cyan(`  Renome Final: ${chalk.bold(entry.prestige)}\n\n`);
+  content += chalk.bold.yellow('  ══ HALL OF FAME ══\n');
+  top5.forEach((e, i) => {
+    content += `  ${medals[i]} ${chalk.white(e.name)} ${chalk.gray(`(${e.race} ${e.background})`)} `;
+    content += chalk.yellow(`Renome: ${e.prestige} `) + chalk.gray(`[Lv${e.level} — ${e.date}]\n`);
+  });
+  content += chalk.bold.red('\n  [ESC] Retornar ao Menu');
+  itemDetailBox.setContent(content);
+  actionMenu.setLabel(' [ GAME OVER ] ');
+  actionMenu.setItems([' [ESC] Menu Principal']);
+  actionMenu.focus(); screen.render();
+}
+
+function showBossRush() {
+  gameState = 'BOSS_RUSH_MENU';
+  mapBox.show(); combatVisualBox.hide(); inventoryBox.hide(); itemDetailBox.show(); logBox.show();
+  itemDetailBox.setLabel(' [ ARENA DOS ARQUITETOS ] ');
+  itemDetailBox.setContent(
+    chalk.bold.red('\n  ══ BOSS RUSH ══\n\n') +
+    chalk.white('  Enfrente todos os Guardiões em sequência.\n') +
+    chalk.yellow(`  ${BOSS_RUSH_SEQUENCE.length} ondas crescentes de dificuldade.\n`) +
+    chalk.green('  Cada vitória restaura 30% HP/SP/MP.\n') +
+    chalk.red('  Derrota encerra o desafio (save preservado).\n')
+  );
+  actionMenu.setLabel(' [ ARENA ] ');
+  actionMenu.setItems([' [1] Iniciar Boss Rush', ' [ESC] Voltar']);
+  actionMenu.focus(); screen.render();
+}
+
+function startBossRushWave() {
+  const wave = BOSS_RUSH_SEQUENCE[bossRushWave];
+  const bossHp = Math.floor((80 + wave.floor * 35 + wave.floor * wave.floor * 0.5) * wave.mult);
+  const boss = new Entity(wave.name, {
+    hp: bossHp, maxHp: bossHp,
+    sp: Math.floor((80 + wave.floor * 8) * wave.mult),
+    mp: Math.floor((80 + wave.floor * 8) * wave.mult),
+    level: wave.floor + 1,
+    strength:     8 + Math.floor(wave.floor * 1.0),
+    dexterity:    6 + Math.floor(wave.floor * 0.6),
+    intelligence: 6 + Math.floor(wave.floor * 0.6)
+  });
+  gameState = 'BOSS_RUSH';
+  currentCombat = new Combat(player, [boss]);
+  mapBox.hide(); combatVisualBox.show(); itemDetailBox.hide();
+  log(chalk.bold.red(`=== ONDA ${bossRushWave + 1}/${BOSS_RUSH_SEQUENCE.length}: ${wave.name} ===`));
+  renderCombat();
+  actionMenu.setLabel(` [ BOSS RUSH — Onda ${bossRushWave + 1}/${BOSS_RUSH_SEQUENCE.length} ] `);
+  actionMenu.setItems([' [1] ATACAR', ' [2] SKILLS', ' [3] RECUPERAR', ' [4] POSTURA']);
+  actionMenu.focus();
+}
+
+function showBossRushVictory() {
+  const bonus = Math.floor(bossRushScore * 0.1);
+  player.orbs += bonus;
+  SaveSystem.saveHallOfFame({
+    name: player.name + ' [BOSS RUSH]', race: player.race, background: player.background,
+    level: player.level, prestige: bossRushScore, floor: 0,
+    date: new Date().toLocaleDateString('pt-BR')
+  });
+  saveGame();
+  gameState = 'NEXUS';
+  combatVisualBox.hide(); mapBox.show(); logBox.show(); itemDetailBox.show();
+  itemDetailBox.setLabel(' [ ARENA: VITÓRIA TOTAL ] ');
+  itemDetailBox.setContent(
+    chalk.bold.yellow('\n  ✦ BOSS RUSH COMPLETO! ✦\n\n') +
+    chalk.white(`  Todos os ${BOSS_RUSH_SEQUENCE.length} Guardiões foram derrotados.\n\n`) +
+    chalk.cyan(`  Score: ${chalk.bold(bossRushScore)}\n`) +
+    chalk.green(`  Bônus: +${bonus} Orbes\n`)
+  );
+  bossRushWave = 0; bossRushScore = 0;
+  actionMenu.setLabel(' [ EXPLORAÇÃO ] ');
+  actionMenu.setItems([' [WASD] Mover', ' [7] Inventário', ' [8] Bestiário', ' [9] Skills', ' [ESC] Sair']);
+  updateStatus(); screen.render();
 }
 
 function showVictory() {
@@ -533,8 +673,17 @@ screen.key(['e'], () => { const l = inventoryBox.visible ? inventoryBox : action
 
 screen.key(['escape', 'v'], () => {
   if (gameState === 'MENU') process.exit(0);
+  if (gameState === 'GAME_OVER') {
+    player = null; currentDungeon = null; currentCombat = null; gameState = 'MENU';
+    mapBox.hide(); combatVisualBox.hide(); inventoryBox.hide(); itemDetailBox.hide(); logBox.show();
+    actionMenu.setLabel(' [ AÇÕES ] '); actionMenu.setItems(initialMenu); actionMenu.focus();
+    screen.render(); return;
+  }
   inventoryBox.hide(); itemDetailBox.hide(); mapBox.show(); logBox.show();
   if (gameState === 'EXPLORING' || gameState === 'COMBAT') { saveGame(); currentDungeon = null; showNexus(); }
+  else if (gameState === 'BOSS_RUSH' || gameState === 'BOSS_RUSH_SKILLS') {
+    bossRushWave = 0; bossRushScore = 0; combatVisualBox.hide(); showNexus();
+  }
   else if (gameState === 'CREATION_NAME') process.exit(0);
   else showNexus();
 });
@@ -549,6 +698,21 @@ actionMenu.on('select', (item, index) => {
   else if (gameState === 'DARWIN') handleDarwin(c);
   else if (gameState === 'COMBAT') handleCombatAction(c);
   else if (gameState === 'COMBAT_SKILLS') processCombatTurn(c);
+  else if (gameState === 'BOSS_RUSH') handleCombatAction(c);
+  else if (gameState === 'BOSS_RUSH_SKILLS') processCombatTurn(c);
+  else if (gameState === 'BOSS_RUSH_MENU') {
+    if (c.includes('Iniciar')) { bossRushWave = 0; bossRushScore = 0; startBossRushWave(); }
+    else showNexus();
+  }
+  else if (gameState === 'MARIE') {
+    if (c.includes('[U]')) {
+      if (currentAltar.upgradeMastery(player)) {
+        const cfg = currentAltar.getMasteryConfig(player.craftingMastery);
+        log(chalk.bold.magenta(`Maestria evoluída: ${cfg.label}!`));
+        showMarie(); updateStatus();
+      } else log(chalk.red('Orbes insuficientes para evoluir Maestria.'));
+    }
+  }
   else if (gameState === 'ATTRIBUTES') { if (c.includes('FORÇA')) player.upgradeAttribute('STR'); if (c.includes('DESTREZA')) player.upgradeAttribute('DEX'); if (c.includes('INTELIGÊNCIA')) player.upgradeAttribute('INT'); updateStatus(); }
   else if (gameState === 'TRADE_BUY' || gameState === 'TRADE_SELL') handleTrade(c, index);
   else if (gameState === 'QUESTS') handleQuests(c, index);

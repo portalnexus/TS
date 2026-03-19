@@ -21,10 +21,12 @@ class Dungeon {
     this.bossDefeated = false;
 
     const biomes = [
-      { name: 'O Prisma de Newton', color: 'gray', key: 'newton' },
-      { name: 'A Singularidade de Hawking', color: 'cyan', key: 'hawking' },
-      { name: 'O Motor de Turing', color: 'red', key: 'turing' },
-      { name: 'O Vazio de Noether', color: 'magenta', key: 'noether' }
+      { name: 'O Prisma de Newton',         color: 'gray',    key: 'newton'   },
+      { name: 'A Singularidade de Hawking', color: 'cyan',    key: 'hawking'  },
+      { name: 'O Motor de Turing',          color: 'red',     key: 'turing'   },
+      { name: 'O Vazio de Noether',         color: 'magenta', key: 'noether'  },
+      { name: 'A Espiral de Euler',         color: 'yellow',  key: 'euler'    },
+      { name: 'O Labirinto de Lovelace',    color: 'green',   key: 'lovelace' }
     ];
     this.biome = biomes[Math.floor(Math.random() * biomes.length)];
 
@@ -113,6 +115,18 @@ class Dungeon {
         { name: 'Vazio Simétrico', hp: 25, sp: 15, mp: 35 },
         { name: 'Sombra da Simetria', hp: 20, sp: 20, mp: 30 },
         { name: 'Tensor de Tensão', hp: 35, sp: 10, mp: 20 }
+      ],
+      euler: [
+        { name: 'Espiral de Fibonacci', hp: 22, sp: 20, mp: 15 },
+        { name: 'Constante de Euler',   hp: 30, sp: 10, mp: 30 },
+        { name: 'Polígono de Gauss',    hp: 35, sp: 25, mp: 5  },
+        { name: 'Somatório Infinito',   hp: 18, sp: 5,  mp: 50 }
+      ],
+      lovelace: [
+        { name: 'Loop Infinito',    hp: 25, sp: 40, mp: 10 },
+        { name: 'Exceção de Pilha', hp: 40, sp: 10, mp: 20 },
+        { name: 'Ponteiro Nulo',    hp: 15, sp: 20, mp: 45 },
+        { name: 'Daemon de Lovelace', hp: 18, sp: 15, mp: 40 }
       ]
     };
 
@@ -129,38 +143,40 @@ class Dungeon {
     if (isBoss) {
       // Bosses temáticos por bioma
       const bossNames = {
-        newton: `CHEFE: Isaac Newton Corrompido`,
-        hawking: `CHEFE: Sombra de Hawking`,
-        turing: `CHEFE: A Máquina Implacável`,
-        noether: `CHEFE: Guardiã do Vazio`
+        newton:   `CHEFE: Isaac Newton Corrompido`,
+        hawking:  `CHEFE: Sombra de Hawking`,
+        turing:   `CHEFE: A Máquina Implacável`,
+        noether:  `CHEFE: Guardiã do Vazio`,
+        euler:    `CHEFE: Euler, Arquiteto da Identidade`,
+        lovelace: `CHEFE: Lovelace, Tecelã da Lógica`
       };
       const bossName = this.floor >= 10
         ? `SENHOR DA ASCENSÃO — Andar ${this.floor}`
         : (bossNames[this.biome.key] || `CHEFE: O Arquiteto do Andar ${this.floor}`);
-      // HP do boss: curva suave — mais acessível nos andares iniciais
-      const bossHp = Math.floor(60 + (this.floor * 20) + (this.floor * this.floor * 1.5));
+      // HP do boss: curva quadrática amortecida (andar 10=480, 50=3080, 100=8580)
+      const bossHp = Math.floor(80 + (this.floor * 35) + (this.floor * this.floor * 0.5));
       return [new Entity(bossName, {
         hp: bossHp,
-        sp: 60 + (this.floor * 10),
-        mp: 60 + (this.floor * 10),
+        sp: 80 + (this.floor * 8),
+        mp: 80 + (this.floor * 8),
         level: this.floor + 1,
-        strength: 8 + Math.floor(this.floor * 1.2),
-        dexterity: 6 + Math.floor(this.floor * 0.8),
-        intelligence: 6 + Math.floor(this.floor * 0.8)
+        strength:    8 + Math.floor(this.floor * 1.0),
+        dexterity:   6 + Math.floor(this.floor * 0.6),
+        intelligence:6 + Math.floor(this.floor * 0.6)
       })];
     }
 
     const t = pool[Math.floor(Math.random() * pool.length)];
-    // Curva suave: escala menor nos andares iniciais, mais agressiva nos tardios
-    const difficultyMult = 1 + (this.floor * 0.08);
-    const hpScale = Math.floor(this.floor * 5); // antes era *8 — menos HP inicial
+    // Curva logarítmica: andar 10=~97HP, 25=~225HP, 50=~457HP, 100=~957HP
+    const difficultyMult = 1 + Math.log(1 + Math.max(1, this.floor)) * 0.35;
+    const hpScale = Math.floor(this.floor * 3.5);
     return [new Entity(t.name, {
       hp: Math.floor((t.hp + hpScale) * difficultyMult),
-      sp: Math.floor((t.sp + hpScale) * difficultyMult),
-      mp: Math.floor((t.mp + hpScale) * difficultyMult),
+      sp: Math.floor((t.sp + hpScale * 0.5) * difficultyMult),
+      mp: Math.floor((t.mp + hpScale * 0.5) * difficultyMult),
       level: this.floor,
-      strength: 4 + Math.floor(this.floor * 0.4),
-      dexterity: 4 + Math.floor(this.floor * 0.3)
+      strength:  4 + Math.floor(this.floor * 0.35),
+      dexterity: 4 + Math.floor(this.floor * 0.25)
     })];
   }
 

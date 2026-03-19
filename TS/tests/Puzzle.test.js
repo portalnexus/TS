@@ -77,7 +77,7 @@ describe('Puzzle — geração aleatória', () => {
   test('tipo aleatório produz puzzle funcional', () => {
     for (let i = 0; i < 10; i++) {
       const p = new Puzzle(null, Math.floor(Math.random() * 5) + 1);
-      expect(['MATH', 'EQUATION', 'RIDDLE', 'SEQUENCE']).toContain(p.type);
+      expect(['MATH', 'EQUATION', 'RIDDLE', 'SEQUENCE', 'BINARY', 'LOGIC_TABLE', 'FORMULA', 'PRIME_CHECK', 'MODULO']).toContain(p.type);
       expect(p.answer).not.toBeNull();
     }
   });

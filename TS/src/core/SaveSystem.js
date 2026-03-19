@@ -5,6 +5,7 @@ class SaveSystem {
   constructor() {
     this.saveDir = path.join(process.cwd(), 'saves');
     this.saveFile = path.join(this.saveDir, 'save_01.json');
+    this.hallFile = path.join(this.saveDir, 'hall_of_fame.json');
     this.ensureSaveDir();
   }
 
@@ -38,6 +39,21 @@ class SaveSystem {
 
   hasSave() {
     return fs.existsSync(this.saveFile);
+  }
+
+  saveHallOfFame(entry) {
+    const hall = this.loadHallOfFame();
+    hall.push(entry);
+    hall.sort((a, b) => b.prestige - a.prestige);
+    try { fs.writeFileSync(this.hallFile, JSON.stringify(hall, null, 2), 'utf8'); } catch (e) {}
+    return hall;
+  }
+
+  loadHallOfFame() {
+    try {
+      if (!fs.existsSync(this.hallFile)) return [];
+      return JSON.parse(fs.readFileSync(this.hallFile, 'utf8'));
+    } catch (e) { return []; }
   }
 
   deleteSave() {

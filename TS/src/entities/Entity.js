@@ -45,6 +45,8 @@ class Entity {
     this.maxPosture = stats.maxPosture || (100 + (this.dexterity * 5));
     this.postureMode = stats.postureMode || 'NEUTRO'; // DEFESA, ATAQUE, NEUTRO
 
+    this.craftingMastery = stats.craftingMastery || 0;
+
     this.activeStatuses = [];
     this.isDead = false;
     this.isStaggered = false;
@@ -170,7 +172,8 @@ class Entity {
       attributePoints: this.attributePoints, proficiencyPoints: this.proficiencyPoints, skillPoints: this.skillPoints,
       proficiencies: this.proficiencies, skillTree: this.skillTree, bestiary: this.bestiary,
       activeQuest: this.activeQuest, posture: this.posture, maxPosture: this.maxPosture,
-      postureMode: this.postureMode, equipment: this.equipment, inventory: this.inventory
+      postureMode: this.postureMode, craftingMastery: this.craftingMastery,
+      equipment: this.equipment, inventory: this.inventory
     };
   }
 

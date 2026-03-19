@@ -1,7 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
     console.log('%c TERMINAL SOULS: THE ECHOES OF REASON ', 'background: #ff5555; color: #000; font-weight: bold; font-size: 20px;');
     console.log('%c [SISTEMA] Inicializando interface de documentação científica... ', 'color: #55ffff;');
-    console.log('%c [NÚCLEO] Versão 1.0.1 — Polimento do Exilado. ', 'color: #55ff55;');
+    console.log('%c [NÚCLEO] Versão 1.1.0 — Conteúdo Expandido. ', 'color: #55ff55;');
 
     // Typing effect for the vision text
     const visionText = document.querySelector('.vision-box p');
@@ -141,6 +141,24 @@ document.addEventListener('DOMContentLoaded', () => {
                 '<span class="magenta" style="font-weight:bold">  ▓▓╚══╦═╦═╦══╝▓▓ </span>',
                 '<span class="magenta" style="font-weight:bold">    ▓▓▓╪═╪═╪▓▓▓   </span>',
                 '<span class="magenta" style="font-weight:bold">     ▓▓/   \\▓▓    </span>'
+            ],
+            'Euler (Arquiteto da Identidade)': [
+                '<span class="yellow" style="font-weight:bold">   ╔═[e^iπ+1=0]═╗  </span>',
+                '<span class="yellow" style="font-weight:bold">   ║  (◉)   (◉) ║  </span>',
+                '<span class="yellow" style="font-weight:bold">   ║   ╔═════╗  ║  </span>',
+                '<span class="yellow" style="font-weight:bold">   ║   ║ ∑ Σ║  ║  </span>',
+                '<span class="yellow" style="font-weight:bold">   ╚═══╝   ╚═══╝  </span>',
+                '<span class="yellow" style="font-weight:bold">      ╔═╪═╪═╗     </span>',
+                '<span class="yellow" style="font-weight:bold">      ╝ / \\ ╚     </span>'
+            ],
+            'Lovelace (Tecelã da Lógica)': [
+                '<span class="green" style="font-weight:bold">   ╔═[10101010]═╗  </span>',
+                '<span class="green" style="font-weight:bold">   ║  (◈)   (◈) ║  </span>',
+                '<span class="green" style="font-weight:bold">   ║  {LOOP:∞}  ║  </span>',
+                '<span class="green" style="font-weight:bold">   ║  [ < ALG > ]║  </span>',
+                '<span class="green" style="font-weight:bold">   ╚═══╝   ╚═══╝  </span>',
+                '<span class="green" style="font-weight:bold">      ╔═╪═╪═╗     </span>',
+                '<span class="green" style="font-weight:bold">      ╝ / \\ ╚     </span>'
             ]
         },
         enemies: {
@@ -334,6 +352,35 @@ document.addEventListener('DOMContentLoaded', () => {
         try {
             const markdown = `
 # 📜 PATCH NOTES - TERMINAL SOULS
+
+---
+
+## [v1.1.0] - Conteúdo Expandido
+*Novos biomas, Boss Rush e Maestria de Crafting.*
+
+### 🗺️ Biomas Euler e Lovelace
+- **A Espiral de Euler:** Fibonacci, Constante, Polígono de Gauss, BOSS: Arquiteto da Identidade.
+- **O Labirinto de Lovelace:** Loop Infinito, Exceção de Pilha, Ponteiro Nulo, BOSS: Tecelã da Lógica.
+
+### ⚔️ Boss Rush
+- **Arena dos Arquitetos:** 7 ondas consecutivas de Guardiões com dificuldade crescente.
+- Cada vitória restaura 30% HP/SP/MP. Save preservado em derrota.
+- Score registrado no Hall of Fame.
+
+### 🏆 Hall of Fame
+- Tela de Game Over exibe Renome Final + top 5 do Hall of Fame local.
+- Registros persistentes em saves/hall_of_fame.json.
+
+### 🔮 Maestria de Crafting
+- 4 níveis no Altar de Marie Curie: Aprendiz → Iniciado → Alquimista → Radiante.
+- Efeitos crescentes: reroll básico, +10% stat, promoção de raridade, +20% todos stats.
+
+### 🧩 9 Tipos de Puzzle
+- **Novos:** BINARY (binário↔decimal), LOGIC_TABLE (AND/OR/XOR), FORMULA (F=ma, E=mc²), PRIME_CHECK (Eratóstenes), MODULO (aritmética de Gauss).
+
+### ⚖️ Balanceamento
+- Curva logarítmica para inimigos nos andares 10–100.
+- Boss: coeficiente quadrático reduzido para progressão sustentável.
 
 ---
 

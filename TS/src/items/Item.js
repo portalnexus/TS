@@ -1,5 +1,6 @@
 const { v4: uuidv4 } = require('uuid');
 const chalk = require('chalk');
+const { T } = require('../ui/Theme');
 
 class Item {
   constructor(floor = 1, forceRarity = null, data = null) {
@@ -209,8 +210,8 @@ class Item {
   }
 
   getColorizedName() {
-    const colors = { COMUM: chalk.white, MÁGICO: chalk.cyan, RARO: chalk.yellow, LENDÁRIO: chalk.magenta.bold };
-    return (colors[this.rarity] || chalk.white)(this.name);
+    const colors = { COMUM: T.rarityComum, MÁGICO: T.rarityMagico, RARO: T.rarityRaro, LENDÁRIO: T.rarityLendario };
+    return (colors[this.rarity] || T.bright)(this.name);
   }
 
   getPrice() {
@@ -231,17 +232,17 @@ class Item {
   }
 
   getDetails() {
-    const typeLabel = this.type === 'TOMO' ? chalk.blue(this.type) : chalk.gray(this.type);
+    const typeLabel = this.type === 'TOMO' ? T.info(this.type) : T.neutral(this.type);
     let details = `${this.getColorizedName()}\n`;
     details += `${typeLabel}`;
-    if (this.consumableType && this.type !== 'TOMO') details += chalk.gray(` [${this.consumableType}]`);
-    details += chalk.gray(` | Andar ${this.floor}\n`);
+    if (this.consumableType && this.type !== 'TOMO') details += T.neutral(` [${this.consumableType}]`);
+    details += T.neutral(` | Andar ${this.floor}\n`);
     for (const [stat, value] of Object.entries(this.stats)) {
-      if (typeof value === 'number') details += ` ${chalk.green('+'+value)} ${stat.toUpperCase()}\n`;
+      if (typeof value === 'number') details += ` ${T.success('+'+value)} ${stat.toUpperCase()}\n`;
     }
     if (this.tags.length > 0) details += ` Tags: <${this.tags.join('> <')}>\n`;
-    if (this.uniques.length > 0) details += chalk.magenta(` Único: "${this.uniques[0]}"\n`);
-    if (this.flavorText) details += chalk.gray.italic(`\n "${this.flavorText}"`);
+    if (this.uniques.length > 0) details += T.magic(` Único: "${this.uniques[0]}"\n`);
+    if (this.flavorText) details += T.neutral.italic(`\n "${this.flavorText}"`);
     return details;
   }
 }

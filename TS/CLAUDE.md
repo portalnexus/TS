@@ -1,7 +1,7 @@
 # Terminal Souls — CLAUDE.md
 
 > TUI-ARPG (Text User Interface Action RPG) / Souls-like + Path of Exile + História da Ciência
-> **Versão atual:** v1.0.0 — "A Ascensão do Exilado" *(lançado)*
+> **Versão atual:** v1.1.0 — "Conteúdo Expandido" *(lançado)*
 > **Autor:** João Pedro Melloni Tardif Germano
 
 ---
@@ -154,6 +154,8 @@ Renome = (Nível × 100) + (TotalAtributos × 10) + BonusSkills + DescobertasBes
 | Singularidade de Hawking | Hawking | Buraco negro |
 | Máquina de Turing | Turing | Código binário |
 | Vazio de Noether | Noether | Simetria/vácuo |
+| Espiral de Euler | Euler | Identidade matemática, espirais |
+| Labirinto de Lovelace | Lovelace | Algoritmos, loops, exceções |
 
 ### Classes e Skills
 - **Guerreiro** (Newton/Galileu/Entropia): tanque físico, skills de impacto e inércia
@@ -176,7 +178,7 @@ Renome = (Nível × 100) + (TotalAtributos × 10) + BonusSkills + DescobertasBes
 
 ---
 
-## 8. Estado Atual (v1.0.0) — O que está FEITO
+## 8. Estado Atual (v1.1.0) — O que está FEITO
 
 - [x] Combate turn-based com efeitos de status elemental (CHOQUE, CONGELAMENTO, EVASÃO, IMUNIDADE)
 - [x] Sinergias de status: CAUTERIZAÇÃO, FRAGMENTAÇÃO, DESCARGA
@@ -200,24 +202,36 @@ Renome = (Nível × 100) + (TotalAtributos × 10) + BonusSkills + DescobertasBes
 - [x] Website: tutorial Linux/Windows com abas, seções de sistemas core e biomas
 - [x] Website: sprites ASCII completos — 4 combos classe+raça, 5 bosses, 14 inimigos
 - [x] 64 testes automatizados (6 suítes: Entity, Combat, Systems, Skills, Quests, Puzzle)
+- [x] Boss Rush mode (7 ondas, NPC Arena no Nexus, Hall of Fame)
+- [x] 2 novos biomas: A Espiral de Euler e O Labirinto de Lovelace (6 biomas total)
+- [x] Tela de Game Over com Hall of Fame persistente (hall_of_fame.json)
+- [x] 5 novos tipos de Puzzle (BINARY, LOGIC_TABLE, FORMULA, PRIME_CHECK, MODULO)
+- [x] Maestria de Crafting: 4 níveis no Altar de Marie Curie (Aprendiz→Radiante)
+- [x] Balanceamento logarítmico para andares 10–100
+- [x] Sistema de 4 Temas de Cores (DARK/LIGHT/COLORBLIND/NO_RED) com persistência em settings.json
+- [x] Sprite do jogador revertido para `@` simples (melhor legibilidade no grid)
 
 ---
 
 ## 9. Roadmap — O que FALTA
 
-### v1.0.1 — Polimento Pós-Lançamento
-- [ ] Balanceamento fino da curva de dificuldade andares 10–100
-- [ ] Mais variação de puzzles (novos padrões de sequência)
-- [ ] Tela de Game Over com Renome registrado
+### v1.0.1 — Polimento Pós-Lançamento ✅
+- [x] Balanceamento fino da curva de dificuldade andares 10–100
+- [x] Mais variação de puzzles (novos padrões de sequência)
+- [x] Tela de Game Over com Renome registrado
 
-### v1.1.0+ — Pós-Lançamento (Multiplayer)
+### v1.1.0 — Conteúdo Expandido ✅
+- [x] Boss Rush mode ✅
+- [x] Maestria de Crafting ✅
+- [x] Biomas adicionais (Euler e Lovelace) ✅
+
+### v1.2.0+ — Pós-Lançamento (Multiplayer)
 - [ ] **Nexus Online**: Hub compartilhado via Socket.io
 - [ ] **Mercado Global**: Trade entre jogadores
 - [ ] **Espectros Assíncronos**: Ver mortes de outros jogadores no mapa
-- [ ] Biomas adicionais além dos 4 core
-- [ ] Boss Rush mode
+- [ ] Biomas 7-8 (além dos 6 core)
+- [ ] Boss Rush expandido (ondas extras, modificadores)
 - [ ] Itens de Lore & Crônicas (história do Exílio)
-- [ ] Maestria de Crafting (níveis para o Altar)
 
 ---
 

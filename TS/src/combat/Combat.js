@@ -1,4 +1,5 @@
 const chalk = require('chalk');
+const { T } = require('../ui/Theme');
 
 class Combat {
   constructor(player, enemies) {
@@ -35,12 +36,12 @@ class Combat {
     if (target.hasStatus && target.hasStatus('SANGRAMENTO') && attacker.equipment?.ARMA?.tags.includes('FOGO')) {
       baseDamage *= 2;
       target.removeStatus('SANGRAMENTO');
-      this.addLog(chalk.bold.red(' >>> CAUTERIZAÇÃO: Dano térmico massivo!'));
+      this.addLog(T.danger.bold(' >>> CAUTERIZAÇÃO: Dano térmico massivo!'));
     }
     if (target.hasStatus && target.hasStatus('CONGELAMENTO') && attacker.equipment?.ARMA?.tags.includes('ESMAGAMENTO')) {
       baseDamage = Math.floor(baseDamage * 1.5);
       target.removeStatus('CONGELAMENTO');
-      this.addLog(chalk.bold.cyan(' >>> FRAGMENTAÇÃO: Alvo despedaçado!'));
+      this.addLog(T.player.bold(' >>> FRAGMENTAÇÃO: Alvo despedaçado!'));
     }
     if (target.hasStatus && target.hasStatus('CHOQUE') && attacker.equipment?.ARMA?.tags.includes('CORTE')) {
       baseDamage = Math.floor(baseDamage * 1.3);
@@ -50,7 +51,7 @@ class Combat {
 
     if (target.isStaggered) {
       baseDamage *= 2;
-      this.addLog(chalk.bold.yellow(` ! COLAPSO: ${target.name} está vulnerável!`));
+      this.addLog(T.warning.bold(` ! COLAPSO: ${target.name} está vulnerável!`));
     }
 
     return {
@@ -66,19 +67,19 @@ class Combat {
     this.player.processStatuses(this.log);
     // IMUNIDADE: bloqueia dano de status no turno ativo
     if (this.player.hasStatus('IMUNIDADE')) {
-      this.addLog(chalk.bold.cyan(' > IMUNIDADE ativa: dano de status bloqueado.'));
+      this.addLog(T.player.bold(' > IMUNIDADE ativa: dano de status bloqueado.'));
     }
     if (this.player.isDead) { this.isOver = true; this.result = 'LOSS'; return; }
 
     // Penalidade de Estabilidade por Ação no modo ATAQUE
     if (this.player.postureMode === 'ATAQUE') {
       this.player.modifyStability(-10);
-      this.addLog(chalk.gray(' > Ataque reduz estabilidade (-10).'));
+      this.addLog(T.neutral(' > Ataque reduz estabilidade (-10).'));
     }
 
     switch (action) {
       case 'ATTACK':
-        if (this.player.sp < 10) { this.addLog(chalk.red(' > Sem stamina!')); return false; }
+        if (this.player.sp < 10) { this.addLog(T.danger(' > Sem stamina!')); return false; }
         const dmg = this.calculateDamage(this.player, target);
         target.takeDamage(dmg.hpDamage, 'physical');
         target.modifyStability(-dmg.stabilityDmg);
@@ -89,7 +90,7 @@ class Combat {
 
       case 'RECOVER':
         this.player.recover();
-        this.addLog(chalk.green(' > Meditação científica recuperou recursos e estabilidade.'));
+        this.addLog(T.success(' > Meditação científica recuperou recursos e estabilidade.'));
         break;
 
       case 'SKILL':
@@ -99,7 +100,7 @@ class Combat {
           this.player.consumeMp(skill.cost);
           this.executeSkill(skillName, target);
         } else {
-          this.addLog(chalk.red(' > Mana insuficiente!'));
+          this.addLog(T.danger(' > Mana insuficiente!'));
           return false;
         }
         break;
@@ -113,7 +114,7 @@ class Combat {
   executeSkill(name, target) {
     const skill = this.player.skillTree[name];
     const lvlBonus = 1 + (skill.lvl * 0.2);
-    this.addLog(chalk.bold.cyan(` > [${name}] NIVEL ${skill.lvl}!`));
+    this.addLog(T.player.bold(` > [${name}] NIVEL ${skill.lvl}!`));
 
     // --- GUERREIRO ---
     if (name === 'Impacto de Newton') {
@@ -126,7 +127,7 @@ class Combat {
       const stability = Math.floor(40 * lvlBonus);
       this.player.modifyStability(stability);
       this.player.recover(0.05, 0.3, 0.05);
-      this.addLog(chalk.cyan(` > Inércia restaurou +${stability} Estabilidade.`));
+      this.addLog(T.player(` > Inércia restaurou +${stability} Estabilidade.`));
 
     } else if (name === 'Entropia Cinética') {
       const strBonus = Math.floor(this.player.strength * 0.8 * lvlBonus);
@@ -166,11 +167,11 @@ class Combat {
     } else if (name === 'Zero Absoluto') {
       target.addStatus('CONGELAMENTO', Math.ceil(1 + skill.lvl * 0.5));
       target.modifyStability(-80 * lvlBonus);
-      this.addLog(chalk.bold.blue(` > Zero Absoluto: CONGELAMENTO + colapso de estabilidade!`));
+      this.addLog(T.info.bold(` > Zero Absoluto: CONGELAMENTO + colapso de estabilidade!`));
 
     } else if (name === 'Paradoxo de Schrödinger') {
       this.player.addStatus('EVASÃO', Math.ceil(1 + skill.lvl));
-      this.addLog(chalk.bold.magenta(` > Paradoxo: Próximos ${Math.ceil(1+skill.lvl)} ataques têm 60% de desvio.`));
+      this.addLog(T.magic.bold(` > Paradoxo: Próximos ${Math.ceil(1+skill.lvl)} ataques têm 60% de desvio.`));
 
     } else if (name === 'Singularidade de Hawking') {
       const dmg = Math.floor(target.hp * 0.3 * lvlBonus);
@@ -199,7 +200,7 @@ class Combat {
       const boost = Math.floor(20 * lvlBonus);
       this.player.modifyStability(boost);
       this.player.addStatus('EVASÃO', 2);
-      this.addLog(chalk.yellow(` > Relatividade: +${boost} Estabilidade + EVASÃO.`));
+      this.addLog(T.warning(` > Relatividade: +${boost} Estabilidade + EVASÃO.`));
 
     } else if (name === 'Óptica de Euclides') {
       const dmg = Math.floor((this.player.getAttackPower() * 2.5 * lvlBonus));
@@ -216,13 +217,13 @@ class Combat {
     } else if (name === 'Cura de Hipócrates') {
       const heal = Math.floor(this.player.maxHp * 0.25 * lvlBonus);
       this.player.hp = Math.min(this.player.maxHp, this.player.hp + heal);
-      this.addLog(chalk.green(` > Hipócrates restaurou ${heal} HP.`));
+      this.addLog(T.success(` > Hipócrates restaurou ${heal} HP.`));
 
     } else if (name === 'Sopro de Gaia') {
       const removed = this.player.activeStatuses.length;
       this.player.activeStatuses = [];
       this.player.modifyStability(Math.floor(20 * lvlBonus));
-      this.addLog(chalk.green(` > Sopro de Gaia removeu ${removed} debuff(s).`));
+      this.addLog(T.success(` > Sopro de Gaia removeu ${removed} debuff(s).`));
 
     } else if (name === 'Luz Primordial') {
       const dmg = this.calculateDamage(this.player, target, 'magical', 1.3 * lvlBonus);
@@ -234,14 +235,14 @@ class Combat {
     } else if (name === 'Teorema de Pitágoras') {
       const shield = Math.floor(this.player.maxPosture * 0.5 * lvlBonus);
       this.player.modifyStability(shield);
-      this.addLog(chalk.bold.white(` > Escudo triangular: +${shield} Estabilidade.`));
+      this.addLog(T.bright.bold(` > Escudo triangular: +${shield} Estabilidade.`));
 
     } else if (name === 'Proporção Áurea') {
       const avg = Math.floor((this.player.hp/this.player.maxHp + this.player.sp/this.player.maxSp + this.player.mp/this.player.maxMp) / 3 * 100);
       this.player.hp = Math.floor(this.player.maxHp * avg / 100);
       this.player.sp = Math.floor(this.player.maxSp * avg / 100);
       this.player.mp = Math.floor(this.player.maxMp * avg / 100);
-      this.addLog(chalk.bold.yellow(` > Proporção Áurea: HP/SP/MP harmonizados em ${avg}%.`));
+      this.addLog(T.warning.bold(` > Proporção Áurea: HP/SP/MP harmonizados em ${avg}%.`));
     }
   }
 
@@ -259,7 +260,7 @@ class Combat {
   playerEvades() {
     if (this.player.hasStatus('EVASÃO') && Math.random() < 0.6) {
       this.player.removeStatus('EVASÃO');
-      this.addLog(chalk.bold.yellow(' > DESVIO! O ataque foi evitado!'));
+      this.addLog(T.warning.bold(' > DESVIO! O ataque foi evitado!'));
       return true;
     }
     return false;
@@ -271,7 +272,7 @@ class Combat {
       enemy.processStatuses(this.log);
       if (enemy.isDead) return;
       if (enemy.isStaggered) {
-        this.addLog(chalk.gray(` > ${enemy.name} em Colapso (Turno Perdido).`));
+        this.addLog(T.neutral(` > ${enemy.name} em Colapso (Turno Perdido).`));
         enemy.modifyStability(40);
         return;
       }
@@ -284,31 +285,31 @@ class Combat {
 
         // Fase 3 (≤30% HP): ataque frenético duplo
         if (hpPercent <= 0.30 && this.turn % 2 === 0) {
-          this.addLog(chalk.bold.bgRed.white(` !! ${enemy.name}: COLAPSO DIMENSIONAL !!`));
+          this.addLog(T.criticalBg(` !! ${enemy.name}: COLAPSO DIMENSIONAL !!`));
           const dmg1 = this.calculateDamage(enemy, this.player);
           const dmg2 = this.calculateDamage(enemy, this.player);
           this.player.takeDamage(dmg1.hpDamage, 'physical');
           this.player.takeDamage(dmg2.hpDamage, 'physical');
           this.player.modifyStability(-(dmg1.stabilityDmg + dmg2.stabilityDmg));
-          this.addLog(chalk.red(` > DUPLO ATAQUE: ${dmg1.hpDamage} + ${dmg2.hpDamage} dano!`));
+          this.addLog(T.danger(` > DUPLO ATAQUE: ${dmg1.hpDamage} + ${dmg2.hpDamage} dano!`));
         // Fase 2 (≤60% HP): aplica status especial a cada 3 turnos
         } else if (hpPercent <= 0.60 && this.turn % 3 === 0) {
-          this.addLog(chalk.bold.magenta(` !! ${enemy.name}: CAMPO DE DISTORÇÃO !!`));
+          this.addLog(T.magic.bold(` !! ${enemy.name}: CAMPO DE DISTORÇÃO !!`));
           this.player.addStatus('CHOQUE', 2);
           this.player.addStatus('COMBUSTÃO', 2);
           const dmg = this.calculateDamage(enemy, this.player, 'magical', 1.3);
           this.player.takeDamage(dmg.hpDamage, 'magical');
-          this.addLog(chalk.magenta(` > Distorção: ${dmg.hpDamage} + CHOQUE + COMBUSTÃO aplicados!`));
+          this.addLog(T.magic(` > Distorção: ${dmg.hpDamage} + CHOQUE + COMBUSTÃO aplicados!`));
         // Fase 1: ataque com recuperação de estabilidade
         } else {
           if (this.turn % 4 === 0) {
             enemy.modifyStability(30);
-            this.addLog(chalk.gray(` > ${enemy.name} recuperou postura.`));
+            this.addLog(T.neutral(` > ${enemy.name} recuperou postura.`));
           }
           const dmg = this.calculateDamage(enemy, this.player, 'physical', 1.2);
           this.player.takeDamage(dmg.hpDamage, 'physical');
           this.player.modifyStability(-dmg.stabilityDmg);
-          this.addLog(chalk.red(` > ${enemy.name} atacou com força: ${dmg.hpDamage} dano.`));
+          this.addLog(T.danger(` > ${enemy.name} atacou com força: ${dmg.hpDamage} dano.`));
         }
       } else {
         // Inimigo comum
@@ -317,11 +318,11 @@ class Combat {
         // Efeito elemental do inimigo (30% chance para inimigos avançados)
         if (enemy.level >= 5 && Math.random() > 0.7) {
           this.player.addStatus('SANGRAMENTO', 2);
-          this.addLog(chalk.red(` > ${enemy.name} causou SANGRAMENTO!`));
+          this.addLog(T.danger(` > ${enemy.name} causou SANGRAMENTO!`));
         }
         this.player.takeDamage(dmg.hpDamage, 'physical');
         this.player.modifyStability(-dmg.stabilityDmg);
-        this.addLog(chalk.red(` > ${enemy.name} atacou: ${dmg.hpDamage} dano.`));
+        this.addLog(T.danger(` > ${enemy.name} atacou: ${dmg.hpDamage} dano.`));
       }
 
       if (this.player.isDead) { this.isOver = true; this.result = 'LOSS'; }
@@ -342,7 +343,7 @@ class Combat {
         return acc + (isBoss ? e.level * 15 : e.level * 3);
       }, 0);
       this.player.orbs += orbs;
-      this.addLog(chalk.bold.green(` >>> VITORIA CIENTIFICA! +${xp} XP  +${orbs} Orbes <<<`));
+      this.addLog(T.success.bold(` >>> VITORIA CIENTIFICA! +${xp} XP  +${orbs} Orbes <<<`));
     }
   }
 }

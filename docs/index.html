@@ -14,14 +14,14 @@
     <div class="container">
         <header class="header-box">
             <h1 class="glitch" data-text="TERMINAL SOULS">TERMINAL SOULS</h1>
-            <p class="subtitle">THE ECHOES OF REASON — v1.0.1 — Polimento do Exilado</p>
+            <p class="subtitle">THE ECHOES OF REASON — v1.1.0 — Conteúdo Expandido</p>
         </header>
 
         <main class="grid-layout">
             <section class="box status-box">
                 <h2>[ STATUS DO PROJETO ]</h2>
                 <div class="content">
-                    <p><span class="label">VERSÃO:</span> <span class="value cyan">1.0.1</span></p>
+                    <p><span class="label">VERSÃO:</span> <span class="value cyan">1.1.0</span></p>
                     <p><span class="label">NÚCLEO:</span> <span class="value red">Node.js / TUI</span></p>
                     <p><span class="label">ESTADO:</span> <span class="value green">Lançado ✓</span></p>
                     <p><span class="label">TESTES:</span> <span class="value yellow">64 passando</span></p>
@@ -74,6 +74,14 @@
                     <div class="system-card">
                         <h3 class="green">Sistema de Missões</h3>
                         <p>3 tipos com auto-progressão: <span class="red">KILL</span> (derrotar N inimigos), <span class="cyan">FLOOR</span> (alcançar andar N), <span class="yellow">ITEM</span> (coletar N drops).</p>
+                    </div>
+                    <div class="system-card">
+                        <h3 class="red">Boss Rush</h3>
+                        <p>Arena dos Arquitetos: 7 ondas consecutivas de Guardiões. Dificuldade crescente. Cada vitória restaura 30% recursos. Save preservado em derrota.</p>
+                    </div>
+                    <div class="system-card">
+                        <h3 class="magenta">Temas de Cores</h3>
+                        <p>4 temas selecionáveis em Nexus → Configurações: <span class="gray">DARK</span> (padrão), <span class="yellow">LIGHT</span> (cores vividas), <span class="cyan">COLORBLIND</span> (vermelho→laranja, verde→azul) e <span class="magenta">NO_RED</span> (perigo→magenta). Persistência em <code>saves/settings.json</code>.</p>
                     </div>
                 </div>
             </section>
@@ -191,6 +199,26 @@
                             <li><span class="red">BOSS: Guardiã do Vazio</span></li>
                         </ul>
                     </div>
+                    <div class="biome-card euler">
+                        <h3>A Espiral de Euler</h3>
+                        <p class="gray">Identidade matemática, espirais infinitas.</p>
+                        <ul>
+                            <li>Espiral de Fibonacci</li>
+                            <li>Constante de Euler</li>
+                            <li>Polígono de Gauss</li>
+                            <li><span class="red">BOSS: Euler, Arquiteto da Identidade</span></li>
+                        </ul>
+                    </div>
+                    <div class="biome-card lovelace">
+                        <h3>O Labirinto de Lovelace</h3>
+                        <p class="gray">Algoritmos, loops, exceções fatais.</p>
+                        <ul>
+                            <li>Loop Infinito</li>
+                            <li>Exceção de Pilha</li>
+                            <li>Ponteiro Nulo</li>
+                            <li><span class="red">BOSS: Lovelace, Tecelã da Lógica</span></li>
+                        </ul>
+                    </div>
                 </div>
             </section>
 
@@ -213,10 +241,13 @@
                 <div class="content">
                     <ul>
                         <li><code>blessed</code> & <code>chalk</code> para renderização TUI imersiva com 6 painéis simultâneos.</li>
-                        <li><code>mathjs</code> para geração dinâmica de puzzles (MATH, EQUATION, RIDDLE, SEQUENCE).</li>
+                        <li><code>mathjs</code> para geração dinâmica de 9 tipos de puzzles (MATH, EQUATION, RIDDLE, SEQUENCE, BINARY, LOGIC_TABLE, FORMULA, PRIME_CHECK, MODULO).</li>
                         <li>Navegação 100% via teclado (1-0, Q/E, WASD) — mouse intencionalmente desativado.</li>
                         <li>Sistema de Orbes e Economia: drops em combate, crafting (Altar de Transmutação), Darwin e Ada.</li>
                         <li>64 testes automatizados (Jest) cobrindo skills, sinergias, missões e puzzles.</li>
+                        <li>Hall of Fame persistente em <code>saves/hall_of_fame.json</code> — registra Renome Final de cada exilado.</li>
+                        <li>Boss Rush com 7 ondas consecutivas e Score registrado no Hall of Fame.</li>
+                        <li>Sistema de Temas de Cores (<code>src/ui/Theme.js</code>): 4 temas (DARK/LIGHT/COLORBLIND/NO_RED) via Proxy dinâmico — acessibilidade para daltonismo.</li>
                     </ul>
                 </div>
             </section>
@@ -328,7 +359,7 @@
             <p class="github-link">
                 <a href="https://portalnexus.github.io/TS/" target="_blank">[ ACESSAR_REPOSITÓRIO_GITHUB ]</a>
             </p>
-            <p class="copyright">© 2026 — O Exílio aguarda sua contribuição científica. v1.0.1</p>
+            <p class="copyright">© 2026 — O Exílio aguarda sua contribuição científica. v1.1.0</p>
         </footer>
     </div>
     <script src="script.js"></script>

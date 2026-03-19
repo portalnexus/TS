@@ -2,6 +2,48 @@
 
 ---
 
+## [v1.1.0] - Conteúdo Expandido
+*Novos biomas, Boss Rush, Maestria de Crafting, Sistema de Temas e ajustes visuais.*
+
+### 🗺️ 2 Novos Biomas
+- **A Espiral de Euler:** Fibonacci, Constante de Euler, Polígono de Gauss. BOSS: Euler, Arquiteto da Identidade.
+- **O Labirinto de Lovelace:** Loop Infinito, Exceção de Pilha, Ponteiro Nulo. BOSS: Lovelace, Tecelã da Lógica.
+- Total: **6 biomas** com inimigos e bosses únicos.
+
+### ⚔️ Boss Rush — Arena dos Arquitetos
+- 7 ondas consecutivas de Guardiões com dificuldade crescente (multiplicadores 1.0× → 2.0×).
+- Cada vitória restaura 30% HP/SP/MP. Save preservado em caso de derrota.
+- NPC **Arena** (β) no Nexus. Score registrado no **Hall of Fame**.
+
+### 🏆 Hall of Fame & Game Over
+- Tela de Game Over exibe Renome Final e top 5 do Hall of Fame local.
+- Registros persistentes em `saves/hall_of_fame.json`.
+
+### 🔮 Maestria de Crafting — Altar de Marie Curie
+- 4 níveis: **Aprendiz → Iniciado → Alquimista → Radiante**.
+- Efeitos crescentes: reroll básico, +10% stat, promoção de raridade, +20% todos stats.
+
+### 🧩 9 Tipos de Puzzle
+- **Novos:** BINARY (binário↔decimal), LOGIC_TABLE (AND/OR/XOR), FORMULA (F=ma, E=mc²), PRIME_CHECK (Eratóstenes), MODULO (aritmética de Gauss).
+
+### 🎨 Sistema de Temas de Cores
+- **4 temas** selecionáveis em Nexus → `[0] Configurações`:
+  - **DARK** — Escuridão do Exílio (padrão)
+  - **LIGHT** — Claridade da Razão (cores bright/vividas)
+  - **COLORBLIND** — Espectro Acessível (vermelho→laranja, verde→azul; deuteranopia/protanopia)
+  - **NO_RED** — O Exílio sem Sangue (nenhum vermelho; perigo→magenta)
+- Preferência salva em `saves/settings.json` e restaurada ao reabrir o jogo.
+- Afeta tiles do mapa, barras de recurso, bordas de painel, raridades de item, ícones de status e mensagens de combate.
+
+### 🖥️ Visual
+- **Sprite do jogador:** Revertido de bloco 2×2 para `@` simples (melhor legibilidade no grid).
+
+### ⚖️ Balanceamento
+- Curva logarítmica para inimigos nos andares 10–100.
+- Boss: coeficiente quadrático reduzido para progressão sustentável.
+
+---
+
 ## [v1.0.1] - Polimento do Exilado
 *Controles corrigidos, postura redesenhada, criação instrutiva.*
 

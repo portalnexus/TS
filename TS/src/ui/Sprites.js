@@ -1,4 +1,5 @@
 const chalk = require('chalk');
+const { T } = require('./Theme');
 
 const Sprites = {
   playerSprites: {
@@ -486,15 +487,17 @@ const Sprites = {
     ]
   },
 
-  objects: {
-    wall:     chalk.bgWhite('  '),
-    floor:    chalk.hex('#1a1a1a')('· '),
-    treasure: chalk.yellow.bold('¤ '),
-    enemy:    chalk.bold.red('!!'),
-    boss:     chalk.bold.magenta('$$'),
-    door:     chalk.bold.white('>>'),
-    puzzle:   chalk.bold.blue('??'),
-    rest:     chalk.bold.green('++')
+  get objects() {
+    return {
+      wall:     T.tileWall,
+      floor:    T.tileFloor,
+      treasure: T.tileTreasure,
+      enemy:    T.tileEnemy,
+      boss:     T.tileBoss,
+      door:     T.tileDoor,
+      puzzle:   T.tilePuzzle,
+      rest:     T.tileRest,
+    };
   },
 
   getEnemySprite(name) {

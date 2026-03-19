@@ -1,4 +1,5 @@
 const chalk = require('chalk');
+const { T } = require('../ui/Theme');
 
 class Nexus {
   constructor() {
@@ -60,16 +61,16 @@ class Nexus {
       for (let x = 0; x < this.width; x++) {
         const npc = this.npcs.find(n => n.x === x && n.y === y);
         if (x === this.playerPos.x && y === this.playerPos.y) {
-          map += chalk.bold.white('@ ');
+          map += T.tileNexusPlayer;
         } else if (npc) {
-          map += chalk.bold[npc.color](npc.char + ' ');
+          map += T.npcChalk(npc.color)(npc.char + ' ');
         } else {
           const char = this.layout[y][x];
           switch(char) {
             case '#': map += chalk.bgWhite('  '); break;
             case '~': map += chalk.bgBlue('  '); break;
-            case 'T': map += chalk.green('Y '); break;
-            case '.': map += chalk.gray('· '); break;
+            case 'T': map += T.success('Y '); break;
+            case '.': map += T.neutral('· '); break;
             default: map += char + ' ';
           }
         }

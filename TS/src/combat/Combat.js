@@ -332,7 +332,7 @@ class Combat {
   }
 
   checkVictory() {
-    this.enemies.forEach(e => { if (e.isDead && !e.recorded) { this.player.recordKill(e.name); e.recorded = true; } });
+    this.enemies.forEach(e => { if (e.isDead && !e.recorded) { this.player.recordKill(e.name, e.level); e.recorded = true; } });
     if (this.enemies.every(e => e.isDead)) {
       this.isOver = true; this.result = 'WIN';
       const xp = this.enemies.reduce((acc, e) => acc + (e.level * 25), 0);

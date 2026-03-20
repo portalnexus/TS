@@ -1,4 +1,6 @@
 const { v4: uuidv4 } = require('uuid');
+const { getEnemyData, isBoss } = require('../core/BestiaryData');
+
 class Entity {
   constructor(name, stats = {}) {
     this.id = stats.id || uuidv4();
@@ -34,7 +36,7 @@ class Entity {
     this.activeQuest = stats.activeQuest || null;
 
     this.skillTree = stats.skillTree || this.initializeSkillTree();
-    this.bestiary = stats.bestiary || {};
+    this.bestiary = this._migrateBestiary(stats.bestiary || {});
 
     this.proficiencies = stats.proficiencies || {
       'CORTE': 0, 'ESMAGAMENTO': 0, 'FOGO': 0, 'CHOQUE': 0, 'VAZIO': 0
@@ -140,7 +142,50 @@ class Entity {
     return false;
   }
 
-  recordKill(monsterName) { if (!this.bestiary[monsterName]) this.bestiary[monsterName] = 0; this.bestiary[monsterName]++; }
+  /**
+   * Migra o bestiário do formato antigo (número) para o novo (objeto com lore).
+   * @param {object} raw
+   * @returns {object}
+   */
+  _migrateBestiary(raw) {
+    const migrated = {};
+    for (const [name, val] of Object.entries(raw)) {
+      if (typeof val === 'number') {
+        const data = getEnemyData(name);
+        migrated[name] = {
+          kills: val,
+          description: data.description,
+          weaknesses: data.weaknesses,
+          drops: data.drops,
+          firstSeenFloor: 1,
+          raridade: data.raridade
+        };
+      } else {
+        migrated[name] = val;
+      }
+    }
+    return migrated;
+  }
+
+  /**
+   * Registra um abate no bestiário expandido.
+   * @param {string} monsterName
+   * @param {number} [floor=1] - Andar onde o abate ocorreu
+   */
+  recordKill(monsterName, floor = 1) {
+    if (!this.bestiary[monsterName]) {
+      const data = getEnemyData(monsterName);
+      this.bestiary[monsterName] = {
+        kills: 0,
+        description: data.description,
+        weaknesses: data.weaknesses,
+        drops: data.drops,
+        firstSeenFloor: floor,
+        raridade: data.raridade
+      };
+    }
+    this.bestiary[monsterName].kills++;
+  }
   getLearnedSkills() { return Object.keys(this.skillTree).filter(name => this.skillTree[name].lvl > 0); }
   upgradeProficiency(tag) { if (this.proficiencyPoints <= 0) return false; if (this.proficiencies[tag] !== undefined) { this.proficiencies[tag]++; this.proficiencyPoints--; return true; } return false; }
   rehydrateItem(itemData) { const Item = require('../items/Item'); return new Item(itemData.floor, null, itemData); }
@@ -299,8 +344,16 @@ class Entity {
     });
 
     // Prestige por Descobertas (Bestiário)
-    Object.values(this.bestiary).forEach(count => {
-      prestige += count * 2;
+    // +10 por criatura única catalogada, +50 adicional por boss, +2 por abate
+    Object.entries(this.bestiary).forEach(([name, entry]) => {
+      if (typeof entry === 'number') {
+        // Formato legado (não deveria ocorrer pós-migração)
+        prestige += entry * 2;
+      } else {
+        prestige += 10; // +10 por criatura única
+        if (isBoss(name)) prestige += 40; // +50 total para bosses (40 + 10 acima)
+        prestige += (entry.kills || 0) * 2; // +2 por abate
+      }
     });
 
     return prestige;

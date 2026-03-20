@@ -1,8 +1,42 @@
 const Entity = require('../entities/Entity');
 
+// Fragmentos de lore histórico por bioma (3 por bioma = 18 total)
+const BIOME_LORE = {
+  newton: [
+    'Newton, 1666: "Em plena Grande Praga, descobri que a luz branca contem todas as cores do espectro. A prisao me revelou o arco-iris."',
+    'Newton: "A maca nao me ensinou sobre gravidade — ela me ensinou que a mesma lei move planetas e frutas caindo de arvores."',
+    'Newton: "Hypotheses non fingo — nao fabrico hipoteses. Os fatos da natureza falam por si mesmos, se os ouvimos."'
+  ],
+  hawking: [
+    'Hawking: "Buracos negros nao sao tao negros. Eles emitem radiacao — e eu a descobri calculando de uma cadeira de rodas."',
+    'Hawking: "O universo nao precisa de um criador para existir. As leis da fisica sao suficientes para criar a si mesmas."',
+    'Hawking: "A inteligencia e a capacidade de se adaptar a mudancas. Este Exilio me prova isso a cada dia."'
+  ],
+  turing: [
+    'Turing, 1936: "Imaginei uma maquina hipotetica que podia computar qualquer problema soluvel. Hoje ela e real."',
+    'Turing: "A questao nao e se as maquinas podem pensar, mas se nos podemos reconhecer o pensamento quando ele ocorre."',
+    'Turing: "Quebramos o Enigma. Salvamos milhoes de vidas. E o mundo nunca soube — ate decadas depois."'
+  ],
+  noether: [
+    'Noether: "A cada simetria da natureza corresponde uma lei de conservacao. Eu provei isso — eles demoraram decadas para acreditar."',
+    'Noether: "Hilbert disse: nao vejo por que o sexo de um candidato seja um argumento contra sua admissao. Nenhum de nos o estava."',
+    'Noether: "A algebra abstrata que desenvolvi parecia inutil. Hoje e a base de toda a fisica moderna. A matematica sempre vence."'
+  ],
+  euler: [
+    'Euler: "Perdi a visao em um olho aos 28, no outro aos 59. Minha producao matematica so aumentou. A mente supera os olhos."',
+    'Euler: "e^(i*pi) + 1 = 0 — cinco das constantes mais importantes da matematica em uma unica equacao perfeita.",',
+    'Euler: "Resolvi o Problema das Sete Pontes de Konigsberg e, sem saber, inventei a teoria dos grafos e a topologia."'
+  ],
+  lovelace: [
+    'Lovelace, 1843: "Escrevi o primeiro algoritmo da historia para o Motor Analitico de Babbage. A maquina nunca foi construida."',
+    'Lovelace: "A maquina pode fazer o que quer que saibamos como ordena-la. Ela nao pode originar nada. A creatividade e humana."',
+    'Lovelace: "Minha mente voa alem dos calculos — vejo a poesia nos numeros, a musica nas equacoes, a arte no algoritmo."'
+  ]
+};
+
 class Tile {
   constructor(type, x, y, data = null) {
-    this.type = type; // 'WALL', 'FLOOR', 'ENEMY', 'BOSS', 'TREASURE', 'PUZZLE', 'EXIT', 'REST'
+    this.type = type; // 'WALL', 'FLOOR', 'ENEMY', 'BOSS', 'TREASURE', 'PUZZLE', 'EXIT', 'REST', 'LORE'
     this.x = x;
     this.y = y;
     this.data = data;
@@ -70,6 +104,7 @@ class Dungeon {
     this.addRandomObject('REST', 1 + Math.floor(this.floor / 5));
     this.addRandomObject('ENEMY', 3 + Math.floor(this.floor / 2));
     this.addRandomObject('BOSS', 1);
+    this.addLoreTiles();
     // Revelar área inicial ao redor do jogador
     this.revealAround(this.playerPos.x, this.playerPos.y, 3);
   }
@@ -178,6 +213,32 @@ class Dungeon {
       strength:  4 + Math.floor(this.floor * 0.35),
       dexterity: 4 + Math.floor(this.floor * 0.25)
     })];
+  }
+
+  /**
+   * Adiciona 2–3 tiles LORE ao dungeon com fragmentos históricos do bioma.
+   */
+  addLoreTiles() {
+    const pool = BIOME_LORE[this.biome.key] || [];
+    if (pool.length === 0) return;
+
+    // Embaralha e usa até 2 fragmentos por dungeon
+    const shuffled = [...pool].sort(() => Math.random() - 0.5);
+    const count = Math.min(2, shuffled.length);
+    let placed = 0;
+    let attempts = 0;
+
+    while (placed < count && attempts < 200) {
+      attempts++;
+      const rx = Math.floor(Math.random() * (this.width - 2)) + 1;
+      const ry = Math.floor(Math.random() * (this.height - 2)) + 1;
+      const tile = this.grid[ry][rx];
+      if (tile.type === 'FLOOR' && (rx !== this.playerPos.x || ry !== this.playerPos.y)) {
+        tile.type = 'LORE';
+        tile.data = { biome: this.biome.key, text: shuffled[placed], index: placed };
+        placed++;
+      }
+    }
   }
 
   movePlayer(dx, dy) {

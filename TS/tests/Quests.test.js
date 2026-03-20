@@ -9,8 +9,8 @@ describe('QuestBoard — geração e aceitação', () => {
     player = new Entity('Teste', { background: 'Guerreiro' });
   });
 
-  test('gera exatamente 3 missões no início', () => {
-    expect(board.quests.length).toBe(3);
+  test('gera exatamente 4 missões no início', () => {
+    expect(board.quests.length).toBe(4);
   });
 
   test('cada missão tem os campos obrigatórios', () => {
@@ -26,11 +26,22 @@ describe('QuestBoard — geração e aceitação', () => {
     });
   });
 
-  test('tipos de missão são válidos (KILL, FLOOR, ITEM)', () => {
-    // gerar várias para garantir cobertura dos 3 tipos
+  test('tipos de missão são válidos (KILL, FLOOR, ITEM, LORE)', () => {
+    // gerar várias para garantir cobertura dos 4 tipos
     const tipos = new Set();
-    for (let i = 0; i < 30; i++) tipos.add(board.generateQuest().type);
-    expect([...tipos].every(t => ['KILL', 'FLOOR', 'ITEM'].includes(t))).toBe(true);
+    for (let i = 0; i < 50; i++) tipos.add(board.generateQuest().type);
+    expect([...tipos].every(t => ['KILL', 'FLOOR', 'ITEM', 'LORE'].includes(t))).toBe(true);
+  });
+
+  test('missão LORE tem campo rewardItem', () => {
+    // Gera missões até encontrar uma LORE
+    let loreQuest = null;
+    for (let i = 0; i < 50; i++) {
+      const q = board.generateQuest();
+      if (q.type === 'LORE') { loreQuest = q; break; }
+    }
+    expect(loreQuest).not.toBeNull();
+    expect(loreQuest.rewardItem).toBe(true);
   });
 
   test('player não pode aceitar duas missões simultâneas', () => {
@@ -79,7 +90,8 @@ describe('QuestBoard — progressão KILL', () => {
     player.activeQuest.completed = true;
     const orbsBefore = player.orbs;
     const xpBefore = player.xp;
-    board.turnInQuest(player);
+    const result = board.turnInQuest(player);
+    expect(result.success).toBe(true);
     expect(player.orbs).toBeGreaterThan(orbsBefore);
     expect(player.xp).toBeGreaterThan(xpBefore);
     expect(player.activeQuest).toBeNull();
@@ -88,7 +100,7 @@ describe('QuestBoard — progressão KILL', () => {
   test('após entrega, board substitui a missão por uma nova', () => {
     player.activeQuest.completed = true;
     board.turnInQuest(player);
-    expect(board.quests.length).toBe(3);
+    expect(board.quests.length).toBe(4);
     const ids = board.quests.map(q => q.id);
     expect(ids.includes('kill-test')).toBe(false);
   });

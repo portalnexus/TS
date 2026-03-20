@@ -9,12 +9,22 @@ describe('Bestiário e Atributos de Itens', () => {
   });
 
   test('deve registrar abates no bestiário corretamente', () => {
-    player.recordKill('Esqueleto de Gauss');
-    player.recordKill('Esqueleto de Gauss');
-    player.recordKill('Lobo de Turing');
+    player.recordKill('Esqueleto de Gauss', 1);
+    player.recordKill('Esqueleto de Gauss', 1);
+    player.recordKill('Lobo de Turing', 2);
 
-    expect(player.bestiary['Esqueleto de Gauss']).toBe(2);
-    expect(player.bestiary['Lobo de Turing']).toBe(1);
+    expect(player.bestiary['Esqueleto de Gauss'].kills).toBe(2);
+    expect(player.bestiary['Lobo de Turing'].kills).toBe(1);
+  });
+
+  test('deve popular dados de lore do bestiário na primeira entrada', () => {
+    player.recordKill('Lobo de Turing', 3);
+    const entry = player.bestiary['Lobo de Turing'];
+    expect(entry).toHaveProperty('description');
+    expect(entry).toHaveProperty('weaknesses');
+    expect(entry).toHaveProperty('drops');
+    expect(entry).toHaveProperty('firstSeenFloor', 3);
+    expect(entry).toHaveProperty('raridade');
   });
 
   test('itens devem conceder atributos extras ao serem equipados', () => {

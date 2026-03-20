@@ -12,6 +12,7 @@ const Blacksmith = require('./items/Blacksmith');
 const CraftingAltar = require('./items/CraftingAltar');
 const QuestBoard = require('./core/QuestBoard');
 const Nexus = require('./core/Nexus');
+const DialogueEngine = require('./core/DialogueEngine');
 
 const screen = blessed.screen({ smartCSR: true, title: 'Terminal Souls - The Echoes of Reason', fullUnicode: true, mouse: false });
 
@@ -48,7 +49,10 @@ let questBoard = new QuestBoard();
 let currentDungeon = null;
 let currentCombat = null;
 let currentNexus = new Nexus();
+let dialogueEngine = new DialogueEngine();
+let lastBiomeKey = null; // Último bioma visitado (para contexto de Darwin)
 let gameState = 'MENU';
+let prevState = null; // Estado anterior — usado pelo botão Voltar para navegação correta
 let creationData = {};
 let bossRushWave = 0;
 let bossRushScore = 0;
@@ -147,7 +151,7 @@ function updateStatus() {
 function updateLegend() {
   let content = '';
   if (gameState === 'EXPLORING' && currentDungeon) {
-    content += `${Sprites.objects.player || '@ '} : Voce\n${Sprites.objects.enemy} : Inimigo\n${Sprites.objects.boss} : Guardiao\n${Sprites.objects.treasure} : Tesouro\n${Sprites.objects.door} : Escada\n${Sprites.objects.puzzle} : Enigma\n${Sprites.objects.rest} : Descanso\n`;
+    content += `${Sprites.objects.player || '@ '} : Voce\n${Sprites.objects.enemy} : Inimigo\n${Sprites.objects.boss} : Guardiao\n${Sprites.objects.treasure} : Tesouro\n${Sprites.objects.door} : Escada\n${Sprites.objects.puzzle} : Enigma\n${Sprites.objects.rest} : Descanso\n${T.magic('? ')} : Lore\n`;
   } else if (gameState === 'COMBAT' && currentCombat) {
     const enemy = currentCombat.enemies[0];
     content += `${T.danger.bold('ALVO:')}\n${enemy.name}\nLvl: ${enemy.level}\nEstabilidade: ${enemy.posture}\n`;
@@ -167,7 +171,24 @@ function updateDetailSection(listComponent) {
     if (s) itemDetailBox.setContent(`${T.player.bold(name)}\n\nNivel: ${s.lvl}\nCusto de Mana: ${s.cost}\nDescricao: ${s.desc}\n\nUse [1-0] ou Enter para upar.`);
   } else if (gameState === 'BESTIARY') {
     const name = Object.keys(player.bestiary)[i];
-    if (name) itemDetailBox.setContent(`${T.danger.bold(name)}\n\nAbates: ${player.bestiary[name]}\nAnalise: Habitante das fendas.\nFraquezas: Em processamento...`);
+    if (name) {
+      const entry = player.bestiary[name];
+      if (typeof entry === 'object' && entry !== null) {
+        const weakStr = entry.weaknesses && entry.weaknesses.length > 0 ? entry.weaknesses.join(', ') : 'Desconhecida';
+        const dropsStr = entry.drops && entry.drops.length > 0 ? entry.drops.join(', ') : 'Desconhecido';
+        itemDetailBox.setContent(
+          `${T.danger.bold(name)}\n\n` +
+          `Raridade: ${T.warning(entry.raridade || 'COMUM')}\n` +
+          `Abates: ${T.bright(entry.kills || 0)}\n` +
+          `Primeiro encontro: Andar ${entry.firstSeenFloor || 1}\n\n` +
+          `${T.neutral(entry.description || 'Criatura das Fendas.')}\n\n` +
+          `${T.info('Fraquezas:')} ${weakStr}\n` +
+          `${T.warning('Drops:')} ${dropsStr}`
+        );
+      } else {
+        itemDetailBox.setContent(`${T.danger.bold(name)}\n\nAbates: ${entry}\nAnalise: Habitante das fendas.`);
+      }
+    }
   } else if (gameState === 'MARIE' && player.inventory[i]) {
     itemDetailBox.setContent(player.inventory[i].getDetails() + '\n\n' + T.magic('Selecione para Reroll (20 Orbes).'));
   }
@@ -203,6 +224,7 @@ actionMenu.on('element focus', (el) => {
 });
 
 function showInventory() {
+  prevState = gameState; // Salva de onde veio (NEXUS, EXPLORING, etc.)
   gameState = 'INVENTORY'; mapBox.hide(); logBox.hide(); inventoryBox.show(); itemDetailBox.show();
   inventoryBox.setLabel(' [ INVENTÁRIO ] ');
   const items = player.inventory.map(it => `${it.getColorizedName()} (${it.type})`);
@@ -218,6 +240,7 @@ inventoryBox.on('select', (item, index) => {
 });
 
 function showPassives() {
+  prevState = gameState; // Salva de onde veio (NEXUS, EXPLORING, etc.)
   gameState = 'SKILL_TREE'; mapBox.hide(); logBox.hide(); inventoryBox.show(); itemDetailBox.show();
   const items = Object.keys(player.skillTree).map(n => ` [${player.skillTree[n].lvl}] ${n}`);
   inventoryBox.setItems(items); inventoryBox.setLabel(` [ ARVORE DE SKILLS - PONTOS: ${player.skillPoints} ] `); 
@@ -227,8 +250,14 @@ function showPassives() {
 function showBestiary() {
   gameState = 'BESTIARY'; mapBox.hide(); logBox.hide(); inventoryBox.show(); itemDetailBox.show();
   const known = Object.keys(player.bestiary);
-  const items = known.length > 0 ? known.map(name => `${T.danger(name)} - Abates: ${player.bestiary[name]}`) : [T.neutral('Nenhum dado.')];
-  inventoryBox.setItems(items); inventoryBox.setLabel(' [ BESTIARIO ] '); inventoryBox.focus();
+  const items = known.length > 0 ? known.map(name => {
+    const entry = player.bestiary[name];
+    const kills = typeof entry === 'number' ? entry : (entry.kills || 0);
+    const raridade = typeof entry === 'object' ? entry.raridade : 'COMUM';
+    const rarColor = raridade === 'RARO' ? T.rarityRaro : raridade === 'INCOMUM' ? T.rarityMagico : T.neutral;
+    return `${rarColor('[' + raridade + ']')} ${T.danger(name)} - Abates: ${kills}`;
+  }) : [T.neutral('Nenhum dado.')];
+  inventoryBox.setItems(items); inventoryBox.setLabel(` [ BESTIARIO - ${known.length} criaturas ] `); inventoryBox.focus();
   actionMenu.setItems([' [V/ESC] Voltar']); updateDetailSection(inventoryBox);
 }
 
@@ -283,7 +312,7 @@ function handleDarwin(c) {
 }
 
 function showBlacksmith() { gameState = 'TRADE_BUY'; actionMenu.setLabel(' [ HALTHOR: FERREIRO ] '); actionMenu.setItems(currentBlacksmith.getMenuOptions()); actionMenu.focus(); }
-function showBlacksmithSell() { gameState = 'TRADE_SELL'; const items = player.inventory.map(it => `${it.getColorizedName()} (${Math.floor(it.getPrice()*0.4)} Orbes)`); items.push(' [ESC] Voltar'); actionMenu.setItems(items); actionMenu.focus(); }
+function showBlacksmithSell() { prevState = 'TRADE_BUY'; gameState = 'TRADE_SELL'; const items = player.inventory.map(it => `${it.getColorizedName()} (${Math.floor(it.getPrice()*0.4)} Orbes)`); items.push(' [ESC] Voltar'); actionMenu.setItems(items); actionMenu.focus(); }
 function handleTrade(c, index) {
   if (gameState === 'TRADE_BUY') { if (c.includes('VENDER')) showBlacksmithSell(); else if (currentBlacksmith.buyItem(player, index)) { log(T.success('Comprado!')); showBlacksmith(); updateStatus(); } else log(T.danger('Sem orbes!')); }
   else if (gameState === 'TRADE_SELL') { if (c.includes('Voltar')) showBlacksmith(); else { const v = currentBlacksmith.sellItem(player, index); if (v) { log(T.success(`Vendido: ${v}`)); showBlacksmithSell(); updateStatus(); } } }
@@ -292,7 +321,29 @@ function handleTrade(c, index) {
 function showQuests() { gameState = 'QUESTS'; actionMenu.setLabel(' [ QUADRO DE MISSÕES ] '); actionMenu.setItems(questBoard.getMenuOptions(player)); actionMenu.focus(); }
 function handleQuests(c, i) {
   if (c.includes('Voltar')) { showNexus(); return; }
-  if (c.includes('ENTREGAR')) { if (questBoard.turnInQuest(player)) { log(T.success('Concluída!')); showQuests(); updateStatus(); } }
+  if (c.includes('ENTREGAR')) {
+    const result = questBoard.turnInQuest(player);
+    if (result.success) {
+      log(T.success('Missão concluída! Recompensa recebida.'));
+      // Recompensa especial para missões LORE: Tomo Histórico LENDÁRIO
+      if (result.specialReward) {
+        const tomo = new Item(player.level, 'LENDÁRIO');
+        tomo.type = 'TOMO';
+        tomo.consumableType = 'TOMO';
+        tomo.name = 'Tomo Historico do Exilio';
+        tomo.flavorText = 'Compilado dos fragmentos historicos encontrados nas Fendas do Exilio. Conhecimento e poder.';
+        const baseVal = 10 * (1 + player.level * 0.1) * 3.5;
+        tomo.stats = {
+          recoverHp: Math.floor(baseVal * 0.8),
+          recoverSp: Math.floor(baseVal * 0.8),
+          recoverMp: Math.floor(baseVal * 0.8)
+        };
+        player.inventory.push(tomo);
+        log(T.magic.bold('>>> RECOMPENSA ESPECIAL: Tomo Historico do Exilio (LENDARIO) adicionado ao inventario! <<<'));
+      }
+      showQuests(); updateStatus();
+    }
+  }
   else if (questBoard.acceptQuest(player, i)) { log(T.player('Aceita!')); showQuests(); } else log(T.danger('Erro.'));
 }
 
@@ -312,6 +363,7 @@ function renderMap() {
         case 'PUZZLE':   d += Sprites.objects.puzzle; break;
         case 'EXIT':     d += Sprites.objects.door; break;
         case 'REST':     d += Sprites.objects.rest; break;
+        case 'LORE':     d += T.magic('? '); break;
         default:         d += Sprites.objects.floor; break;
       }
     }
@@ -348,7 +400,9 @@ function startDungeon(floor = 1) {
   // Calcula quantos tiles cabem no mapBox (cada tile = 2 chars, descontar bordas)
   const availW = Math.max(20, Math.floor((screen.width * 0.60 - 4) / 2));
   const availH = Math.max(10, Math.floor(screen.height * 0.65 - 2));
-  currentDungeon = new Dungeon(floor, availW, availH); gameState = 'EXPLORING'; mapBox.setLabel(chalk[currentDungeon.biome.color](` [ ${currentDungeon.biome.name} - ${floor} ] `));
+  currentDungeon = new Dungeon(floor, availW, availH); gameState = 'EXPLORING';
+  lastBiomeKey = currentDungeon.biome.key;
+  mapBox.setLabel(chalk[currentDungeon.biome.color](` [ ${currentDungeon.biome.name} - ${floor} ] `));
   mapBox.show(); combatVisualBox.hide(); inventoryBox.hide(); itemDetailBox.show(); logBox.show();
   actionMenu.setLabel(' [ EXPLORACAO ] '); actionMenu.setItems([' [1] Norte', ' [2] Sul', ' [3] Oeste', ' [4] Leste', ' [5] Inv', ' [6] Skills', ' [ESC] Fugir']);
   log(T.success(`Fenda ${floor} aberta.`));
@@ -378,7 +432,14 @@ function handleMove(dx, dy) {
     const interaction = currentNexus.movePlayer(dx, dy);
     mapBox.setContent(currentNexus.render());
     if (interaction) {
-      log(T.player(interaction.dialogue));
+      const npcNames = ['Halthor', 'Ada', 'Darwin', 'Marie Curie'];
+      if (player && npcNames.includes(interaction.name)) {
+        const context = interaction.name === 'Darwin' ? { biome: lastBiomeKey } : {};
+        const dialogue = dialogueEngine.getDialogue(interaction.name, player, context);
+        log(T.player(dialogue));
+      } else {
+        log(T.player(interaction.dialogue));
+      }
       if (interaction.name === 'Ada') showAda();
       else if (interaction.name === 'Marie Curie') showMarie();
       else if (interaction.name === 'Darwin') showDarwin();
@@ -412,21 +473,54 @@ function handleTileInteraction(t) {
     }
     case 'PUZZLE': startPuzzle(t); break;
     case 'REST': player.recover(0.5, 0.5, 0.5); log(T.success('Descansou.')); t.type = 'FLOOR'; break;
+    case 'LORE': handleLoreTile(t); break;
   }
+}
+
+function handleLoreTile(t) {
+  if (!t.data) { t.type = 'FLOOR'; return; }
+  const loreText = t.data.text;
+
+  // Exibe o fragmento histórico no log
+  log(T.magic('═══ FRAGMENTO HISTÓRICO ═══'));
+  log(T.info(loreText));
+  log(T.magic('══════════════════════════'));
+
+  t.type = 'FLOOR'; // Tile consumido — não ativa mais
+
+  // Auto-progresso de missão LORE
+  if (player.activeQuest && player.activeQuest.type === 'LORE' && !player.activeQuest.completed) {
+    player.activeQuest.progress++;
+    if (player.activeQuest.progress >= player.activeQuest.target) {
+      player.activeQuest.completed = true;
+      log(T.success.bold('>>> MISSÃO LORE CONCLUÍDA! Retorne ao Quadro de Missões. <<<'));
+    } else {
+      log(T.warning(`Missão: ${player.activeQuest.progress}/${player.activeQuest.target} fragmentos descobertos.`));
+    }
+  }
+
+  // Dispara evento de diálogo especial (loreDisco) para os NPCs
+  if (player) dialogueEngine.triggerEvent('loreDisco', player);
 }
 
 function startCombat(e) { gameState = 'COMBAT'; currentCombat = new Combat(player, e); mapBox.hide(); combatVisualBox.show(); renderCombat(); actionMenu.setItems([' [1] ATACAR', ' [2] SKILLS', ' [3] RECUPERAR', ' [4] POSTURA', ' [ESC] Fugir']); actionMenu.focus(); }
 function handleCombatAction(c) {
   if (currentCombat.isOver) return; if (c.includes('ATACAR')) currentCombat.playerAction('ATTACK');
-  else if (c.includes('SKILLS')) { const l = player.getLearnedSkills(); if (l.length === 0) log(T.danger('Sem skills!')); else { gameState = gameState === 'BOSS_RUSH' ? 'BOSS_RUSH_SKILLS' : 'COMBAT_SKILLS'; actionMenu.setItems([...l, ' [ESC] Voltar']); actionMenu.focus(); return; } }
+  else if (c.includes('SKILLS')) { const l = player.getLearnedSkills(); if (l.length === 0) log(T.danger('Sem skills!')); else { prevState = gameState; gameState = gameState === 'BOSS_RUSH' ? 'BOSS_RUSH_SKILLS' : 'COMBAT_SKILLS'; actionMenu.setItems([...l, ' [ESC] Voltar']); actionMenu.focus(); return; } }
   else if (c.includes('RECUPERAR')) currentCombat.playerAction('RECOVER');
   else if (c.includes('POSTURA')) { const m = ['NEUTRO', 'DEFESA', 'ATAQUE']; player.setPostureMode(m[(m.indexOf(player.postureMode)+1)%3]); log(T.player(`Postura: ${player.postureMode}`)); }
   processCombatTurn();
 }
 
 function processCombatTurn(s = null) {
+  const prevLevel = player ? player.level : 0;
   if (s) currentCombat.playerAction('SKILL', 0, s);
   currentCombat.log.forEach(m => logBox.log(m)); currentCombat.log = []; updateStatus(); renderCombat();
+  // Detecta subida para nível 10 (trigger de diálogo especial)
+  if (player && player.level >= 10 && prevLevel < 10 && !dialogueEngine.hasEvent('level10', player)) {
+    dialogueEngine.triggerEvent('level10', player);
+    log(T.magic.bold('>>> NÍVEL 10 ALCANÇADO! Os NPCs do Nexus têm algo a dizer... <<<'));
+  }
   if (!currentCombat.isOver) {
     const spDelta = { DEFESA: 0.12, NEUTRO: 0.05, ATAQUE: -0.10 };
     const rate = spDelta[player.postureMode] ?? 0;
@@ -485,6 +579,10 @@ function processCombatTurn(s = null) {
         const t = currentDungeon.getTile(currentDungeon.playerPos.x, currentDungeon.playerPos.y);
         if (t) t.type = 'EXIT';
         renderMap();
+        // Dispara evento de diálogo firstBossKill (uma vez por save)
+        if (player && !dialogueEngine.hasEvent('firstBossKill', player)) {
+          dialogueEngine.triggerEvent('firstBossKill', player);
+        }
       }
     } else {
       const entry = {
@@ -673,20 +771,72 @@ screen.key(['q'], () => { const l = inventoryBox.visible ? inventoryBox : action
 screen.key(['e'], () => { const l = inventoryBox.visible ? inventoryBox : actionMenu; l.down(1); updateDetailSection(l); });
 
 screen.key(['escape', 'v'], () => {
-  if (gameState === 'MENU') process.exit(0);
+  // --- Menu principal: sai ---
+  if (gameState === 'MENU') { process.exit(0); return; }
+
+  // --- Game Over: volta ao menu ---
   if (gameState === 'GAME_OVER') {
     player = null; currentDungeon = null; currentCombat = null; gameState = 'MENU';
     mapBox.hide(); combatVisualBox.hide(); inventoryBox.hide(); itemDetailBox.hide(); logBox.show();
     actionMenu.setLabel(' [ AÇÕES ] '); actionMenu.setItems(initialMenu); actionMenu.focus();
     screen.render(); return;
   }
-  inventoryBox.hide(); itemDetailBox.hide(); mapBox.show(); logBox.show();
-  if (gameState === 'EXPLORING' || gameState === 'COMBAT') { saveGame(); currentDungeon = null; showNexus(); }
-  else if (gameState === 'BOSS_RUSH' || gameState === 'BOSS_RUSH_SKILLS') {
-    bossRushWave = 0; bossRushScore = 0; combatVisualBox.hide(); showNexus();
+
+  // --- Vitória: volta ao menu ---
+  if (gameState === 'VICTORY') {
+    player = null; currentDungeon = null; currentCombat = null; gameState = 'MENU';
+    mapBox.hide(); combatVisualBox.hide(); inventoryBox.hide(); itemDetailBox.hide(); logBox.show();
+    actionMenu.setLabel(' [ AÇÕES ] '); actionMenu.setItems(initialMenu); actionMenu.focus();
+    screen.render(); return;
   }
-  else if (gameState === 'CREATION_NAME') process.exit(0);
-  else showNexus();
+
+  // --- Criação de personagem: sai do jogo ---
+  if (gameState === 'CREATION_NAME') { process.exit(0); return; }
+
+  // --- Exploração e combate: fuga salva o jogo e volta ao Nexus ---
+  if (gameState === 'EXPLORING' || gameState === 'COMBAT') {
+    saveGame(); currentDungeon = null;
+    inventoryBox.hide(); itemDetailBox.hide(); combatVisualBox.hide(); mapBox.show(); logBox.show();
+    showNexus(); return;
+  }
+
+  // --- Boss Rush: abandona sem penalidade ---
+  if (gameState === 'BOSS_RUSH' || gameState === 'BOSS_RUSH_SKILLS') {
+    bossRushWave = 0; bossRushScore = 0;
+    inventoryBox.hide(); itemDetailBox.hide(); combatVisualBox.hide(); mapBox.show(); logBox.show();
+    showNexus(); return;
+  }
+
+  // --- Lista de skills de combate: volta ao combate ---
+  if (gameState === 'COMBAT_SKILLS') {
+    gameState = 'COMBAT';
+    actionMenu.setItems([' [1] ATACAR', ' [2] SKILLS', ' [3] RECUPERAR', ' [4] POSTURA', ' [ESC] Fugir']);
+    actionMenu.focus(); screen.render(); return;
+  }
+
+  // --- Venda: volta para a compra (Halthor) ---
+  if (gameState === 'TRADE_SELL') {
+    showBlacksmith(); return;
+  }
+
+  // --- Inventário/Skills abertas a partir da exploração: volta à exploração ---
+  if ((gameState === 'INVENTORY' || gameState === 'SKILL_TREE') && prevState === 'EXPLORING') {
+    inventoryBox.hide(); itemDetailBox.hide(); mapBox.show(); logBox.show();
+    gameState = 'EXPLORING';
+    actionMenu.setLabel(' [ EXPLORAÇÃO ] ');
+    actionMenu.setItems([' [1] Norte', ' [2] Sul', ' [3] Oeste', ' [4] Leste', ' [5] Inv', ' [6] Skills', ' [ESC] Fugir']);
+    actionMenu.focus(); renderMap(); return;
+  }
+
+  // --- Marie: sai do inventário de crafting e volta ao menu Marie ---
+  if (gameState === 'MARIE') {
+    inventoryBox.hide(); mapBox.show(); logBox.show();
+    showNexus(); return;
+  }
+
+  // --- Todos os outros submenus do Nexus: volta ao Nexus ---
+  inventoryBox.hide(); itemDetailBox.hide(); mapBox.show(); logBox.show();
+  showNexus();
 });
 
 // --- SISTEMA DE TEMAS ---
@@ -745,9 +895,25 @@ actionMenu.on('select', (item, index) => {
   else if (gameState === 'ADA') handleAda(c);
   else if (gameState === 'DARWIN') handleDarwin(c);
   else if (gameState === 'COMBAT') handleCombatAction(c);
-  else if (gameState === 'COMBAT_SKILLS') processCombatTurn(c);
+  else if (gameState === 'COMBAT_SKILLS') {
+    if (c.includes('Voltar') || c.includes('ESC')) {
+      gameState = 'COMBAT';
+      actionMenu.setItems([' [1] ATACAR', ' [2] SKILLS', ' [3] RECUPERAR', ' [4] POSTURA', ' [ESC] Fugir']);
+      actionMenu.focus();
+    } else {
+      processCombatTurn(c);
+    }
+  }
   else if (gameState === 'BOSS_RUSH') handleCombatAction(c);
-  else if (gameState === 'BOSS_RUSH_SKILLS') processCombatTurn(c);
+  else if (gameState === 'BOSS_RUSH_SKILLS') {
+    if (c.includes('Voltar') || c.includes('ESC')) {
+      gameState = 'BOSS_RUSH';
+      actionMenu.setItems([' [1] ATACAR', ' [2] SKILLS', ' [3] RECUPERAR', ' [4] POSTURA']);
+      actionMenu.focus();
+    } else {
+      processCombatTurn(c);
+    }
+  }
   else if (gameState === 'BOSS_RUSH_MENU') {
     if (c.includes('Iniciar')) { bossRushWave = 0; bossRushScore = 0; startBossRushWave(); }
     else showNexus();

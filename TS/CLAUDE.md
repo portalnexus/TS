@@ -1,7 +1,7 @@
 # Terminal Souls — CLAUDE.md
 
 > TUI-ARPG (Text User Interface Action RPG) / Souls-like + Path of Exile + História da Ciência
-> **Versão atual:** v1.1.0 — "Conteúdo Expandido" *(lançado)*
+> **Versão atual:** v1.2.0 — "A Voz do Exílio" *(em desenvolvimento — Sprint 5 concluído)*
 > **Autor:** João Pedro Melloni Tardif Germano
 
 ---
@@ -175,63 +175,82 @@ Renome = (Nível × 100) + (TotalAtributos × 10) + BonusSkills + DescobertasBes
 - **Mouse desativado**: Intencionalmente. Nunca habilitar — quebra a imersão TUI
 - **Persistência**: Saves em `/saves/*.json` via `SaveSystem.js`; não alterar estrutura do JSON sem migração
 - **Darwin**: Verifica `c.includes('FORÇA')`, `c.includes('DESTREZA')`, `c.includes('INTELIGÊNCIA')` — maiúsculas obrigatórias
+- **Bestiário**: Formato é `{ kills, description, weaknesses, drops, firstSeenFloor, raridade }`. Saves antigos (número simples) são migrados em `_migrateBestiary()` no construtor de Entity.
+- **DialogueEngine**: Instância global `dialogueEngine` em `index.js`. Eventos: `firstBossKill`, `level10`, `loreDisco`. Contexto de bioma passado para Darwin via `{ biome: lastBiomeKey }`.
+- **prevState**: Variável global em `index.js` que rastreia o estado anterior para navegação correta via ESC. Deve ser definido antes de mudar `gameState` em: `showInventory()`, `showPassives()`, `showBlacksmithSell()`, e ao entrar em `COMBAT_SKILLS`.
+- **Tiles LORE**: Tipo `'LORE'` em Dungeon; `tile.data = { biome, text, index }`. Consumido ao ser pisado (vira FLOOR). Renderizado como `? ` no mapa.
+- **turnInQuest**: Retorna `{ success: boolean, specialReward: boolean }` — verificar `specialReward` para entregar Tomo Histórico LENDÁRIO em missões LORE.
 
 ---
 
-## 8. Estado Atual (v1.1.0) — O que está FEITO
+## 8. Estado Atual (v1.2.0) — O que está FEITO
 
 - [x] Combate turn-based com efeitos de status elemental (CHOQUE, CONGELAMENTO, EVASÃO, IMUNIDADE)
 - [x] Sinergias de status: CAUTERIZAÇÃO, FRAGMENTAÇÃO, DESCARGA
-- [x] Geração procedural de dungeons com biomas temáticos (newton/hawking/turing/noether)
-- [x] Inimigos temáticos por bioma (4 por bioma, 16 no total) + bosses nomeados
+- [x] Geração procedural de dungeons com biomas temáticos (6 biomas)
+- [x] Inimigos temáticos por bioma (4 por bioma, 24 total) + bosses nomeados
 - [x] Boss final "SENHOR DA ASCENSÃO" com IA de 3 fases (andar ≥10)
 - [x] Progressão RPG completa (atributos, skills, proficiências)
 - [x] 20 skills implementadas (5 por classe: Guerreiro, Mago, Arqueiro, Clérigo)
 - [x] Sistema de itens expandido: TOMO, consumíveis tipados, 12 efeitos lendários, 20 flavor texts
-- [x] Sistema de save persistente (JSON)
+- [x] Sistema de save persistente (JSON) com migração de formato legado
 - [x] Hub Nexus com NPCs vendedores e upgrades (Halthor, Marie, Ada, Darwin)
-- [x] Darwin fix: upgrades de STR/DEX/INT funcionando corretamente
-- [x] Sistema de Bestiário (tecla B)
-- [x] Score de Renome Científico
+- [x] Sistema de Bestiário expandido: descrição, fraquezas, drops, raridade, andar do 1º encontro
+- [x] Score de Renome Científico (fórmula atualizada com bestiário expandido)
 - [x] Navegação unificada por teclado (1-0 universal)
 - [x] Boss por andar + drops de Orbes (level×3 / boss level×15)
-- [x] Sistema de missões (KILL, FLOOR, ITEM) com auto-progressão
-- [x] Puzzles de Sequência (10 padrões matemáticos) substituindo Minesweeper
+- [x] Sistema de missões (KILL, FLOOR, ITEM, **LORE**) com auto-progressão — 4 missões no board
+- [x] Puzzles (10 padrões matemáticos, 9 tipos)
 - [x] Tela de Vitória com Renome Final e créditos
-- [x] HUD: barras `makeBar()` com cor por threshold, ícones de status (⚡❄◎⬡), badge de postura
-- [x] Website: tutorial Linux/Windows com abas, seções de sistemas core e biomas
-- [x] Website: sprites ASCII completos — 4 combos classe+raça, 5 bosses, 14 inimigos
-- [x] 64 testes automatizados (6 suítes: Entity, Combat, Systems, Skills, Quests, Puzzle)
+- [x] HUD: barras `makeBar()` com cor por threshold, ícones de status, badge de postura
+- [x] Website: tutorial Linux/Windows, sprites ASCII, sistemas core
+- [x] **88 testes automatizados** (8 suítes: Entity, Combat, Systems, Skills, Quests, Puzzle, Dialogue, Bestiary)
 - [x] Boss Rush mode (7 ondas, NPC Arena no Nexus, Hall of Fame)
-- [x] 2 novos biomas: A Espiral de Euler e O Labirinto de Lovelace (6 biomas total)
-- [x] Tela de Game Over com Hall of Fame persistente (hall_of_fame.json)
-- [x] 5 novos tipos de Puzzle (BINARY, LOGIC_TABLE, FORMULA, PRIME_CHECK, MODULO)
-- [x] Maestria de Crafting: 4 níveis no Altar de Marie Curie (Aprendiz→Radiante)
+- [x] Tela de Game Over com Hall of Fame persistente
+- [x] Maestria de Crafting: 4 níveis no Altar de Marie Curie
 - [x] Balanceamento logarítmico para andares 10–100
-- [x] Sistema de 4 Temas de Cores (DARK/LIGHT/COLORBLIND/NO_RED) com persistência em settings.json
-- [x] Sprite do jogador revertido para `@` simples (melhor legibilidade no grid)
+- [x] Sistema de 4 Temas de Cores (DARK/LIGHT/COLORBLIND/NO_RED)
+- [x] **DialogueEngine**: diálogos contextuais + eventos únicos para todos os NPCs
+- [x] **Tiles LORE**: 18 fragmentos históricos (3/bioma) nos dungeons
+- [x] **Navegação ESC corrigida**: COMBAT_SKILLS→COMBAT, TRADE_SELL→Halthor, INVENTORY/SKILLS de exploração→exploração
 
 ---
 
 ## 9. Roadmap — O que FALTA
 
 ### v1.0.1 — Polimento Pós-Lançamento ✅
-- [x] Balanceamento fino da curva de dificuldade andares 10–100
-- [x] Mais variação de puzzles (novos padrões de sequência)
-- [x] Tela de Game Over com Renome registrado
-
 ### v1.1.0 — Conteúdo Expandido ✅
-- [x] Boss Rush mode ✅
-- [x] Maestria de Crafting ✅
-- [x] Biomas adicionais (Euler e Lovelace) ✅
+### v1.2.0 — A Voz do Exílio ✅ (Sprint 5 — concluído 2026-03-19)
 
-### v1.2.0+ — Pós-Lançamento (Multiplayer)
-- [ ] **Nexus Online**: Hub compartilhado via Socket.io
-- [ ] **Mercado Global**: Trade entre jogadores
-- [ ] **Espectros Assíncronos**: Ver mortes de outros jogadores no mapa
-- [ ] Biomas 7-8 (além dos 6 core)
-- [ ] Boss Rush expandido (ondas extras, modificadores)
-- [ ] Itens de Lore & Crônicas (história do Exílio)
+### v1.4.0 — Legado dos Arquitetos II (Sprint 7 — próximo recomendado)
+- [ ] Passivas de Atributo (`src/core/PassiveTree.js`) — 12 passivas, 4 arquétipos
+- [ ] Encantamentos de Itens — novo serviço da Marie Curie (100 Orbes)
+- [ ] Combos de Skills — sequências que ativam efeito bônus no log de combate
+- [ ] Proficiências ESCUDO/REFLEXO/ABSORÇÃO funcionais em `calculateDamage()`
+
+### v1.3.0 — O Arquiteto das Fendas (Sprint 6)
+- [ ] Salas especiais por bioma (BIBLIOTECA, ALTAR, CÂMARA_DO_BOSS)
+- [ ] Armadilhas e hazards ambientais (tile TRAP)
+- [ ] Salas de descanso com menu curto/longo
+- [ ] Fog of War visual melhorado (tiles visitados em cinza)
+
+### v1.5.0 — A Mente das Máquinas (Sprint 8)
+- [ ] AI Profiles por bioma (Newton=Físico, Turing=Lógico, etc.)
+- [ ] Comportamentos táticos (fuga, coordenação em grupo)
+- [ ] Bosses com fala ao mudar de fase (`BossDialogue.js`)
+
+### v1.6.0 — Refatoração Arquitetural (Sprint 9 — prerequisito para v2.0)
+- [ ] Split de `src/index.js` → GameRenderer, InputHandler, GameState, GameLoop
+- [ ] EventBus (`src/core/EventBus.js`)
+- [ ] Config centralizado (`src/config.js`)
+- [ ] Versionamento de saves com `migrateSave()`
+- [ ] 100+ testes
+
+### v2.0.0 — Nexus Online (Sprint 10)
+- [ ] Servidor Express + Socket.io
+- [ ] Ghosts assíncronos nas fendas
+- [ ] Mercado Global de Orbes
+- [ ] Leaderboard online
 
 ---
 

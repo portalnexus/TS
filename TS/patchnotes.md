@@ -2,6 +2,39 @@
 
 ---
 
+## [v1.2.0] - A Voz do Exílio
+*Narrativa, profundidade de NPCs e bestiário expandido.*
+
+### 💬 Sistema de Diálogo Contextual (DialogueEngine)
+- NPCs agora reagem ao estado real do jogador: HP baixo, nível alto, itens raros no inventário, bioma visitado.
+- **Halthor:** comenta itens LENDÁRIOS, HP crítico, nível 10+, muitos Orbes.
+- **Ada:** reage ao número de skills aprendidas e INT alta.
+- **Darwin:** menciona o bioma mais recente e o total de abates no bestiário.
+- **Marie Curie:** reage a itens RARO/LENDÁRIO no inventário e nível de Maestria.
+- Eventos únicos (exibidos uma vez): `firstBossKill`, `level10`, `loreDisco`.
+
+### 📜 Fragmentos Históricos nas Fendas
+- Novo tile `?` (LORE) aparece nos dungeons com fragmentos históricos dos cientistas.
+- **18 fragmentos** no total (3 por bioma): Newton, Hawking, Turing, Noether, Euler, Lovelace.
+- Descobrir um fragmento dispara o evento `loreDisco` para diálogos especiais dos NPCs.
+
+### 📚 Bestiário Expandido
+- Cada entrada agora inclui: **descrição**, **fraquezas**, **drops**, **andar do primeiro encontro**, **raridade** (COMUM/INCOMUM/RARO).
+- Tela do bestiário exibe ficha completa ao selecionar a criatura.
+- Renome revisado: **+10** por criatura única catalogada, **+50** por boss, **+2** por abate.
+- Saves antigos migrados automaticamente para o novo formato.
+
+### 🗒️ Missão LORE + Quadro de 4 Missões
+- Novo tipo de missão: **LORE** — descubra fragmentos históricos nas Fendas.
+- Recompensa especial: **Tomo Histórico do Exílio** (item LENDÁRIO).
+- Quadro agora exibe **4 missões simultâneas** (era 3).
+
+### 🔙 Navegação por Menus Corrigida
+- ESC/V agora respeita o contexto: COMBAT_SKILLS → volta ao combate, TRADE_SELL → volta ao Halthor, INVENTORY/SKILLS abertas da exploração → volta à exploração.
+- Seleção de `[ESC] Voltar` na lista de skills de combate também retorna ao menu de ação.
+
+---
+
 ## [v1.1.0] - Conteúdo Expandido
 *Novos biomas, Boss Rush, Maestria de Crafting, Sistema de Temas e ajustes visuais.*
 

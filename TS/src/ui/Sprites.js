@@ -500,6 +500,55 @@ const Sprites = {
     };
   },
 
+  npcPortraits: {
+    'Halthor': [
+      '  o===[]===o  ',
+      '  (  o_o  )  ',
+      '   \\ \\|/ /   ',
+      '    \\   /    ',
+      '  [HALTHOR]  ',
+      ' Ferreiro do  ',
+      '   Exílio    '
+    ],
+    'Ada': [
+      '   .------.  ',
+      '  ( ^   ^ ) ',
+      '   \\ \\_/ /   ',
+      '   /|ADA|\\   ',
+      '  Ada Lovelace',
+      ' Algoritmos  ',
+      '  e Ciência  '
+    ],
+    'Darwin': [
+      '  .--------. ',
+      ' ( ~  ~  ~ )',
+      '  \\ (___) /  ',
+      '  (DARWIN)   ',
+      ' Charles Darwin',
+      ' Evolução do ',
+      '   Exilado   '
+    ],
+    'Marie Curie': [
+      '  .--------.  ',
+      ' ( *  .  * )  ',
+      '  \\ (_^_) /  ',
+      '   [MARIE]   ',
+      ' Marie Curie  ',
+      ' Transmutação ',
+      '  Radiativa   '
+    ]
+  },
+
+  getNpcPortrait(npcId) {
+    return this.npcPortraits[npcId] || [
+      '  .-------.  ',
+      ' (  o   o ) ',
+      '  \\  ---  /  ',
+      '   -------   ',
+      '     NPC     '
+    ];
+  },
+
   getEnemySprite(name) {
     // Correspondência exata
     if (this.enemies[name]) return this.enemies[name];

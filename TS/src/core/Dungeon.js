@@ -202,9 +202,11 @@ class Dungeon {
     }
 
     const t = pool[Math.floor(Math.random() * pool.length)];
-    // Curva logarítmica: andar 10=~97HP, 25=~225HP, 50=~457HP, 100=~957HP
-    const difficultyMult = 1 + Math.log(1 + Math.max(1, this.floor)) * 0.35;
-    const hpScale = Math.floor(this.floor * 3.5);
+    // Curva original: 1 + Math.log(1 + Math.max(1, this.floor)) * 0.35
+    // Nova: para andares 1-3 usa um multiplicador mais suave (0.15 em vez de 0.35)
+    const logFactor = this.floor <= 3 ? 0.15 : 0.35;
+    const difficultyMult = 1 + Math.log(1 + Math.max(1, this.floor)) * logFactor;
+    const hpScale = this.floor <= 3 ? Math.floor(this.floor * 1.5) : Math.floor(this.floor * 3.5);
     return [new Entity(t.name, {
       hp: Math.floor((t.hp + hpScale) * difficultyMult),
       sp: Math.floor((t.sp + hpScale * 0.5) * difficultyMult),

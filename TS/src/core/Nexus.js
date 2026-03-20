@@ -69,7 +69,7 @@ class Nexus {
           switch(char) {
             case '#': map += chalk.bgWhite('  '); break;
             case '~': map += chalk.bgBlue('  '); break;
-            case 'T': map += T.success('Y '); break;
+            case 'T': map += chalk.green('♦ '); break;
             case '.': map += T.neutral('· '); break;
             default: map += char + ' ';
           }

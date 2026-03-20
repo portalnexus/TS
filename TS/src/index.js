@@ -29,6 +29,13 @@ const logBox = blessed.log({ top: '68%', left: '20%', width: '80%', height: '30%
 const actionMenu = blessed.list({ top: '68%', left: 0, width: '20%', height: '30%', label: ' [ AÇÕES ] ', border: { type: 'line', fg: T.borderAction }, keys: true, vi: true, style: { selected: { bg: T.selectedBg, bold: true } } });
 const interactBox = blessed.box({ top: 'center', left: 'center', width: '50%', height: 9, label: ' [ INTERAÇÃO ] ', border: { type: 'line', fg: T.borderInteract }, hidden: true, tags: true });
 const inputField = blessed.textbox({ parent: interactBox, top: 5, left: 2, width: '90%', height: 1, inputOnFocus: true, style: { bg: 'blue' } });
+const storyBox = blessed.box({
+  top: '8%', left: '20%', width: '60%', height: '80%',
+  label: ' [ NARRATIVA ] ',
+  border: { type: 'line', fg: 'yellow' },
+  hidden: true, tags: true, scrollable: true, alwaysScroll: true,
+  padding: { left: 1, right: 1, top: 0, bottom: 0 }
+});
 const inventoryBox = blessed.list({ top: 5, left: '20%', width: '60%', height: '65%', label: ' [ LISTA ] ', border: { type: 'line', fg: T.borderInventory }, keys: true, vi: true, style: { selected: { bg: T.inventorySelectedBg, bold: true } }, hidden: true });
 const itemDetailBox = blessed.box({ top: '68%', left: '20%', width: '80%', height: '30%', label: ' [ ANALISE DE DADOS ] ', border: { type: 'line', fg: T.borderLog }, tags: true, hidden: true });
 const equipVisualBox = blessed.box({ top: 5, left: '80%', width: '20%', height: '65%', label: ' [ EQUIPAMENTO ] ', border: { type: 'line', fg: T.borderEquip }, tags: true, scrollable: true });
@@ -53,6 +60,9 @@ let dialogueEngine = new DialogueEngine();
 let lastBiomeKey = null; // Último bioma visitado (para contexto de Darwin)
 let gameState = 'MENU';
 let prevState = null; // Estado anterior — usado pelo botão Voltar para navegação correta
+let storyCallback = null;          // Callback após fechar story
+const visitedBiomes = new Set();   // Biomas já visitados (para narrativa de entrada)
+const metNpcs = new Set();         // NPCs já conhecidos (para diálogo de 1ª vez)
 let creationData = {};
 let bossRushWave = 0;
 let bossRushScore = 0;
@@ -71,6 +81,71 @@ function saveGame() { if (player && SaveSystem.save(player.serialize())) log(T.s
 function loadGame() {
   const data = SaveSystem.load();
   if (data) { player = Entity.fromSave(data); log(T.player('✨ Reencarnação concluída.')); updateStatus(); showNexus(); }
+}
+
+// --- STORY OVERLAY ---
+function showStory(title, content, callback) {
+  storyCallback = callback || null;
+  gameState = 'STORY';
+  storyBox.setLabel(` [ ${title} ] `);
+  storyBox.setContent(content);
+  mapBox.hide(); combatVisualBox.hide(); inventoryBox.hide();
+  storyBox.show();
+  actionMenu.setLabel(' [ NARRATIVA ] ');
+  actionMenu.setItems([' [Enter/1] Continuar', ' [ESC] Pular']);
+  actionMenu.focus();
+  screen.render();
+}
+
+function closeStory() {
+  storyBox.hide();
+  mapBox.show(); logBox.show();
+  const cb = storyCallback;
+  storyCallback = null;
+  if (cb) cb();
+  else showNexus();
+}
+
+function showNpcStory(npcId, player, onContinue) {
+  const portrait = Sprites.getNpcPortrait(npcId);
+  const context = npcId === 'Darwin' ? { biome: lastBiomeKey } : {};
+  const dialogue = dialogueEngine.getDialogue(npcId, player, context);
+
+  const portraitStr = portrait.map(l => T.warning('  ' + l)).join('\n');
+  const divider = T.neutral('\n  ' + '─'.repeat(34) + '\n');
+
+  const content =
+    '\n' + portraitStr + '\n' +
+    divider +
+    '\n' + T.bright('  ' + dialogue) +
+    '\n\n' + T.neutral('  [1/Enter] Continuar  [ESC] Pular');
+
+  showStory(npcId, content, onContinue);
+}
+
+const BIOME_INTROS = {
+  newton:   'Você entra no Prisma de Newton.\n\n  Aqui, a luz é fragmentada em armas espectrais e a gravidade é uma prisão. As criaturas se alimentam de fótons e massa pura.\n\n  "Eu fui corrompido pela minha própria descoberta," sussurra uma voz. "Mas a física não mente."\n\n  Prepare-se para enfrentar os Guardiões da Luz.',
+  hawking:  'Você entra na Singularidade de Hawking.\n\n  Onde o tempo se curva e o espaço colapsa em si mesmo. A radiação de Hawking ganhou consciência — e quer te consumir.\n\n  O horizonte de eventos está em todo lugar. Não há escape pela força bruta.\n\n  Prepare-se para enfrentar os Guardiões do Vácuo.',
+  turing:   'Você entra no Motor de Turing.\n\n  Uma máquina infinita de cálculo que nunca para. Os autômatos aqui foram programados para uma única função: destruir.\n\n  "O problema da parada não tem solução," ecoa no corredor. "Nem para você."\n\n  Prepare-se para enfrentar os Guardiões do Código.',
+  noether:  'Você entra no Vazio de Noether.\n\n  A simetria é lei aqui. Tudo que você faz é espelhado. Tudo que você destrói, se reconstrói.\n\n  "A conservação é absoluta," a Guardiã sussurra. "Sua energia pertence ao Vazio."\n\n  Prepare-se para enfrentar os Guardiões da Simetria.',
+  euler:    'Você entra na Espiral de Euler.\n\n  Onde os números ganham forma. As criaturas crescem em padrões de Fibonacci, suas forças multiplicando a cada ciclo.\n\n  "e elevado a iπ mais 1 igual a zero," ressoa no ar. "A equação mais bela — e a mais letal."\n\n  Prepare-se para enfrentar os Guardiões da Identidade.',
+  lovelace: 'Você entra no Labirinto de Lovelace.\n\n  Um algoritmo sem fim. Loops recursivos, exceções não tratadas, ponteiros para o nada.\n\n  "O primeiro programa foi meu," a Tecelã murmura. "Este labirinto também é. Você nunca vai depurá-lo."\n\n  Prepare-se para enfrentar os Guardiões da Lógica.'
+};
+
+function showBiomeIntro(biome) {
+  const text = BIOME_INTROS[biome.key] || `Você entra em ${biome.name}.`;
+  const content = '\n' + T.warning.bold('  ══ ' + biome.name.toUpperCase() + ' ══') +
+    '\n\n' + T.neutral(text.split('\n').map(l => '  ' + l).join('\n')) +
+    '\n\n' + T.neutral('  [1/Enter] Adentrar a Fenda  [ESC] Continuar');
+  showStory(biome.name, content, () => {
+    gameState = 'EXPLORING';
+    mapBox.show(); mapBox.setLabel(chalk[biome.color](` [ ${biome.name} ] `));
+    mapBox.setContent(currentDungeon ? '' : '');
+    actionMenu.setLabel(' [ EXPLORAÇÃO ] ');
+    actionMenu.setItems([' [1] Norte', ' [2] Sul', ' [3] Oeste', ' [4] Leste', ' [5] Inv', ' [6] Skills', ' [ESC] Fugir']);
+    actionMenu.focus();
+    if (currentDungeon) renderMap();
+  });
 }
 
 // --- RENDERIZAÇÃO ---
@@ -156,7 +231,22 @@ function updateLegend() {
     const enemy = currentCombat.enemies[0];
     content += `${T.danger.bold('ALVO:')}\n${enemy.name}\nLvl: ${enemy.level}\nEstabilidade: ${enemy.posture}\n`;
     if (enemy.isStaggered) content += T.criticalBg(' COLAPSO ') + '\n';
-  } else if (gameState === 'NEXUS') { content += T.info.bold('NPCs NO HUB:\n') + 'Ada: Skills\nMarie Curie: Alquimia\nDarwin: Evolucao\nHalthor: Ferreiro'; }
+  } else if (gameState === 'NEXUS') {
+    content += T.info.bold('NEXUS — CONTROLES:\n');
+    content += T.neutral('WASD') + ' mover\n';
+    content += T.neutral('[7]') + ' Inventário\n';
+    content += T.neutral('[8]') + ' Bestiário\n';
+    content += T.neutral('[9]') + ' Skills\n';
+    content += T.neutral('[0]') + ' Temas\n';
+    content += '\n' + T.info.bold('NPCs:\n');
+    content += T.warning('H') + ' Halthor (loja)\n';
+    content += T.info('A') + ' Ada (skills)\n';
+    content += T.success('D') + ' Darwin (atrib.)\n';
+    content += T.magic('M') + ' Marie (craft)\n';
+    content += T.danger('Ω') + ' Fenda (dungeon)\n';
+    content += T.danger('β') + ' Arena (rush)\n';
+    content += '\n' + T.neutral('♦') + ' deco\n';
+  }
   legendBox.setContent(content);
 }
 
@@ -248,6 +338,7 @@ function showPassives() {
 }
 
 function showBestiary() {
+  prevState = gameState; // add this
   gameState = 'BESTIARY'; mapBox.hide(); logBox.hide(); inventoryBox.show(); itemDetailBox.show();
   const known = Object.keys(player.bestiary);
   const items = known.length > 0 ? known.map(name => {
@@ -407,6 +498,13 @@ function startDungeon(floor = 1) {
   actionMenu.setLabel(' [ EXPLORACAO ] '); actionMenu.setItems([' [1] Norte', ' [2] Sul', ' [3] Oeste', ' [4] Leste', ' [5] Inv', ' [6] Skills', ' [ESC] Fugir']);
   log(T.success(`Fenda ${floor} aberta.`));
 
+  // Narrativa de entrada no bioma (primeira visita)
+  if (!visitedBiomes.has(currentDungeon.biome.key)) {
+    visitedBiomes.add(currentDungeon.biome.key);
+    showBiomeIntro(currentDungeon.biome);
+    return; // showBiomeIntro handles the state transition
+  }
+
   // Auto-progresso de missão FLOOR
   if (player && player.activeQuest && player.activeQuest.type === 'FLOOR' && !player.activeQuest.completed) {
     player.activeQuest.progress = floor;
@@ -434,18 +532,24 @@ function handleMove(dx, dy) {
     if (interaction) {
       const npcNames = ['Halthor', 'Ada', 'Darwin', 'Marie Curie'];
       if (player && npcNames.includes(interaction.name)) {
-        const context = interaction.name === 'Darwin' ? { biome: lastBiomeKey } : {};
-        const dialogue = dialogueEngine.getDialogue(interaction.name, player, context);
-        log(T.player(dialogue));
+        // For NPCs with story: show story panel before menu
+        const npcMenuMap = {
+          'Ada':         showAda,
+          'Marie Curie': showMarie,
+          'Darwin':      showDarwin,
+          'Halthor':     showBlacksmith
+        };
+        const onContinue = npcMenuMap[interaction.name];
+        if (onContinue) {
+          showNpcStory(interaction.name, player, onContinue);
+        }
+      } else if (interaction.name === 'Fenda') {
+        startDungeon();
+      } else if (interaction.name === 'Arena') {
+        showBossRush();
       } else {
         log(T.player(interaction.dialogue));
       }
-      if (interaction.name === 'Ada') showAda();
-      else if (interaction.name === 'Marie Curie') showMarie();
-      else if (interaction.name === 'Darwin') showDarwin();
-      else if (interaction.name === 'Halthor') showBlacksmith();
-      else if (interaction.name === 'Fenda') startDungeon();
-      else if (interaction.name === 'Arena') showBossRush();
     }
     screen.render();
   }
@@ -480,27 +584,37 @@ function handleTileInteraction(t) {
 function handleLoreTile(t) {
   if (!t.data) { t.type = 'FLOOR'; return; }
   const loreText = t.data.text;
-
-  // Exibe o fragmento histórico no log
-  log(T.magic('═══ FRAGMENTO HISTÓRICO ═══'));
-  log(T.info(loreText));
-  log(T.magic('══════════════════════════'));
-
-  t.type = 'FLOOR'; // Tile consumido — não ativa mais
+  t.type = 'FLOOR';
 
   // Auto-progresso de missão LORE
+  let questMsg = '';
   if (player.activeQuest && player.activeQuest.type === 'LORE' && !player.activeQuest.completed) {
     player.activeQuest.progress++;
     if (player.activeQuest.progress >= player.activeQuest.target) {
       player.activeQuest.completed = true;
-      log(T.success.bold('>>> MISSÃO LORE CONCLUÍDA! Retorne ao Quadro de Missões. <<<'));
+      questMsg = '\n\n' + T.success.bold('  ► MISSÃO LORE CONCLUÍDA! Retorne ao Nexus.');
     } else {
-      log(T.warning(`Missão: ${player.activeQuest.progress}/${player.activeQuest.target} fragmentos descobertos.`));
+      questMsg = '\n\n' + T.warning(`  ► Fragmentos: ${player.activeQuest.progress}/${player.activeQuest.target}`);
     }
   }
 
-  // Dispara evento de diálogo especial (loreDisco) para os NPCs
+  // Dispara evento de diálogo especial
   if (player) dialogueEngine.triggerEvent('loreDisco', player);
+
+  const content =
+    '\n' + T.magic.bold('  ══ FRAGMENTO HISTÓRICO ══\n\n') +
+    T.bright('  "' + loreText + '"\n') +
+    questMsg +
+    '\n\n' + T.neutral('  [1/Enter] Continuar exploração');
+
+  showStory('FRAGMENTO HISTÓRICO', content, () => {
+    gameState = 'EXPLORING';
+    mapBox.show();
+    actionMenu.setLabel(' [ EXPLORAÇÃO ] ');
+    actionMenu.setItems([' [1] Norte', ' [2] Sul', ' [3] Oeste', ' [4] Leste', ' [5] Inv', ' [6] Skills', ' [ESC] Fugir']);
+    actionMenu.focus();
+    renderMap();
+  });
 }
 
 function startCombat(e) { gameState = 'COMBAT'; currentCombat = new Combat(player, e); mapBox.hide(); combatVisualBox.show(); renderCombat(); actionMenu.setItems([' [1] ATACAR', ' [2] SKILLS', ' [3] RECUPERAR', ' [4] POSTURA', ' [ESC] Fugir']); actionMenu.focus(); }
@@ -714,7 +828,27 @@ function startPuzzle(t) {
 
 function startCreation() {
   creationData = {};
-  gameState = 'CREATION_NAME'; interactBox.setLabel(' [ NOME ] '); interactBox.show(); inputField.focus(); inputField.setValue(''); screen.render();
+  // Intro story before character creation
+  const introText =
+    T.warning.bold('  ══ O EXÍLIO DOS ARQUITETOS ══\n\n') +
+    T.neutral('  Há cem anos, os maiores cientistas da história\n') +
+    T.neutral('  abriram as Fendas — portais para o conhecimento\n') +
+    T.neutral('  puro. O que encontraram os destruiu.\n\n') +
+    T.bright('  As Fendas são instáveis. Criaturas nascidas da\n') +
+    T.bright('  matemática corrompida surgem delas, drenando\n') +
+    T.bright('  energia e matéria de tudo ao redor.\n\n') +
+    T.player('  Você é um Exilado. Enviado para sobreviver\n') +
+    T.player('  onde os maiores gênios falharam.\n\n') +
+    T.info('  No Nexus — a vila dos refugiados — os\n') +
+    T.info('  descendentes dos Arquitetos esperam.\n') +
+    T.info('  Ada ensina algoritmos. Darwin fortalece.\n') +
+    T.info('  Halthor forja armas. Marie transmuta.\n\n') +
+    T.danger.bold('  Vá. As Fendas não esperarão.\n\n') +
+    T.neutral('  [1/Enter] Criar Personagem  [ESC] Menu');
+
+  showStory('O EXÍLIO DOS ARQUITETOS', introText, () => {
+    gameState = 'CREATION_NAME'; interactBox.setLabel(' [ NOME ] '); interactBox.show(); inputField.focus(); inputField.setValue(''); screen.render();
+  });
   inputField.once('submit', (n) => {
     if (!n || n.trim() === '') n = 'Exilado';
     creationData.name = n;
@@ -790,6 +924,9 @@ screen.key(['escape', 'v'], () => {
     screen.render(); return;
   }
 
+  // --- Story overlay: fechar e continuar ---
+  if (gameState === 'STORY') { closeStory(); return; }
+
   // --- Criação de personagem: sai do jogo ---
   if (gameState === 'CREATION_NAME') { process.exit(0); return; }
 
@@ -819,13 +956,21 @@ screen.key(['escape', 'v'], () => {
     showBlacksmith(); return;
   }
 
-  // --- Inventário/Skills abertas a partir da exploração: volta à exploração ---
-  if ((gameState === 'INVENTORY' || gameState === 'SKILL_TREE') && prevState === 'EXPLORING') {
+  // --- Inventário/Skills abertas da exploração: volta à exploração ---
+  if ((gameState === 'INVENTORY' || gameState === 'SKILL_TREE' || gameState === 'BESTIARY') && prevState === 'EXPLORING') {
     inventoryBox.hide(); itemDetailBox.hide(); mapBox.show(); logBox.show();
     gameState = 'EXPLORING';
     actionMenu.setLabel(' [ EXPLORAÇÃO ] ');
     actionMenu.setItems([' [1] Norte', ' [2] Sul', ' [3] Oeste', ' [4] Leste', ' [5] Inv', ' [6] Skills', ' [ESC] Fugir']);
     actionMenu.focus(); renderMap(); return;
+  }
+
+  // --- Inventário/Skills/Bestiário abertas de submenus de NPCs: volta ao NPC ---
+  const npcReturnMap = { 'ADA': showAda, 'DARWIN': showDarwin, 'MARIE': showMarie, 'TRADE_BUY': showBlacksmith };
+  if (['SKILL_TREE', 'INVENTORY', 'BESTIARY'].includes(gameState) && prevState && npcReturnMap[prevState]) {
+    inventoryBox.hide(); itemDetailBox.hide(); mapBox.show(); logBox.show();
+    npcReturnMap[prevState]();
+    return;
   }
 
   // --- Marie: sai do inventário de crafting e volta ao menu Marie ---
@@ -881,6 +1026,7 @@ function showSettings() {
 
 actionMenu.on('select', (item, index) => {
   const c = item.getText().trim();
+  if (gameState === 'STORY') { closeStory(); return; }
   if (gameState === 'MENU') { if (c.includes('Novo Jogo')) startCreation(); if (c.includes('Carregar')) loadGame(); if (c.includes('Sair')) process.exit(0); }
   else if (gameState === 'SETTINGS') {
     if (c.includes('[DARK]'))       { setTheme('DARK');       applyTheme(); showSettings(); }
@@ -947,5 +1093,5 @@ actionMenu.on('select', (item, index) => {
 screen.on('resize', () => screen.render());
 screen.append(titleBox); screen.append(statusBox); screen.append(synergyBox); screen.append(legendBox); screen.append(mapBox);
 screen.append(combatVisualBox); screen.append(inventoryBox); screen.append(itemDetailBox);
-screen.append(equipVisualBox); screen.append(logBox); screen.append(actionMenu); screen.append(interactBox);
+screen.append(equipVisualBox); screen.append(logBox); screen.append(actionMenu); screen.append(storyBox); screen.append(interactBox);
 const initialMenu = [' [1] Novo Jogo', ' [2] Carregar Jogo', ' [3] Sair']; actionMenu.setItems(initialMenu); actionMenu.focus(); updateStatus();

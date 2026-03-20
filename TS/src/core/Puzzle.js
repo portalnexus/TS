@@ -7,8 +7,15 @@ class Puzzle {
     this.difficulty = Math.min(10, Math.floor(floor / 2) + 1);
     
     // Pick random type for variety if not specifically requested
-    const types = ['MATH', 'EQUATION', 'RIDDLE', 'SEQUENCE', 'BINARY', 'LOGIC_TABLE', 'FORMULA', 'PRIME_CHECK', 'MODULO'];
-    this.type = type || types[Math.floor(Math.random() * types.length)];
+    let typePool;
+    if (this.difficulty <= 1) {
+      typePool = ['MATH', 'RIDDLE', 'EQUATION'];
+    } else if (this.difficulty <= 3) {
+      typePool = ['MATH', 'RIDDLE', 'EQUATION', 'SEQUENCE'];
+    } else {
+      typePool = ['MATH', 'EQUATION', 'RIDDLE', 'SEQUENCE', 'BINARY', 'LOGIC_TABLE', 'FORMULA', 'PRIME_CHECK', 'MODULO'];
+    }
+    this.type = type || typePool[Math.floor(Math.random() * typePool.length)];
     
     this.isSolved = false;
     this.question = '';
